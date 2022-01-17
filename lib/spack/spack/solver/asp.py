@@ -664,7 +664,7 @@ class PyclingoDriver(object):
 class SpackSolverSetup(object):
     """Class to set up and run a Spack concretization solve."""
 
-    def __init__(self, reuse=False, tests=False):
+    def __init__(self, reuse=None, minimal=None, tests=False):
         self.gen = None  # set by setup()
 
         self.declared_versions = {}
@@ -689,10 +689,11 @@ class SpackSolverSetup(object):
         # Caches to optimize the setup phase of the solver
         self.target_specs_cache = None
 
-        # whether to add installed/binary hashes to the solve
-        self.reuse = reuse
-
-        # whether to add installed/binary hashes to the solve
+        # Solver paramters that affect setup -- see Solver documentation
+        self.reuse = spack.config.get(
+            "concretizer:reuse", False) if reuse is None else reuse
+        self.minimal = spack.config.get(
+            "concretizer:minimal", False) if minimal is None else minimal
         self.tests = tests
 
     def pkg_version_rules(self, pkg):
@@ -829,7 +830,7 @@ class SpackSolverSetup(object):
                 pkg.name, cspec.name, cspec.version, -i * 100
             ))
 
-    def pkg_rules(self, pkg, tests):
+    def pkg_rules(self, pkg):
         pkg = packagize(pkg)
 
         # versions
@@ -1769,10 +1770,14 @@ class SpackSolverSetup(object):
         self.gen.h1("Concrete input spec definitions")
         self.define_concrete_input_specs(specs, possible)
 
+        self.gen.h1("Concretizer options")
+        if self.reuse:
+            self.gen.fact(fn.optimize_for_reuse())
+        if self.minimal:
+            self.gen.fact(fn.minimal_installs())
+
         if self.reuse:
             self.gen.h1("Installed packages")
-            self.gen.fact(fn.optimize_for_reuse())
-            self.gen.newline()
             self.define_installed_packages(specs, possible)
 
         self.gen.h1('General Constraints')
@@ -1793,7 +1798,7 @@ class SpackSolverSetup(object):
         self.gen.h1('Package Constraints')
         for pkg in sorted(pkgs):
             self.gen.h2('Package rules: %s' % pkg)
-            self.pkg_rules(pkg, tests=self.tests)
+            self.pkg_rules(pkg)
             self.gen.h2('Package preferences: %s' % pkg)
             self.preferred_variants(pkg)
             self.preferred_targets(pkg)
@@ -2123,6 +2128,10 @@ class Solver(object):
       ``reuse (bool)``
         Whether to try to reuse existing installs/binaries
 
+      ``minimal (bool)``
+        If ``True`` make minimizing nodes the top priority, even higher
+        than defaults from packages and preferences.
+
     """
     def __init__(self):
         self.driver = PyclingoDriver()
@@ -2130,6 +2139,7 @@ class Solver(object):
         # These properties are settable via spack configuration, and overridable
         # by setting them directly as properties.
         self.reuse = spack.config.get("concretizer:reuse", False)
+        self.minimal = spack.config.get("concretizer:minimal", False)
 
     def solve(
             self,
@@ -2160,7 +2170,7 @@ class Solver(object):
                     continue
                 spack.spec.Spec.ensure_valid_variants(s)
 
-        setup = SpackSolverSetup(reuse=self.reuse, tests=tests)
+        setup = SpackSolverSetup(reuse=self.reuse, minimal = self.minimal, tests=tests)
         return self.driver.solve(
             setup,
             specs,

@@ -15,6 +15,19 @@ concretizer:
   # as possible, rather than building. If `false`, we'll always give you a fresh
   # concretization.
   reuse: false
+
+  # If `true`, Spack will consider minimizing builds its *topmost* priority.
+  # Note that this can result in weird package configurations. In particular,
+  # Spack will disable variants and might downgrade versions to avoid building
+  # new packages for an install. By default, Spack respects defaults from
+  # packages and preferences *before* minimizing the number of builds.
+  #
+  # Example for intuition: `cmake` can optionally build without openssl, but
+  # it's enabled by default because many builds use that functionality. Using
+  # `minimal: true` will build `cmake~openssl` unless the user asks for
+  # `cmake+openssl` explicitly.
+  minimal: false
+
   # Options that tune which targets are considered for concretization. The
   # concretization process is very sensitive to the number targets, and the time
   # needed to reach a solution increases noticeably with the number of targets
