@@ -1801,6 +1801,11 @@ class Spec(object):
 
     def package_hash(self):
         """Compute the hash of the contents of the package for this node"""
+        # Can't call package_hash on old concrete specs b/c we do not know what the
+        # package looked like at concretization time (and it may no longer exist).
+        assert (not self._concrete or self._package_hash), \
+            "Cannot call package_hash() on concrete specs with the old dag_hash()"
+
         return self._cached_hash(ht.package_hash)
 
     def dag_hash(self, length=None):
@@ -1923,8 +1928,13 @@ class Spec(object):
             if hasattr(variant, '_patches_in_order_of_appearance'):
                 d['patches'] = variant._patches_in_order_of_appearance
 
-        if self._concrete and hash.package_hash:
-            package_hash = self.package_hash()
+        if self._concrete and hash.package_hash and self._package_hash:
+            # We use the attribute here instead of `self.package_hash()` because this
+            # should *always* be assignhed at concretization time. We don't want to try
+            # to compute a package hash for concrete spec where a) the package might not
+            # exist, or b) the `dag_hash` didn't include the package hash when the spec
+            # was concretized.
+            package_hash = self._package_hash
 
             # Full hashes are in bytes
             if (not isinstance(package_hash, six.text_type)
@@ -2694,8 +2704,15 @@ class Spec(object):
             # TODO: or turn external_path into a lazy property
             Spec.ensure_external_path_if_external(s)
 
-        # Mark everything in the spec as concrete, as well.
+        # See docs for in _assign_hash for why package_hash needs to happen here.
+        self._assign_hash(ht.package_hash)
+
+        # Mark everything in the spec as concrete
         self._mark_concrete()
+
+        # Assign dag_hash (this *could* be done lazily, but it's assigned anyway in
+        # ensure_no_deprecated, and it's clearer to see explicitly where it happens)
+        self._assign_hash(ht.dag_hash)
 
         # If any spec in the DAG is deprecated, throw an error
         Spec.ensure_no_deprecated(self)
@@ -2859,7 +2876,6 @@ class Spec(object):
 
         concretized = answer[name]
         self._dup(concretized)
-        self._mark_concrete()
 
     def concretize(self, tests=False):
         """Concretize the current spec.
@@ -2895,6 +2911,44 @@ class Spec(object):
             elif not value:
                 s.clear_cached_hashes()
             s._mark_root_concrete(value)
+
+    def _assign_hash(self, hash):
+        """Compute and cache the provided hash type for this spec and its dependencies.
+
+        Arguments:
+            hash (spack.hash_types.SpecHashDescriptor): the hash to assign to nodes
+                in the spec.
+
+        There are special semantics to consider for `package_hash`.
+
+        This should be called:
+          1. for `package_hash`, immediately after concretization, but *before* marking
+             concrete, and
+          2. for `dag_hash`, immediately after marking concrete.
+
+        `package_hash` is tricky, because we can't call it on *already* concrete specs,
+        but we need to assign it *at concretization time* to just-concretized specs. So,
+        the concretizer must assign the package hash *before* marking their specs
+        concrete (so that the only concrete specs are the ones already marked concrete).
+
+        `dag_hash` is also tricky, since it cannot compute `package_hash()` lazily for
+        the same reason. `package_hash` needs to be assigned *at concretization time*,
+        so, `to_node_dict()` can't just assume that it can compute `package_hash` itself
+        -- it needs to either see or not see a `_package_hash` attribute.
+
+        Rules of thumb for `package_hash`:
+          1. Old-style concrete specs from *before* `dag_hash` included `package_hash`
+             will not have a `_package_hash` attribute at all.
+          2. New-style concrete specs will have a `_package_hash` assigned at
+             concretization time.
+          3. Abstract specs will not have a `_package_hash` attribute at all.
+
+        """
+        for spec in self.traverse():
+            # Already concrete specs either already have a package hash (new dag_hash())
+            # or they never will b/c we can't know it (old dag_hash()). Skip them.
+            if hash is ht.package_hash and not spec.concrete:
+                spec._cached_hash(hash)
 
     def concretized(self, tests=False):
         """This is a non-destructive version of concretize().

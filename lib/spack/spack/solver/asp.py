@@ -40,6 +40,7 @@ import spack.dependency
 import spack.directives
 import spack.environment as ev
 import spack.error
+import spack.hash_types as ht
 import spack.package
 import spack.package_prefs
 import spack.platforms
@@ -2107,8 +2108,17 @@ class SpecBuilder(object):
         for s in self._specs.values():
             _develop_specs_from_env(s, ev.active_environment())
 
-        for s in self._specs.values():
-            s._mark_concrete()
+        # mark concrete and assign hashes to all specs in the solve
+        for root in roots.values():
+            # See docs for in _assign_hash for why package_hash needs to happen here.
+            root._assign_hash(ht.package_hash)
+
+            # Mark everything in the spec as concrete
+            root._mark_concrete()
+
+            # Assign dag_hash (this *could* be done lazily, but it's assigned anyway in
+            # ensure_no_deprecated, and it's clearer to see explicitly where it happens)
+            root._assign_hash(ht.dag_hash)
 
         for s in self._specs.values():
             spack.spec.Spec.ensure_no_deprecated(s)
