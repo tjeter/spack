@@ -377,7 +377,7 @@ def print_cves(pkg):
         r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
     # by default includes V2 scores that don't apply to specified version
         for eachCVE in r:
-            if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5:
+            if eachCVE.score[0] == 'V3' and eachCVE.score[1]:
                 print(i, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
         # and eachCVE.score[2] == "CRITICAL":
         '''if eachCVE.score[0] == 'V3': #and len(eachCVE.id) == len(set(eachCVE.id)):
