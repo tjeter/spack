@@ -20,6 +20,9 @@ import spack.repo
 import spack.spec
 from spack.package_base import has_test_method, preferred_version
 
+import nvdlib
+api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
+
 description = 'get detailed information on a particular package'
 section = 'basic'
 level = 'short'
@@ -51,6 +54,7 @@ def setup_parser(subparser):
         ('--no-dependencies', 'do not ' + print_dependencies.__doc__),
         ('--no-variants', 'do not ' + print_variants.__doc__),
         ('--no-versions', 'do not ' + print_versions.__doc__),
+        ('--cves', print_cves.__doc__),
         ('--phases', print_phases.__doc__),
         ('--tags', print_tags.__doc__),
         ('--tests', print_tests.__doc__),
@@ -362,6 +366,25 @@ def print_versions(pkg):
                 line = version('    {0}'.format(pad(v))) + color.cescape(url)
                 color.cprint(line)
 
+def print_cves(pkg):
+    color.cprint('')
+    color.cprint(section_title('Known CVEs: '))
+    v = []
+    for i in pkg.versions:
+        v.append(i)
+
+    for i in pkg.cpe:
+        r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
+    # by default includes V2 scores that don't apply to specified version
+        for eachCVE in r:
+            if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5:
+                print(i, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
+        # and eachCVE.score[2] == "CRITICAL":
+        '''if eachCVE.score[0] == 'V3': #and len(eachCVE.id) == len(set(eachCVE.id)):
+            print(eachCVE.id, str(eachCVE.score[1]), eachCVE.url)
+        else:
+            pass
+    '''
 
 def print_virtuals(pkg):
     """output virtual packages"""
@@ -409,6 +432,7 @@ def info(parser, args):
         (args.all or args.detectable, print_detectable),
         (args.all or args.tags, print_tags),
         (args.all or not args.no_versions, print_versions),
+        (args.all or args.cves, print_cves),
         (args.all or not args.no_variants, print_variants),
         (args.all or args.phases, print_phases),
         (args.all or not args.no_dependencies, print_dependencies),
@@ -418,5 +442,5 @@ def info(parser, args):
     for print_it, func in sections:
         if print_it:
             func(pkg)
-
+    print_cves(pkg)
     color.cprint('')
