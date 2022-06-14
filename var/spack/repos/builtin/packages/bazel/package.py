@@ -20,6 +20,20 @@ class Bazel(Package):
 
     tags = ['build-tools']
 
+
+    version('5.2.0',  sha256='820a94dbb14071ed6d8c266cf0c080ecb265a5eea65307579489c4662c2d582a')
+    version('5.1.1',  sha256='7f5d3bc1d344692b2400f3765fd4b5c0b636eb4e7a8a7b17923095c7b56a4f78')
+    version('5.1.0',  sha256='4de301f509fc6d0cbc697b2017384ecdc94df8f36245bbcbedc7ea6780acc9f5')
+    version('5.0.0',  sha256='072dd62d237dbc11e0bac02e118d8c2db4d0ba3ba09f1a0eb1e2a460fb8419db')
+    version('4.2.2',  sha256='9981d0d53a356c4e87962847750a97c9e8054e460854748006c80f0d7e2b2d33')
+    version('4.2.1',  sha256='12ea7aa11e2bdb12de1dceb9939a22e96f5a480437cb17c123379d8e0fdf5e82')
+
+#    version('5.2.0',  sha256='af7be4c0056fa893b2cc04b6d53fc9dd6b17122822c4890aaf54c01aa9ff9bf7')
+#    version('5.1.1',  sha256='b8fc5ee8f48a0f7ff0a72f8457aaefb5807777162caf6967c5648f73ae320cf3')
+#    version('5.1.0',  sha256='10b9748cf67b8b6f7275be7d61e67e03c88efddc02b9ce4ed5f716dbf0fdcfe0')
+#    version('5.0.0',  sha256='720c42ca793d6ff3050121140c17e3511f7e8306b252ebfb4310b124dbdac10c')
+#    version('4.2.2',  sha256='097f8bb3bc9aa8ccbda8bac1a3db72764461662ba1f7e2db20249bfab8b22d79')
+#    version('4.2.1',  sha256='7218ae58d0225582d38cc2fbeb6d48f9532e6cff7f4288828e055dae4324ab5b')
     version('4.0.0',  sha256='d350f80e70654932db252db380d2ec0144a00e86f8d9f2b4c799ffdb48e9cdd1')
     version('3.7.2',  sha256='de255bb42163a915312df9f4b86e5b874b46d9e8d4b72604b5123c3a845ed9b1')
     version('3.7.1',  sha256='c9244e5905df6b0190113e26082c72d58b56b1b0dec66d076f083ce4089b0307')
@@ -109,6 +123,14 @@ class Bazel(Package):
     version('0.2.0',  sha256='54669662f7751d9fc9959207e13d9a171bda15be9087703d3dbd3968fed12b27')
     version('0.1.4',  sha256='f3c395f5cd78cfef96f4008fe842f327bc8b03b77f46999387bc0ad223b5d970')
     version('0.1.1',  sha256='c6ae19610b936a0aa940b44a3626d6e660fc457a8187d295cdf0b21169453d20')
+
+    cpe = {
+            '0.4.1':'cpe:2.3:a:google:bazel:0.4.1:*:*:*:*:visual_studio:*:*',
+            '-':'cpe:2.3:a:google:bazel:-:*:*:*:*:visual_studio:*:*',
+            '0.2.0':'cpe:2.3:a:google:bazel:0.2.0:*:*:*:*:visual_studio:*:*',
+            '0.3.0':'cpe:2.3:a:google:bazel:0.3.0:*:*:*:*:visual_studio:*:*',
+            '0.4.0':'cpe:2.3:a:google:bazel:0.4.0:*:*:*:*:visual_studio:*:*'
+          }
 
     variant('nodepfail', default=True, description='Disable failing dependency checks due to injected absolute paths - required for most builds using bazel with spack')
 

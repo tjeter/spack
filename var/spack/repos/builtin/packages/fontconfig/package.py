@@ -18,6 +18,15 @@ class Fontconfig(AutotoolsPackage):
     version('2.12.1', sha256='a9f42d03949f948a3a4f762287dbc16e53a927c91a07ee64207ebd90a9e5e292')
     version('2.11.1', sha256='b6b066c7dce3f436fdc0dfbae9d36122b38094f4f53bd8dffd45e195b0540d8d')
 
+    cpe = {
+            '2.11.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.11.1:*:*:*:*:*:*:*',
+            '2.12.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.12.1:*:*:*:*:*:*:*',
+            '2.12.3':'cpe:2.3:a:fontconfig_project:fontconfig:2.12.3:*:*:*:*:*:*:*',
+            '2.13.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.1:*:*:*:*:*:*:*',
+            '2.13.93':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.93:*:*:*:*:*:*:*',
+            '2.13.94':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.94:*:*:*:*:*:*:*'
+          }
+
     depends_on('freetype')
     depends_on('gperf', type='build', when='@2.12.2:')
     depends_on('libxml2')

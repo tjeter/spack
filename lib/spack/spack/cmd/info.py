@@ -16,9 +16,16 @@ from llnl.util.tty.colify import colify
 
 import spack.cmd.common.arguments as arguments
 import spack.fetch_strategy as fs
+import spack.paths
 import spack.repo
 import spack.spec
 from spack.package_base import has_test_method, preferred_version
+import os
+from os.path import exists
+import json
+
+import nvdlib
+api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
 
 description = 'get detailed information on a particular package'
 section = 'basic'
@@ -362,6 +369,42 @@ def print_versions(pkg):
                 line = version('    {0}'.format(pad(v))) + color.cescape(url)
                 color.cprint(line)
 
+def print_cves(pkg):
+    color.cprint('')
+    color.cprint(section_title('Known CVEs: '))
+    
+    repo = spack.repo.path
+    path_to_pkg = repo.filename_for_package_name(pkg.name)
+    path_parent = os.path.dirname(path_to_pkg)
+    file_exists = exists(path_parent+"/cve.json")
+    cve_json_path = path_parent+"/cve.json"
+    
+    cve_dict = {}
+    json_list = []
+
+    if(file_exists):
+        with open(cve_json_path, 'r') as json_file:
+            cve_loader = json.load(json_file)
+            for cves in cve_loader:
+                for version, data in cves.items():
+                   print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                   print("-"*80)
+    else:
+        for i in pkg.cpe:
+            r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
+            for eachCVE in r:
+                if eachCVE.score[0] == 'V3':
+                    cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
+                    cve_dict[i]["cve"] = eachCVE.id
+                    cve_dict[i]["score"] = eachCVE.score[1]
+                    cve_dict[i]["url"] = eachCVE.url
+                    print(i,"|", eachCVE.id, "|",  str(eachCVE.score[0]), "|", str(eachCVE.score[1]), "|", eachCVE.url)
+                    print("-"*80)
+                    json_list.append(cve_dict)
+        
+        with open(cve_json_path, 'w') as json_file:
+            json.dump(json_list, json_file)
+
 
 def print_virtuals(pkg):
     """output virtual packages"""
@@ -409,6 +452,7 @@ def info(parser, args):
         (args.all or args.detectable, print_detectable),
         (args.all or args.tags, print_tags),
         (args.all or not args.no_versions, print_versions),
+        #(args.all or args.cves, print_cves),
         (args.all or not args.no_variants, print_variants),
         (args.all or args.phases, print_phases),
         (args.all or not args.no_dependencies, print_dependencies),
@@ -418,5 +462,5 @@ def info(parser, args):
     for print_it, func in sections:
         if print_it:
             func(pkg)
-
+    print_cves(pkg)
     color.cprint('')

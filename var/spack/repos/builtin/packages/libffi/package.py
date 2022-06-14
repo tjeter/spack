@@ -18,6 +18,12 @@ class Libffi(AutotoolsPackage):
     version('3.3',   url='https://sourceware.org/pub/libffi/libffi-3.3.tar.gz', sha256='72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056')
     version('3.2.1', url='https://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz', sha256='d06ebb8e1d9a22d19e38d63fdb83954253f39bedc5d46232a05645685722ca37')
 
+    cpe = {
+            '3.2.1':'cpe:2.3:a:libffi_project:libffi:3.2.1:*:*:*:*:*:*:*',
+            '3.3':'cpe:2.3:a:libffi_project:libffi:3.3:rc0:*:*:*:*:*:*',
+            '3.4.2':'cpe:2.3:a:libffi_project:libffi:3.4.2:*:*:*:*:*:*:*'
+          }
+
     patch('clang-powerpc-3.2.1.patch', when='@3.2.1%clang platform=linux')
     # ref.: https://github.com/libffi/libffi/pull/561
     patch('powerpc-3.3.patch', when='@3.3')

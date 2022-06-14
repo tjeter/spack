@@ -21,6 +21,14 @@ class Libxcb(AutotoolsPackage):
     version('1.11.1', sha256='660312d5e64d0a5800262488042c1707a0261fa01a759bad265b1b75dd4844dd')
     version('1.11',   sha256='4b351e1dc95eb0a1c25fa63611a6f4cf033cb63e20997c4874c80bbd1876d0b4')
 
+    cpe = {
+            '1.11':'cpe:2.3:a:x:libxcb:1.11:*:*:*:*:*:*:*',
+            '1.11.1':'cpe:2.3:a:x:libxcb:1.11.1:*:*:*:*:*:*:*',
+            '1.12':'cpe:2.3:a:x:libxcb:1.12:*:*:*:*:*:*:*',
+            '1.13':'cpe:2.3:a:x:libxcb:1.13:*:*:*:*:*:*:*',
+            '1.14':'cpe:2.3:a:x:libxcb:1.14:*:*:*:*:*:*:*'
+          }
+
     depends_on('libpthread-stubs')
     depends_on('libxau@0.99.2:')
     depends_on('libxdmcp')

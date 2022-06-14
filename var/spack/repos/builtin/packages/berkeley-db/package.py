@@ -23,6 +23,15 @@ class BerkeleyDb(AutotoolsPackage):
     version('6.0.35', sha256='24421affa8ae436fe427ae4f5f2d1634da83d3d55a5ad6354a98eeedb825de55', deprecated=True)
     version('5.3.28', sha256='e0a992d740709892e81f9d93f06daf305cf73fb81b545afe72478043172c3628')
 
+    cpe = {
+            '18.1.40':'cpe:2.3:a:oracle:berkeley_db:18.4.0:*:*:*:*:*:*:*',
+            '18.1.32':'cpe:2.3:a:oracle:berkeley_db:18.1.32:*:*:*:*:*:*:*',
+            '6.2.32':'cpe:2.3:a:oracle:berkeley_db:6.2.32:*:*:*:*:*:*:*',
+            '6.1.29':'cpe:2.3:a:oracle:berkeley_db:6.1.29:*:*:*:*:*:*:*',
+            '6.0.35':'cpe:2.3:a:oracle:berkeley_db:6.0.35:*:*:*:*:*:*:*',
+            '5.3.28':'cpe:2.3:a:oracle:berkeley_db:5.3.28:*:*:*:*:*:*:*'
+          }
+
     variant('docs', default=False)
     variant('cxx', default=True, description='Build with C++ API')
     variant('stl', default=True, description='Build with C++ STL API')

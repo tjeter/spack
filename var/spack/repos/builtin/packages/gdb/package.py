@@ -18,7 +18,8 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     gnu_mirror_path = "gdb/gdb-11.2.tar.gz"
 
     maintainers = ['robertu94']
-
+    
+    version('12.1',   sha256='87296a3a9727356b56712c793704082d5df0ff36a34ca9ec9734fc9a8bdfdaab') 
     version('11.2',   sha256='b558b66084835e43b6361f60d60d314c487447419cdf53adf83a87020c367290')
     version('11.1',   sha256='cc2903474e965a43d09c3b263952d48ced39dd22ce2d01968f3aa181335fcb9c')
     version('10.2',   sha256='b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350')
@@ -35,6 +36,23 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     version('7.12.1', sha256='142057eacecfb929d52b561eb47a1103c7d504cec3f659dd8a5ae7bc378f7e77')
     version('7.11.1', sha256='57e9e9aa3172ee16aa1e9c66fef08b4393b51872cc153e3f1ffdf18a57440586')
     version('7.10.1', sha256='ff14f8050e6484508c73cbfa63731e57901478490ca1672dc0b5e2b03f6af622')
+
+    cpe = {
+            '-':'cpe:2.3:a:gnu:gdb:-:*:*:*:*:*:*:*',
+            '7.11.1':'cpe:2.3:a:gnu:gdb:7.11.1:*:*:*:*:*:*:*',
+            '7.12.1':'cpe:2.3:a:gnu:gdb:7.12.1:*:*:*:*:*:*:*',
+            '8.0':'cpe:2.3:a:gnu:gdb:8.0:*:*:*:*:*:*:*',
+            '8.0.1':'cpe:2.3:a:gnu:gdb:8.0.1:*:*:*:*:*:*:*',
+            '7.10.1':'cpe:2.3:a:gnu:gdb:7.10.1:*:*:*:*:*:*:*',
+            '8.1':'cpe:2.3:a:gnu:gdb:8.1:*:*:*:*:*:*:*',
+            '8.2':'cpe:2.3:a:gnu:gdb:8.2:*:*:*:*:*:*:*',
+            '8.2.1':'cpe:2.3:a:gnu:gdb:8.2.1:*:*:*:*:*:*:*',
+            '8.3':'cpe:2.3:a:gnu:gdb:8.3:*:*:*:*:*:*:*',
+            '8.3.1':'cpe:2.3:a:gnu:gdb:8.3.1:*:*:*:*:*:*:*',
+            '9.1':'cpe:2.3:a:gnu:gdb:9.1:*:*:*:*:*:*:*',
+            '9.2':'cpe:2.3:a:gnu:gdb:9.2:*:*:*:*:*:*:*',
+            '10.1':'cpe:2.3:a:gnu:gdb:10.1:*:*:*:*:*:*:*'
+          }
 
     variant('python', default=True, description='Compile with Python support')
     variant('xz', default=True, description='Compile with lzma support')

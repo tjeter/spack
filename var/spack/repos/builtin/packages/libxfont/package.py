@@ -19,6 +19,10 @@ class Libxfont(AutotoolsPackage, XorgPackage):
 
     version('1.5.2', sha256='a7350c75171d03d06ae0d623e42240356d6d3e1ac7dfe606639bf20f0d653c93')
 
+    cpe = {
+            '1.5.2':'cpe:2.3:a:x:libxfont:1.5.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('libfontenc')
     depends_on('freetype')
 

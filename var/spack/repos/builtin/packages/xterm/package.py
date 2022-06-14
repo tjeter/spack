@@ -20,6 +20,14 @@ class Xterm(AutotoolsPackage):
     version('330', sha256='7aeef9f29f6b95e09f481173c8c3053357bf5ffe162585647f690fd1707556df')
     version('327', sha256='66fb2f6c35b342148f549c276b12a3aa3fb408e27ab6360ddec513e14376150b')
 
+    cpe = {
+            '327':'cpe:2.3:a:invisible-island:xterm:327:*:*:*:*:*:*:*',
+            '330':'cpe:2.3:a:invisible-island:xterm:330:*:*:*:*:*:*:*',
+            '340':'cpe:2.3:a:invisible-island:xterm:340:*:*:*:*:*:*:*',
+            '350':'cpe:2.3:a:invisible-island:xterm:350:*:*:*:*:*:*:*',
+            '353':'cpe:2.3:a:invisible-island:xterm:353:*:*:*:*:*:*:*'
+          }
+
     depends_on('libxft')
     depends_on('fontconfig')
     depends_on('libxaw')

@@ -88,7 +88,6 @@ _versions = {
         'Linux-x86_64': ('79e96dce03a14271040023231a7d0ae374b755d48adf68bbdaec30294e4e2b88', 'https://download.java.net/openjdk/jdk8u40/ri/jdk_ri-8u40-b25-linux-x64-10_feb_2015.tar.gz')},
 }
 
-
 class Openjdk(Package):
     """The free and opensource java implementation"""
 
@@ -114,6 +113,27 @@ class Openjdk(Package):
     provides('java@8', when='@1.8.0:1.8')
 
     conflicts('target=ppc64:', msg='openjdk is not available for ppc64 (big endian)')
+
+    
+    cpe = {
+            '17.0.3_7':'cpe:2.3:a:oracle:openjdk:17.0.3_7:*:*:*:*:*:*:*',
+            '17.0.2_8':'cpe:2.3:a:oracle:openjdk:17.0.2_8:*:*:*:*:*:*:*',
+            '17.0.0_35':'cpe:2.3:a:oracle:openjdk:17.0.0_35:*:*:*:*:*:*:*',
+            '16.0.2':'cpe:2.3:a:oracle:openjdk:16.0.2:*:*:*:*:*:*:*',
+            '11.0.15_10':'cpe:2.3:a:oracle:openjdk:11.0.15_10:*:*:*:*:*:*:*',
+            '11.0.14.1_1':'cpe:2.3:a:oracle:openjdk:11.0.14.1_1:*:*:*:*:*:*:*',
+            '11.0.12_7':'cpe:2.3:a:oracle:openjdk:11.0.12_7:*:*:*:*:*:*:*',
+            '11.0.9.1_1':'cpe:2.3:a:oracle:openjdk:11.0.9.1_1:*:*:*:*:*:*:*',
+            '11.0.8_10':'cpe:2.3:a:oracle:openjdk:11.0.8_10:*:*:*:*:*:*:*',
+            '11.0.0-2020-01-01':'cpe:2.3:a:oracle:openjdk:11.0.0-2020-01-01:*:*:*:*:*:*:*',
+            '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
+            '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
+            '1.8.0_265-b01':'cpe:2.3:a:oracle:openjdk:1.8.0_265-b01:*:*:*:*:*:*:*',
+            '1.8.0_191-b12':'cpe:2.3:a:oracle:openjdk:1.8.0_191-b12:*:*:*:*:*:*:*',
+            '1.8.0_222-b10':'cpe:2.3:a:oracle:openjdk:1.8.0_222-b10:*:*:*:*:*:*:*',
+            '1.8.0_202-b08':'cpe:2.3:a:oracle:openjdk:1.8.0_202-b08:*:*:*:*:*:*:*',
+            '1.8.0_40-b25':'cpe:2.3:a:oracle:openjdk:1.8.0_40-b25:*:*:*:*:*:*:*'
+          }
 
     # FIXME:
     # 1. `extends('java')` doesn't work, you need to use `extends('openjdk')`

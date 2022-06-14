@@ -48,6 +48,36 @@ class Openblas(MakefilePackage):
     version('0.2.16', sha256='766f350d0a4be614812d535cead8c816fc3ad3b9afcd93167ea5e4df9d61869b')
     version('0.2.15', sha256='73c40ace5978282224e5e122a41c8388c5a19e65a6f2329c2b7c0b61bacc9044')
 
+    cpe = {
+            '0.2.15':'cpe:2.3:a:openblas_project:openblas:0.2.15:*:*:*:*:*:*:*',
+            '0.3.20':'cpe:2.3:a:openblas_project:openblas:0.3.20:*:*:*:*:*:*:*',
+            '0.3.19':'cpe:2.3:a:openblas_project:openblas:0.3.19:*:*:*:*:*:*:*',
+            '0.3.18':'cpe:2.3:a:openblas_project:openblas:0.3.18:*:*:*:*:*:*:*',
+            '0.3.17':'cpe:2.3:a:openblas_project:openblas:0.3.17:*:*:*:*:*:*:*',
+            '0.3.16':'cpe:2.3:a:openblas_project:openblas:0.3.16:*:*:*:*:*:*:*',
+            '0.3.15':'cpe:2.3:a:openblas_project:openblas:0.3.15:*:*:*:*:*:*:*',
+            '0.3.14':'cpe:2.3:a:openblas_project:openblas:0.3.14:*:*:*:*:*:*:*',
+            '0.3.13':'cpe:2.3:a:openblas_project:openblas:0.3.13:*:*:*:*:*:*:*',
+            '0.3.12':'cpe:2.3:a:openblas_project:openblas:0.3.12:*:*:*:*:*:*:*',
+            '0.3.11':'cpe:2.3:a:openblas_project:openblas:0.3.11:*:*:*:*:*:*:*',
+            '0.3.10':'cpe:2.3:a:openblas_project:openblas:0.3.10:*:*:*:*:*:*:*',
+            '0.3.9':'cpe:2.3:a:openblas_project:openblas:0.3.9:*:*:*:*:*:*:*',
+            '0.3.8':'cpe:2.3:a:openblas_project:openblas:0.3.8:*:*:*:*:*:*:*',
+            '0.3.7':'cpe:2.3:a:openblas_project:openblas:0.3.7:*:*:*:*:*:*:*',
+            '0.3.6':'cpe:2.3:a:openblas_project:openblas:0.3.6:*:*:*:*:*:*:*',
+            '0.3.5':'cpe:2.3:a:openblas_project:openblas:0.3.5:*:*:*:*:*:*:*',
+            '0.3.4':'cpe:2.3:a:openblas_project:openblas:0.3.4:*:*:*:*:*:*:*',
+            '0.3.3':'cpe:2.3:a:openblas_project:openblas:0.3.3:*:*:*:*:*:*:*',
+            '0.3.2':'cpe:2.3:a:openblas_project:openblas:0.3.2:*:*:*:*:*:*:*',
+            '0.3.1':'cpe:2.3:a:openblas_project:openblas:0.3.1:*:*:*:*:*:*:*',
+            '0.3.0':'cpe:2.3:a:openblas_project:openblas:0.3.0:*:*:*:*:*:*:*',
+            '0.2.20':'cpe:2.3:a:openblas_project:openblas:0.2.20:*:*:*:*:*:*:*',
+            '0.2.19':'cpe:2.3:a:openblas_project:openblas:0.2.19:*:*:*:*:*:*:*',
+            '0.2.18':'cpe:2.3:a:openblas_project:openblas:0.2.18:*:*:*:*:*:*:*',
+            '0.2.17':'cpe:2.3:a:openblas_project:openblas:0.2.17:*:*:*:*:*:*:*',
+            '0.2.16':'cpe:2.3:a:openblas_project:openblas:0.2.16:-:*:*:*:*:*:*'
+          }
+
     variant('ilp64', default=False, description='Force 64-bit Fortran native integers')
     variant('pic', default=True, description='Build position independent code')
     variant('shared', default=True, description='Build shared libraries')

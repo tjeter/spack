@@ -26,6 +26,26 @@ class Tar(AutotoolsPackage, GNUMirrorPackage):
     version('1.29', sha256='cae466e6e58c7292355e7080248f244db3a4cf755f33f4fa25ca7f9a7ed09af0')
     version('1.28', sha256='6a6b65bac00a127a508533c604d5bf1a3d40f82707d56f20cefd38a05e8237de')
 
+    cpe = {
+            '1.28':'cpe:2.3:a:emeric_vernat:javamelody:1.28:*:*:*:*:*:*:*',
+            '1.28':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.28:*:*:*:*:perl:*:*',
+            '1.28':'cpe:2.3:a:gnu:tar:1.28:*:*:*:*:*:*:*',
+            '1.29':'cpe:2.3:a:emeric_vernat:javamelody:1.29:*:*:*:*:*:*:*',
+            '1.29':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.29:*:*:*:*:perl:*:*',
+            '1.29':'cpe:2.3:a:gnu:tar:1.29:*:*:*:*:*:*:*',
+            '1.30':'cpe:2.3:a:emeric_vernat:javamelody:1.30:*:*:*:*:*:*:*',
+            '1.30':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.30:*:*:*:*:perl:*:*',
+            '1.30':'cpe:2.3:a:gnu:tar:1.30:*:*:*:*:*:*:*',
+            '1.31':'cpe:2.3:a:emeric_vernat:javamelody:1.31:*:*:*:*:*:*:*',
+            '1.31':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.31:*:*:*:*:perl:*:*',
+            '1.31':'cpe:2.3:a:gnu:tar:1.31:*:*:*:*:*:*:*',
+            '1.32':'cpe:2.3:a:emeric_vernat:javamelody:1.32:*:*:*:*:*:*:*',
+            '1.32':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.32:*:*:*:*:perl:*:*',
+            '1.32':'cpe:2.3:a:gnu:tar:1.32:*:*:*:*:*:*:*',
+            '1.34':'cpe:2.3:a:emeric_vernat:javamelody:1.34:*:*:*:*:*:*:*',
+            '1.34':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.34:*:*:*:*:perl:*:*'
+          }
+
     # A saner default than gzip?
     variant('zip', default='pigz', values=('gzip', 'pigz'), description='Default compression program for tar -z')
 

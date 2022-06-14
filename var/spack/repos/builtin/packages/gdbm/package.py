@@ -29,6 +29,22 @@ class Gdbm(AutotoolsPackage, GNUMirrorPackage):
     version('1.9.1',  sha256='6025852637772b0699f2294b5f14fd4a084bca3c8161d29d64d1f30d6d1a9aed')
     version('1.9',    sha256='f85324d7de3777db167581fd5d3493d2daa3e85e195a8ae9afc05b34551b6e57')
 
+    cpe = {
+            '1.23':'cpe:2.3:a:gnu:gdbm:1.23',
+            '1.22':'cpe:2.3:a:gnu:gdbm:1.22',
+            '1.21':'cpe:2.3:a:gnu:gdbm:1.21',
+            '1.20':'cpe:2.3:a:gnu:gdbm:1.20',
+            '1.19':'cpe:2.3:a:gnu:gdbm:1.19',
+            '1.18.1':'cpe:2.3:a:gnu:gdbm:1.18.1',
+            '1.14.1':'cpe:2.3:a:gnu:gdbm:1.14.1',
+            '1.13':'cpe:2.3:a:gnu:gdbm:1.13',
+            '1.12':'cpe:2.3:a:gnu:gdbm:1.12',
+            '1.11':'cpe:2.3:a:gnu:gdbm:1.11',
+            '1.10':'cpe:2.3:a:gnu:gdbm:1.10',
+            '1.9.1':'cpe:2.3:a:gnu:gdbm:1.91',
+            '1.9':'cpe:2.3:a:gnu:gdbm:1.9'
+          }
+
     depends_on("readline")
 
     patch('macOS.patch', when='@1.21 platform=darwin')

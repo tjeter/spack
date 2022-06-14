@@ -18,6 +18,13 @@ class Libsigsegv(AutotoolsPackage, GNUMirrorPackage):
     version('2.11', sha256='dd7c2eb2ef6c47189406d562c1dc0f96f2fc808036834d596075d58377e37a18')
     version('2.10', sha256='8460a4a3dd4954c3d96d7a4f5dd5bc4d9b76f5754196aa245287553b26d2199a')
 
+    cpe = {
+            '2.13':'cpe:2.3:a:gnu:libsigsegv:2.13',
+            '2.12':'cpe:2.3:a:gnu:libsigsegv:2.12',
+            '2.11':'cpe:2.3:a:gnu:libsigsegv:2.11',
+            '2.10':'cpe:2.3:a:gnu:libsigsegv:2.10'
+          }
+
     patch('patch.new_config_guess', when='@2.10')
 
     test_requires_compiler = True

@@ -14,6 +14,10 @@ class Libxt(AutotoolsPackage, XorgPackage):
 
     version('1.1.5', sha256='b59bee38a9935565fa49dc1bfe84cb30173e2e07e1dcdf801430d4b54eb0caa3')
 
+    cpe = {
+            '1.1.5':'cpe:2.3:a:x:libxt:1.1.5:*:*:*:*:*:*:*'
+          }
+
     depends_on('libsm')
     depends_on('libice')
     depends_on('libx11')

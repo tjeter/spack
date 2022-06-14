@@ -15,6 +15,10 @@ class Mkfontscale(AutotoolsPackage, XorgPackage):
 
     version('1.1.2', sha256='8bba59e60fbc4cb082092cf6b67e810b47b4fe64fbc77dbea1d7e7d55312b2e4')
 
+    cpe = {
+            '1.1.2':'cpe:2.3:a:freedesktop:mkfontscale:1.1.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('libfontenc')
     depends_on('freetype')
 

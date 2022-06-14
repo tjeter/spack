@@ -19,7 +19,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
     homepage = "https://www.openssl.org"
 
     # URL must remain http:// so Spack can bootstrap curl
-    url = "https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+    url = "https://www.openssl.org/source/openssl-3.0.5.tar.gz"
     list_url = "https://www.openssl.org/source/old/"
     list_depth = 1
 
@@ -27,12 +27,20 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
 
     executables = ['openssl']
 
+    # The latest stable version is the 3.0 series supported until 7th September 2026. 
+    # This is also a Long Term Support (LTS) version. 
+
+    version('3.0.5', sha256='aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a')
+    version('3.0.4', sha256='2831843e9a668a0ab478e7020ad63d2d65e51f72977472dc73efcefbafc0c00f')
+    version('3.0.3', sha256='ee0078adcef1de5f003c62c80cc96527721609c6f3bb42b7795df31f8b558c0b')
     version('3.0.2', sha256='98e91ccead4d4756ae3c9cde5e09191a8e586d9f4d50838e7ec09d6411dfdb63')
     version('3.0.1', sha256='c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1', deprecated=True)
     version('3.0.0', sha256='59eedfcb46c25214c9bd37ed6078297b4df01d012267fe9e9eee31f61bc70536', deprecated=True)
 
     # The latest stable version is the 1.1.1 series. This is also our Long Term
     # Support (LTS) version, supported until 11th September 2023.
+    version('1.1.1q', sha256='d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca')
+    version('1.1.1p', sha256='bf61b62aaa66c7c7639942a94de4c9ae8280c08f17d4eac2e44644d9fc8ace6f', deprecated=True)
     version('1.1.1o', sha256='9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f', preferred=True)
     version('1.1.1n', sha256='40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a', deprecated=True)
     version('1.1.1m', sha256='f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96', deprecated=True)
@@ -84,6 +92,88 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
     version('1.0.1r', sha256='784bd8d355ed01ce98b812f873f8b2313da61df7c7b5677fcf2e57b0863a3346', deprecated=True)
     version('1.0.1h', sha256='9d1c8a9836aa63e2c6adb684186cbd4371c9e9dcc01d6e3bb447abf2d4d3d093', deprecated=True)
     version('1.0.1e', sha256='f74f15e8c8ff11aa3d5bb5f276d202ec18d7246e95f961db76054199c69c1ae3', deprecated=True)
+
+    cpe = {
+            '-':'cpe:2.3:a:openssl:openssl:-:*:*:*:*:*:*:*',
+            '1.0.2d':'cpe:2.3:a:openssl:openssl:1.0.2d:*:*:*:*:*:*:*',
+            '1.0.1r':'cpe:2.3:a:openssl:openssl:1.0.1r:*:*:*:*:*:*:*',
+            '1.0.2f':'cpe:2.3:a:openssl:openssl:1.0.2f:*:*:*:*:*:*:*',
+            '1.0.2e':'cpe:2.3:a:openssl:openssl:1.0.2e:*:*:*:*:*:*:*',
+            '1.0.2h':'cpe:2.3:a:openssl:openssl:1.0.2h:*:*:*:*:*:*:*',
+            '1.0.1t':'cpe:2.3:a:openssl:openssl:1.0.1t:*:*:*:*:*:*:*',
+            '1.0.2j':'cpe:2.3:a:openssl:openssl:1.0.2j:*:*:*:*:*:*:*',
+            '1.1.0d':'cpe:2.3:a:openssl:openssl:1.1.0d:*:*:*:*:*:*:*',
+            '1.1.0c':'cpe:2.3:a:openssl:openssl:1.1.0c:*:*:*:*:*:*:*',
+            '1.0.2.g':'cpe:2.3:a:openssl:openssl:1.0.2g:*:*:*:*:*:*:*',
+            '1.1.0e':'cpe:2.3:a:openssl:openssl:1.1.0e:*:*:*:*:*:*:*',
+            '1.0.1u':'cpe:2.3:a:openssl:openssl:1.0.1u:*:*:*:*:*:*:*',
+            '1.0.2k':'cpe:2.3:a:openssl:openssl:1.0.2k:*:*:*:*:*:*:*',
+            '1.0.2m':'cpe:2.3:a:openssl:openssl:1.0.2m:*:*:*:*:*:*:*',
+            '1.1.0g':'cpe:2.3:a:openssl:openssl:1.1.0g:*:*:*:*:*:*:*',
+            '1.0.2n':'cpe:2.3:a:openssl:openssl:1.0.2n:*:*:*:*:*:*:*',
+            '-':'cpe:2.3:a:openssl.js_project:openssl.js:-:*:*:*:*:node.js:*:*',
+            '-':'cpe:2.3:a:node-openssl_project:node-openssl:-:*:*:*:*:node.js:*:*',
+            '1.0.2o':'cpe:2.3:a:openssl:openssl:1.0.2o:*:*:*:*:*:*:*',
+            '1.0.2p':'cpe:2.3:a:openssl:openssl:1.0.2p:*:*:*:*:*:*:*',
+            '1.1.1a':'cpe:2.3:a:openssl:openssl:1.1.1a:*:*:*:*:*:*:*',
+            '1.1.0i':'cpe:2.3:a:openssl:openssl:1.1.0i:*:*:*:*:*:*:*',
+            '1.1.0j':'cpe:2.3:a:openssl:openssl:1.1.0j:*:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre1:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre2:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre3:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre4:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre5:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre6:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre7:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre8:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre9:*:*:*:*:*:*',
+            '1.1.1b':'cpe:2.3:a:openssl:openssl:1.1.1b:*:*:*:*:*:*:*',
+            '1.0.2r':'cpe:2.3:a:openssl:openssl:1.0.2r:*:*:*:*:*:*:*',
+            '1.0.2s':'cpe:2.3:a:openssl:openssl:1.0.2s:*:*:*:*:*:*:*',
+            '1.1.0k':'cpe:2.3:a:openssl:openssl:1.1.0k:*:*:*:*:*:*:*',
+            '1.1.1c':'cpe:2.3:a:openssl:openssl:1.1.1c:*:*:*:*:*:*:*',
+            '-':'cpe:2.3:a:ruby-lang:openssl:-:*:*:*:*:ruby:*:*',
+            '1.0.2t':'cpe:2.3:a:openssl:openssl:1.0.2t:*:*:*:*:*:*:*',
+            '1.1.0l':'cpe:2.3:a:openssl:openssl:1.1.0l:*:*:*:*:*:*:*',
+            '1.1.1d':'cpe:2.3:a:openssl:openssl:1.1.1d:*:*:*:*:*:*:*',
+            '1.1.1e':'cpe:2.3:a:openssl:openssl:1.1.1e:*:*:*:*:*:*:*',
+            '1.1.1f':'cpe:2.3:a:openssl:openssl:1.1.1f:*:*:*:*:*:*:*',
+            '1.1.1g':'cpe:2.3:a:openssl:openssl:1.1.1g:*:*:*:*:*:*:*',
+            '1.0.2u':'cpe:2.3:a:openssl:openssl:1.0.2u:*:*:*:*:*:*:*',
+            '1.1.1h':'cpe:2.3:a:openssl:openssl:1.1.1h:*:*:*:*:*:*:*',
+            '1.1.1i':'cpe:2.3:a:openssl:openssl:1.1.1i:*:*:*:*:*:*:*',
+            '1.1.1j':'cpe:2.3:a:openssl:openssl:1.1.1j:*:*:*:*:*:*:*',
+            '1.1.1k':'cpe:2.3:a:openssl:openssl:1.1.1k:*:*:*:*:*:*:*',
+            '-':'cpe:2.3:a:redhat:wildfly_openssl:-:*:*:*:*:*:*:*',
+            '1.1.1l':'cpe:2.3:a:openssl:openssl:1.1.1l:*:*:*:*:*:*:*',
+            '1.1.1m':'cpe:2.3:a:openssl:openssl:1.1.1m:*:*:*:*:*:*:*',
+            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:-:*:*:*:*:*:*',
+            '1.1.1n':'cpe:2.3:a:openssl:openssl:1.1.1n:*:*:*:*:*:*:*',
+            '1.1.1o':'cpe:2.3:a:openssl:openssl:1.1.1o:*:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:beta2:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:beta1:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha9:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha8:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha7:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha6:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha5:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha4:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha3:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha2:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha17:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha16:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha15:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha14:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha13:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha12:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha11:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha10:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha1:*:*:*:*:*:*',
+            '3.0.1':'cpe:2.3:a:openssl:openssl:3.0.1:*:*:*:*:*:*:*',
+            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:-:*:*:*:*:*:*',
+            '3.0.2':'cpe:2.3:a:openssl:openssl:3.0.2:*:*:*:*:*:*:*',
+            '3.0.3':'cpe:2.3:a:openssl:openssl:3.0.3:*:*:*:*:*:*:*'
+          }
 
     variant('certs', default='system',
             values=('mozilla', 'system', 'none'), multi=False,

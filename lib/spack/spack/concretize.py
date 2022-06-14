@@ -43,6 +43,9 @@ from spack.config import config
 from spack.package_prefs import PackagePrefs, is_spec_buildable, spec_externals
 from spack.version import Version, VersionList, VersionRange, ver
 
+import nvdlib
+api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
+
 #: impements rudimentary logic for ABI compatibility
 _abi = llnl.util.lang.Singleton(lambda: spack.abi.ABI())
 
@@ -196,6 +199,7 @@ class Concretizer(object):
 
         # List of versions we could consider, in sorted order
         pkg_versions = spec.package_class.versions
+        print("Package Versions: ", pkg_versions)
         usable = [v for v in pkg_versions
                   if any(v.satisfies(sv) for sv in spec.versions)]
 

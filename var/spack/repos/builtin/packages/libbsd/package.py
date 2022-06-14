@@ -30,6 +30,19 @@ class Libbsd(AutotoolsPackage):
     version('0.8.7', sha256='f548f10e5af5a08b1e22889ce84315b1ebe41505b015c9596bad03fd13a12b31')
     version('0.8.6', sha256='467fbf9df1f49af11f7f686691057c8c0a7613ae5a870577bef9155de39f9687')
 
+    cpe = {
+            '0.8.6':'cpe:2.3:a:freedesktop:libbsd:0.8.6:*:*:*:*:*:*:*',
+            '0.8.7':'cpe:2.3:a:freedesktop:libbsd:0.8.7:*:*:*:*:*:*:*',
+            '0.9.0':'cpe:2.3:a:freedesktop:libbsd:0.9.0:*:*:*:*:*:*:*',
+            '0.9.1':'cpe:2.3:a:freedesktop:libbsd:0.9.1:*:*:*:*:*:*:*',
+            '0.10.0':'cpe:2.3:a:freedesktop:libbsd:0.10.0:*:*:*:*:*:*:*',
+            '0.11.0':'cpe:2.3:a:freedesktop:libbsd:0.11.0:*:*:*:*:*:*:*',
+            '0.11.1':'cpe:2.3:a:freedesktop:libbsd:0.11.1:*:*:*:*:*:*:*',
+            '0.11.2':'cpe:2.3:a:freedesktop:libbsd:0.11.2:*:*:*:*:*:*:*',
+            '0.11.3':'cpe:2.3:a:freedesktop:libbsd:0.11.3:*:*:*:*:*:*:*',
+            '0.11.5':'cpe:2.3:a:freedesktop:libbsd:0.11.5:*:*:*:*:*:*:*'
+          }
+
     patch('cdefs.h.patch', when='@0.8.6 %gcc@:4')
     patch('local-elf.h.patch', when='@:0.10 %intel')
 

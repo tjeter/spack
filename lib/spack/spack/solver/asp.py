@@ -735,6 +735,7 @@ class SpackSolverSetup(object):
         # If False allows for input specs that are not solved
         self.concretize_everything = True
 
+
     def pkg_version_rules(self, pkg):
         """Output declared versions of a package.
 

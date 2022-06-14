@@ -14,6 +14,10 @@ class Libxdmcp(AutotoolsPackage, XorgPackage):
 
     version('1.1.2', sha256='6f7c7e491a23035a26284d247779174dedc67e34e93cc3548b648ffdb6fc57c0')
 
+    cpe = {
+            '1.1.2':'cpe:2.3:a:freedesktop:libxdmcp:1.1.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('xproto')
     depends_on('pkgconfig', type='build')
     depends_on('util-macros', type='build')

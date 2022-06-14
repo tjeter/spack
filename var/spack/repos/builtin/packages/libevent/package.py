@@ -34,6 +34,24 @@ class Libevent(AutotoolsPackage):
     version('2.0.13', sha256='e2cc3b9f03e68ff878919b1cd031a210ba9ff376283d895161afcbc25aca00a9')
     version('2.0.12', sha256='ac0283f72e0f881e93ac3ae9497a20c78bd075c6c12506ad10e821aa1c29e5ab')
 
+    cpe = {
+            '2.0.12':'cpe:2.3:a:libevent_project:libevent:2.0.12:*:*:*:*:*:*:*',
+            '2.0.13':'cpe:2.3:a:libevent_project:libevent:2.0.13:*:*:*:*:*:*:*',
+            '2.0.14':'cpe:2.3:a:libevent_project:libevent:2.0.14:*:*:*:*:*:*:*',
+            '2.0.15':'cpe:2.3:a:libevent_project:libevent:2.0.15:*:*:*:*:*:*:*',
+            '2.0.16':'cpe:2.3:a:libevent_project:libevent:2.0.16:*:*:*:*:*:*:*',
+            '2.0.17':'cpe:2.3:a:libevent_project:libevent:2.0.17:*:*:*:*:*:*:*',
+            '2.0.18':'cpe:2.3:a:libevent_project:libevent:2.0.18:*:*:*:*:*:*:*',
+            '2.0.19':'cpe:2.3:a:libevent_project:libevent:2.0.19:*:*:*:*:*:*:*',
+            '2.0.20':'cpe:2.3:a:libevent_project:libevent:2.0.20:*:*:*:*:*:*:*',
+            '2.0.21':'cpe:2.3:a:libevent_project:libevent:2.0.21:*:*:*:*:*:*:*',
+            '2.0.22':'cpe:2.3:a:libevent_project:libevent:2.0.22:*:*:*:*:*:*:*',
+            '2.1.8':'cpe:2.3:a:libevent_project:libevent:2.1.8:*:*:*:*:*:*:*',
+            '2.1.10':'cpe:2.3:a:libevent_project:libevent:2.1.10:*:*:*:*:*:*:*',
+            '2.1.11':'cpe:2.3:a:libevent_project:libevent:2.1.11:*:*:*:*:*:*:*',
+            '2.1.12':'cpe:2.3:a:libevent_project:libevent:2.1.12:*:*:*:*:*:*:*'
+          }
+
     variant('openssl', default=True,
             description="Build with encryption enabled at the libevent level.")
     # Versions before 2.1 do not build with OpenSSL 1.1
