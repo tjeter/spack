@@ -58,6 +58,81 @@ packages:
       xxd: [xxd-standalone, vim]
       yacc: [bison, byacc]
       ziglang: [zig]
+  torque:
+    buildable: false
+    externals:
+    - spec: torque@6.0.0
+      prefix: /usr
+    - spec: torque@5.1.2
+      prefix: /usr
+    - spec: torque@5.1.1.2
+      prefix: /usr
+    - spec: torque@5.1.1
+      prefix: /usr
+    - spec: torque@5.0.2
+      prefix: /usr
+    - spec: torque@5.0.1.h2
+      prefix: /usr
+    - spec: torque@5.0.1
+      prefix: /usr
+    - spec: torque@5.0.0
+      prefix: /usr
+    - spec: torque@4.5.0
+      prefix: /usr
+    - spec: torque@4.2.9
+      prefix: /usr
+    - spec: torque@4.2.8
+      prefix: /usr
+    - spec: torque@4.2.7
+      prefix: /usr
+    - spec: torque@4.2.6.1.h1
+      prefix: /usr
+    - spec: torque@4.2.6.1
+      prefix: /usr
+    - spec: torque@4.2.6
+      prefix: /usr
+    - spec: torque@4.2.5
+      prefix: /usr
+    - spec: torque@4.2.4
+      prefix: /usr
+    - spec: torque@4.2.3
+      prefix: /usr
+    - spec: torque@4.2.2
+      prefix: /usr
+    - spec: torque@4.2.1
+      prefix: /usr
+    - spec: torque@4.2.0
+      prefix: /usr
+    - spec: torque@4.1.6
+      prefix: /usr
+    - spec: torque@4.1.5
+      prefix: /usr
+    - spec: torque@4.1.4
+      prefix: /usr
+    - spec: torque@4.1.3
+      prefix: /usr
+    - spec: torque@4.1.2
+      prefix: /usr
+    - spec: torque@4.1.1
+      prefix: /usr
+    - spec: torque@4.1.0
+      prefix: /usr
+    - spec: torque@4.0.3
+      prefix: /usr
+    - spec: torque@4.0.2
+      prefix: /usr
+    - spec: torque@4.0.1
+      prefix: /usr
+    - spec: torque@4.0.0
+      prefix: /usr
+    - spec: torque@3.0.5
+      prefix: /usr
+    - spec: torque@3.0.4
+      prefix: /usr
+    - spec: torque@3.0.3
+      prefix: /usr
+    - spec: torque@3.0.2
+      prefix: /usr
     permissions:
       read: world
       write: user
