@@ -1564,7 +1564,7 @@ class PackageInstaller(object):
 
             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
             version = pkg.version
-            print("This is what we want", version, pkg.name)
+            print("Version/Package", version, pkg.name)
             r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
             # by default includes V2 scores that don't apply to specified version
             for eachCVE in r:
