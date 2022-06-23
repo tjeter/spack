@@ -59,6 +59,9 @@ from spack.util.environment import EnvironmentModifications, dump_environment
 from spack.util.executable import which
 from spack.util.timer import Timer
 
+import nvdlib
+api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
+
 #: Counter to support unique spec sequencing that is used to ensure packages
 #: with the same priority are (initially) processed in the order in which they
 #: were added (see https://docs.python.org/2/library/heapq.html).
@@ -1560,6 +1563,13 @@ class PackageInstaller(object):
             keep_prefix = install_args.get('keep_prefix')
 
             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
+            version = pkg.version
+            print("This is what we want", version, pkg.name)
+            r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
+            # by default includes V2 scores that don't apply to specified version
+            for eachCVE in r:
+                if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5:
+                    print(version, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
             term_title.next_pkg(pkg)
             term_title.set('Processing {0}'.format(pkg.name))
             tty.debug('Processing {0}: task={1}'.format(pkg_id, task))
