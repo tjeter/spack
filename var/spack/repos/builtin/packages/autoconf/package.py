@@ -21,6 +21,14 @@ class Autoconf(AutotoolsPackage, GNUMirrorPackage):
     version('2.62', sha256='83aa747e6443def0ebd1882509c53f5a2133f502ddefa21b3de141c433914bdd')
     version('2.59', sha256='9cd05c73c5fcb1f5ccae53dd6cac36bb8cb9c7b3e97ffae5a7c05c72594c88d8')
 
+    cpe = {
+            '2.71':'cpe:2.3:a:gnu:autoconf:2.71',
+            '2.70':'cpe:2.3:a:gnu:autoconf:2.70',
+            '2.69':'cpe:2.3:a:gnu:autoconf:2.69',
+            '2.62':'cpe:2.3:a:gnu:autoconf:2.62',
+            '2.59':'cpe:2.3:a:gnu:autoconf:2.59'
+          }
+
     # https://savannah.gnu.org/support/?110396
     patch('https://git.savannah.gnu.org/cgit/autoconf.git/patch/?id=05972f49ee632cd98057a3caf82ebfb9574846da',
           sha256='eaa3f69d927a853313a0b06e2117c51adab6377a2278549b05abc5df93643e16',
