@@ -22,6 +22,12 @@ class Libtool(AutotoolsPackage, GNUMirrorPackage):
     # Version released in 2011
     version('2.4.2', sha256='b38de44862a987293cd3d8dfae1c409d514b6c4e794ebc93648febf9afc38918', deprecated=True)
 
+    cpe = {
+            '2.4.7':'cpe:2.3:a:gnu:libtool:2.4.7:*:*:*:*:*:*:*',
+            '2.4.6':'cpe:2.3:a:gnu:libtool:2.4.6:*:*:*:*:*:*:*',
+            '2.4.2':'cpe:2.3:a:gnu:libtool:2.4.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('m4@1.4.6:', type='build')
 
     with when('@2.4.2'):
