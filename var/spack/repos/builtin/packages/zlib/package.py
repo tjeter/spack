@@ -29,7 +29,8 @@ class Zlib(Package):
     cpe = {
             '1.2.3':'cpe:2.3:a:zlib:zlib:1.2.3:*:*:*:*:*:*:*',
             '1.2.8':'cpe:2.3:a:zlib:zlib:1.2.8:*:*:*:*:*:*:*',
-            '1.2.11':'cpe:2.3:a:zlib:zlib:1.2.11:*:*:*:*:*:*:*'
+            '1.2.11':'cpe:2.3:a:zlib:zlib:1.2.11:*:*:*:*:*:*:*',
+            '1.2.12':'cpe:2.3:a:zlib:zlib:1.2.12:*:*:*:*:*:*:*'
           }
 
     variant('pic', default=True,
