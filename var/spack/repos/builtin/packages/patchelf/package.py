@@ -31,7 +31,21 @@ class Patchelf(AutotoolsPackage):
     version('0.9',    sha256='f2aa40a6148cb3b0ca807a1bf836b081793e55ec9e5540a5356d800132be7e0a')
     version('0.8',    sha256='14af06a2da688d577d64ff8dac065bb8903bbffbe01d30c62df7af9bf4ce72fe')
 
-    cpe = {}
+    cpe = {
+            '0.14.5':'cpe:2.3:a:nixos:patchelf:0.14.5',
+            '0.14.3':'cpe:2.3:a:nixos:patchelf:0.14.3',
+            '0.14.2':'cpe:2.3:a:nixos:patchelf:0.14.2',
+            '0.14.1':'cpe:2.3:a:nixos:patchelf:0.14.1',
+            '0.14':'cpe:2.3:a:nixos:patchelf:0.14',  
+            '0.13.1':'cpe:2.3:a:nixos:patchelf:0.13.1',
+            '0.13':'cpe:2.3:a:nixos:patchelf:0.13',  
+            '0.12':'cpe:2.3:a:nixos:patchelf:0.12',  
+            '0.11':'cpe:2.3:a:nixos:patchelf:0.11',  
+            '0.10':'cpe:2.3:a:nixos:patchelf:0.10',  
+            '0.9':'cpe:2.3:a:nixos:patchelf:0.9',   
+            '0.8':'cpe:2.3:a:nixos:patchelf:0.8' 
+
+        }
 
     conflicts('%gcc@:4.6', when='@0.10:', msg="Requires C++11 support")
     conflicts('%gcc@:6', when='@0.14:', msg="Requires C++17 support")
