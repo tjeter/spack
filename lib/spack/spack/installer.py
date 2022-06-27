@@ -35,6 +35,7 @@ import os
 import shutil
 import sys
 import time
+import json
 from collections import defaultdict
 
 import six
@@ -869,6 +870,7 @@ class PackageInstaller(object):
             else:
                 lock.release_read()
 
+
     def _prepare_for_install(self, task):
         """
         Check the database and leftover installation directories/files and
@@ -1535,6 +1537,7 @@ class PackageInstaller(object):
         # back on failure
         return InstallAction.OVERWRITE
 
+    
     def install(self):
         """
         Install the requested package(s) and or associated dependencies.
@@ -1561,15 +1564,50 @@ class PackageInstaller(object):
             spack.hooks.on_install_start(task.request.pkg.spec)
             install_args = task.request.install_args
             keep_prefix = install_args.get('keep_prefix')
-
+            cve_list = []
+            cvss_thresh_block = 9
+            cvss_warn = 7
+            can_block = True
             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
+            '''TODO: have users set a environment variable equal to api_key and reference it earlier'''
             version = pkg.version
-            print("Version/Package", version, pkg.name)
             r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
             # by default includes V2 scores that don't apply to specified version
+            #so for cve scores between 1-6 we do nothing
+            #between 6.1-8.9  we throw a warning and print vulnerability description
+            #above 8.9 we block the install
+
             for eachCVE in r:
-                if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5:
-                    print(version, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
+                cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
+                if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
+                    pass
+
+                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
+                    cve_dict["package"] = pkg.name
+                    cve_dict["cve"] = eachCVE.id
+                    cve_dict["version"] = version
+                    cve_dict["score"] = eachCVE.score[1]
+                    cve_dict["url"] = eachCVE.url
+                    cve_list.append(cve_dict)
+                
+                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
+                    print("BLOCKED INSTALLATION: your installation was BLOCKED due to having one or more CRITCAL vulnerabilities")
+                    cve_dict["package"] = pkg.name
+                    cve_dict["cve"] = eachCVE.id
+                    cve_dict["version"] = version
+                    cve_dict["score"] = eachCVE.score[1]
+                    cve_dict["url"] = eachCVE.url
+                    cve_list.append(cve_dict)
+                    for cve in cve_list:
+                        print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                    exit()
+
+            if cve_list: 
+                print("WARNING: the following vulnerabilities were found in the following packages: ")
+                print("------------------------------------------------------------------------------")  
+            for cve in cve_list:
+                print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+    
             term_title.next_pkg(pkg)
             term_title.set('Processing {0}'.format(pkg.name))
             tty.debug('Processing {0}: task={1}'.format(pkg_id, task))
