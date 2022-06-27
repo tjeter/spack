@@ -736,13 +736,6 @@ class SpackSolverSetup(object):
         self.concretize_everything = True
 
 
-    def cve_search(pkg):
-        version = pkg.version
-        r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
-        # by default includes V2 scores that don't apply to specified version
-        for eachCVE in r:
-            if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5: 
-                print(version, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
 
 
     def pkg_version_rules(self, pkg):
