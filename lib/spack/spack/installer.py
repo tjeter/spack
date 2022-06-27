@@ -1587,7 +1587,8 @@ class PackageInstaller(object):
                     cve_list.append(cve_dict)
                 
                 elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
-                    print("BLOCKED INSTALLATION: The package(s) you are trying to install has a CVE score above the allowable threshold of ", cvss_thresh_block)
+                    print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                    print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ".")
                     print("---------------------------------------------------------------------------------------------------------------------")
                     cve_dict["package"] = pkg.name
                     cve_dict["cve"] = eachCVE.id
@@ -1598,12 +1599,12 @@ class PackageInstaller(object):
                     for cve in cve_list:
                         print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
                     
-                    print("If you still wish to install this package(s), please contact your system adminstrator for instructions how to safely install this package(s)")
+                    print("If you still wish to install this package(s), you will need elevated privileges. Please contact your system adminstrator for instructions on how to safely install this package(s).")
                     exit()
 
             if cve_list: 
-                print("WARNING: This package contains known vulnerabilities. Continuing install... ")
-                print("----------------------------------------------------------------------------")  
+                print("WARNING: This package contains known vulnerabilities. For more information, click the link associated with a vulnerability below. Continuing install...")
+                print("--------------------------------------------------------------------------------------------------------------------------------------------------------")  
             for cve in cve_list:
                 print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
 
