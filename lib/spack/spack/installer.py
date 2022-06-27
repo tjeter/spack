@@ -1567,10 +1567,10 @@ class PackageInstaller(object):
             cve_list = []
             cvss_thresh_block = 9
             cvss_warn = 7
-            can_block = True
             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
             '''TODO: have users set a environment variable equal to api_key and reference it earlier'''
             version = pkg.version
+            print("version is ", version)
             r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
             # by default includes V2 scores that don't apply to specified version
             #so for cve scores between 1-6 we do nothing
