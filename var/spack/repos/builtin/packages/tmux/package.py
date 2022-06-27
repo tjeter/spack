@@ -80,16 +80,6 @@ class Tmux(AutotoolsPackage):
 
     conflicts('+static', when='platform=darwin', msg='Static build not supported on MacOS')
 
-    cpe = {
-            '2.9':'cpe:2.3:a:tmux_project:tmux:2.9:*:*:*:*:*:*:*',
-            '2.9a':'cpe:2.3:a:tmux_project:tmux:2.9a:*:*:*:*:*:*:*',
-            '3.0':'cpe:2.3:a:tmux_project:tmux:3.0:*:*:*:*:*:*:*',
-            '3.0a':'cpe:2.3:a:tmux_project:tmux:3.0a:*:*:*:*:*:*:*',
-            '3.1':'cpe:2.3:a:tmux_project:tmux:3.1:*:*:*:*:*:*:*',
-            '3.1a':'cpe:2.3:a:tmux_project:tmux:3.1a:*:*:*:*:*:*:*',
-            '3.1b':'cpe:2.3:a:tmux_project:tmux:3.1b:*:*:*:*:*:*:*'
-           }
-
 
     @run_before('autoreconf')
     def autogen(self):
