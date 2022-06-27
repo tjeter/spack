@@ -736,15 +736,6 @@ class SpackSolverSetup(object):
         self.concretize_everything = True
 
 
-    def cve_search(pkg):
-        version = pkg.version
-        r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
-        # by default includes V2 scores that don't apply to specified version
-        for eachCVE in r:
-            if eachCVE.score[0] == 'V3' and eachCVE.score[1] > 7.5: 
-                print(version, eachCVE.id, str(eachCVE.score[0]), str(eachCVE.score[1]), eachCVE.url)
-
-
     def pkg_version_rules(self, pkg):
         """Output declared versions of a package.
 
@@ -759,7 +750,6 @@ class SpackSolverSetup(object):
         pkg = packagize(pkg)
         declared_versions = self.declared_versions[pkg.name]
         most_to_least_preferred = sorted(declared_versions, key=key_fn)
-        print("Most to Least Preferred versions of ", pkg.name, "are ", most_to_least_preferred)
 
         for weight, declared_version in enumerate(most_to_least_preferred):
             self.gen.fact(fn.version_declared(
