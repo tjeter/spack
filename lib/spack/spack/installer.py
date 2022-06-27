@@ -1603,7 +1603,7 @@ class PackageInstaller(object):
                     exit()
 
             if cve_list: 
-                print("WARNING: the following vulnerabilities were found in the following packages: ")
+                print("WARNING: the following vulnerabilities were found in the following package: ")
                 print("------------------------------------------------------------------------------")  
             for cve in cve_list:
                 print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
