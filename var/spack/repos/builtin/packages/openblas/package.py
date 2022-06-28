@@ -71,12 +71,11 @@ class Openblas(MakefilePackage):
             '0.3.2':'cpe:2.3:a:openblas_project:openblas:0.3.2:*:*:*:*:*:*:*',
             '0.3.1':'cpe:2.3:a:openblas_project:openblas:0.3.1:*:*:*:*:*:*:*',
             '0.3.0':'cpe:2.3:a:openblas_project:openblas:0.3.0:*:*:*:*:*:*:*',
-            ''0.2.20:'cpe:2.3:a:openblas_project:openblas:0.2.20:*:*:*:*:*:*:*',
+            '0.2.20':'cpe:2.3:a:openblas_project:openblas:0.2.20:*:*:*:*:*:*:*',
             '0.2.19':'cpe:2.3:a:openblas_project:openblas:0.2.19:*:*:*:*:*:*:*',
             '0.2.18':'cpe:2.3:a:openblas_project:openblas:0.2.18:*:*:*:*:*:*:*',
             '0.2.17':'cpe:2.3:a:openblas_project:openblas:0.2.17:*:*:*:*:*:*:*',
-            '0.2.16':'cpe:2.3:a:openblas_project:openblas:0.2.16:-:*:*:*:*:*:*',
-            '0.2.16':'cpe:2.3:a:openblas_project:openblas:0.2.16:rc1:*:*:*:*:*:*'
+            '0.2.16':'cpe:2.3:a:openblas_project:openblas:0.2.16:-:*:*:*:*:*:*'
           }
 
     variant('ilp64', default=False, description='Force 64-bit Fortran native integers')
