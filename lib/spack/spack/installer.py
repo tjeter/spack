@@ -1589,8 +1589,8 @@ class PackageInstaller(object):
                     
                     elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
                         print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
-                        print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ".")
-                        print("---------------------------------------------------------------------------------------------------------------------")
+                        print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the link associated with a vulnerability below.")
+                        print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
                         cve_dict["package"] = pkg.name
                         cve_dict["cve"] = eachCVE.id
                         cve_dict["version"] = version
