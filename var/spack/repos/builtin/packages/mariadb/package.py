@@ -31,6 +31,18 @@ class Mariadb(CMakePackage):
     version('10.1.14', sha256='18e71974a059a268a3f28281599607344d548714ade823d575576121f76ada13')
     version('5.5.49', sha256='2c82f2af71b88a7940d5ff647498ed78922c92e88004942caa213131e20f4706')
 
+    cpe = { 
+            '5.5.49':'cpe:2.3:a:mariadb:mariadb:5.5.49:*:*:*:*:*:*:*',
+            '5.5.56':'cpe:2.3:a:mariadb:mariadb:5.5.56:*:*:*:*:*:*:*',
+            '10.1.14':'cpe:2.3:a:mariadb:mariadb:10.1.14:*:*:*:*:*:*:*',
+            '10.1.23':'cpe:2.3:a:mariadb:mariadb:10.1.23:*:*:*:*:*:*:*',
+            '10.2.8':'cpe:2.3:a:mariadb:mariadb:10.2.8:*:*:*:*:*:*:*',
+            '10.4.7':'cpe:2.3:a:mariadb:mariadb:10.4.7:*:*:*:*:*:*:*',
+            '10.4.8':'cpe:2.3:a:mariadb:mariadb:10.4.8:*:*:*:*:*:*:*',
+            '10.4.12':'cpe:2.3:a:mariadb:mariadb:10.4.12:*:*:*:*:*:*:*',
+            '10.8.2':'cpe:2.3:a:mariadb:mariadb:10.8.2:*:*:*:*:*:*:*'
+          }
+
     variant('nonblocking', default=True, description='Allow non blocking '
             'operations in the mariadb client library.')
 

@@ -39,6 +39,28 @@ class Binutils(AutotoolsPackage, GNUMirrorPackage):
     version('2.23.2', sha256='fe914e56fed7a9ec2eb45274b1f2e14b0d8b4f41906a5194eac6883cfe5c1097')
     version('2.20.1', sha256='71d37c96451333c5c0b84b170169fdcb138bbb27397dc06281905d9717c8ed64')
 
+    cpe = {
+            '2.20.1':'cpe:2.3:a:gnu:binutils:2.20.1:*:*:*:*:*:*:*',
+            '2.23.2':'cpe:2.3:a:gnu:binutils:2.23.2:*:*:*:*:*:*:*',
+            '2.24':'cpe:2.3:a:gnu:binutils:2.24:*:*:*:*:*:*:*',
+            '2.25':'cpe:2.3:a:gnu:binutils:2.25:*:*:*:*:*:*:*',
+            '2.25.1':'cpe:2.3:a:gnu:binutils:2.25.1:*:*:*:*:*:*:*',
+            '2.26':'cpe:2.3:a:gnu:binutils:2.26:*:*:*:*:*:*:*',
+            '2.27':'cpe:2.3:a:gnu:binutils:2.27:*:*:*:*:*:*:*',
+            '2.28':'cpe:2.3:a:gnu:binutils:2.28:*:*:*:*:*:*:*',
+            '2.29.1':'cpe:2.3:a:gnu:binutils:2.29.1:*:*:*:*:*:*:*',
+            '2.31.1':'cpe:2.3:a:gnu:binutils:2.31.1:*:*:*:*:*:*:*',
+            '2.32':'cpe:2.3:a:gnu:binutils:2.32:*:*:*:*:*:*:*',
+            '2.33.1':'cpe:2.3:a:gnu:binutils:2.33.1:*:*:*:*:*:*:*',
+            '2.34':'cpe:2.3:a:gnu:binutils:2.34:*:*:*:*:*:*:*',
+            '2.35':'cpe:2.3:a:gnu:binutils:2.35:*:*:*:*:*:*:*',
+            '2.35.1':'cpe:2.3:a:gnu:binutils:2.35.1:*:*:*:*:*:*:*',
+            '2.35.2':'cpe:2.3:a:gnu:binutils:2.35.2:*:*:*:*:*:*:*',
+            '2.36.1':'cpe:2.3:a:gnu:binutils:2.36.1:*:*:*:*:*:*:*',
+            '2.37':'cpe:2.3:a:gnu:binutils:2.37:*:*:*:*:*:*:*',
+            '2.38':'cpe:2.3:a:gnu:binutils:2.38:*:*:*:*:*:*:*'
+          }
+
     variant('plugins', default=True,
             description="enable plugins, needed for gold linker")
     variant('gold', default=False,
