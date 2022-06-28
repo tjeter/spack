@@ -47,7 +47,7 @@ class Mysql(CMakePackage):
     version('5.6.44', sha256='c031c92c3f226856b09bf929d8a26b0cd8600036cb9db4e0fdf6b6f032ced336')
     version('5.6.43', sha256='1c95800bf0e1b7a19a37d37fbc5023af85c6bc0b41532433b3a886263a1673ef')
     version('5.5.62', sha256='b1e7853bc1f04aabf6771e0ad947f35ac8d237f4b35d0706d1095c9526ff99d7')
-   cpe = {
+    cpe = {
         '5.5.62':'cpe:2.3:a:oracle:mysql:5.5.62:*:*:*:*:*:*:*',
         '5.6.43':'cpe:2.3:a:oracle:mysql:5.6.43:*:*:*:*:*:*:*',
         '5.6.44':'cpe:2.3:a:oracle:mysql:5.6.44:*:*:*:*:*:*:*',

@@ -54,7 +54,6 @@ class Postgresql(AutotoolsPackage):
         '9.6.11':'cpe:2.3:a:postgresql:postgresql:9.6.11:*:*:*:*:*:*:*',
         '9.5.3':'cpe:2.3:a:postgresql:postgresql:9.5.3:*:*:*:*:*:*:*', 
         '9.3.4':'cpe:2.3:a:postgresql:postgresql:9.3.4:*:*:*:*:*:*:*' 
-
     }
 
     variant('client_only', default=False,

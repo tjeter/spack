@@ -65,7 +65,6 @@ class Openssh(AutotoolsPackage):
         '8.8p1':'cpe:2.3:a:openbsd:openssh:8.8:p1:*:*:*:*:*:*',
         '8.9p1':'cpe:2.3:a:openbsd:openssh:8.9:p1:*:*:*:*:*:*',
         '9.0p1':'cpe:2.3:a:openbsd:openssh:9.0:p1:*:*:*:*:*:*'
-
     }
 
 

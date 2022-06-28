@@ -39,7 +39,7 @@ class Sqlite(AutotoolsPackage):
     version('3.26.0', sha256='5daa6a3fb7d1e8c767cd59c4ded8da6e4b00c61d3b466d0685e35c4dd6d7bf5d')
     # All versions prior to 3.26.0 are vulnerable to Magellan when FTS
     # is enabled, see https://blade.tencent.com/magellan/index_en.html
-        cpe = {
+    cpe = {
             '3.38.5':'cpe:2.3:a:sqlite:sqlite:3.38.5:*:*:*:*:*:*:*',
             '3.38.3':'cpe:2.3:a:sqlite:sqlite:3.38.3:*:*:*:*:*:*:*',
             '3.37.2':'cpe:2.3:a:sqlite:sqlite:3.37.2:*:*:*:*:*:*:*',
@@ -61,8 +61,7 @@ class Sqlite(AutotoolsPackage):
             '3.27.1':'cpe:2.3:a:sqlite:sqlite:3.27.1:*:*:*:*:*:*:*',
             '3.27.0':'cpe:2.3:a:sqlite:sqlite:3.27.0:*:*:*:*:*:*:*',
             '3.26.0':'cpe:2.3:a:sqlite:sqlite:3.26.0:*:*:*:*:*:*:*'
-
-        }
+    }
 
     variant('functions', default=False, when='+dynamic_extensions',
             description='Provide mathematical and string extension functions for SQL '
