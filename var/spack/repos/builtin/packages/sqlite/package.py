@@ -39,6 +39,39 @@ class Sqlite(AutotoolsPackage):
     version('3.26.0', sha256='5daa6a3fb7d1e8c767cd59c4ded8da6e4b00c61d3b466d0685e35c4dd6d7bf5d')
     # All versions prior to 3.26.0 are vulnerable to Magellan when FTS
     # is enabled, see https://blade.tencent.com/magellan/index_en.html
+    cpe = {
+        '5.5.62':'cpe:2.3:a:oracle:mysql:5.5.62:*:*:*:*:*:*:*',
+        '5.6.43':'cpe:2.3:a:oracle:mysql:5.6.43:*:*:*:*:*:*:*',
+        '5.6.44':'cpe:2.3:a:oracle:mysql:5.6.44:*:*:*:*:*:*:*',
+        '5.7.9':'cpe:2.3:a:oracle:mysql:5.7.9:*:*:*:*:*:*:*',
+        '5.7.10':'cpe:2.3:a:oracle:mysql:5.7.10:*:*:*:*:*:*:*',
+        '5.7.11':'cpe:2.3:a:oracle:mysql:5.7.11:*:*:*:*:*:*:*',
+        '5.7.12':'cpe:2.3:a:oracle:mysql:5.7.12:*:*:*:*:*:*:*',
+        '5.7.13':'cpe:2.3:a:oracle:mysql:5.7.13:*:*:*:*:*:*:*',
+        '5.7.14':'cpe:2.3:a:oracle:mysql:5.7.14:*:*:*:*:*:*:*',
+        '5.7.15':'cpe:2.3:a:oracle:mysql:5.7.15:*:*:*:*:*:*:*',
+        '5.7.16':'cpe:2.3:a:oracle:mysql:5.7.16:*:*:*:*:*:*:*',
+        '5.7.17':'cpe:2.3:a:oracle:mysql:5.7.17:*:*:*:*:*:*:*',
+        '5.7.18':'cpe:2.3:a:oracle:mysql:5.7.18:*:*:*:*:*:*:*',
+        '5.7.19':'cpe:2.3:a:oracle:mysql:5.7.19:*:*:*:*:*:*:*',
+        '5.7.20':'cpe:2.3:a:oracle:mysql:5.7.20:*:*:*:*:*:*:*',
+        '5.7.21':'cpe:2.3:a:oracle:mysql:5.7.21:*:*:*:*:*:*:*',
+        '5.7.22':'cpe:2.3:a:oracle:mysql:5.7.22:*:*:*:*:*:*:*',
+        '5.7.23':'cpe:2.3:a:oracle:mysql:5.7.23:*:*:*:*:*:*:*',
+        '5.7.24':'cpe:2.3:a:oracle:mysql:5.7.24:*:*:*:*:*:*:*',
+        '5.7.25':'cpe:2.3:a:oracle:mysql:5.7.25:*:*:*:*:*:*:*',
+        '5.7.26':'cpe:2.3:a:oracle:mysql:5.7.26:*:*:*:*:*:*:*',
+        '5.7.27':'cpe:2.3:a:oracle:mysql:5.7.27:*:*:*:*:*:*:*',
+        '8.0.11':'cpe:2.3:a:oracle:mysql:8.0.11:*:*:*:*:*:*:*',
+        '8.0.12':'cpe:2.3:a:oracle:mysql:8.0.12:*:*:*:*:*:*:*',
+        '8.0.13':'cpe:2.3:a:oracle:mysql:8.0.13:*:*:*:*:*:*:*',
+        '8.0.14':'cpe:2.3:a:oracle:mysql:8.0.14:*:*:*:*:*:*:*',
+        '8.0.15':'cpe:2.3:a:oracle:mysql:8.0.15:*:*:*:*:*:*:*',
+        '8.0.16':'cpe:2.3:a:oracle:mysql:8.0.16:*:*:*:*:*:*:*',
+        '8.0.17':'cpe:2.3:a:oracle:mysql:8.0.17:*:*:*:*:*:*:*',
+        '8.0.18':'cpe:2.3:a:oracle:mysql:8.0.18:*:*:*:*:*:*:*',
+        '8.0.19':'cpe:2.3:a:oracle:mysql:8.0.19:*:*:*:*:*:*:*'
+    }
 
     variant('functions', default=False, when='+dynamic_extensions',
             description='Provide mathematical and string extension functions for SQL '
