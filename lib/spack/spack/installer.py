@@ -1573,40 +1573,45 @@ class PackageInstaller(object):
             # CVE scores between 6.1-8.9 are "safe-yet-vulnerable" and print warning messages to make the user aware of vulnerabilities
             # CVE scores 9.0 or above are completely blocked and a block message appears telling the user why
 
-            for eachCVE in r:
-                cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
-                if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
-                    pass
+            try:
+                for eachCVE in r:
+                    cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
+                    if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
+                        pass
 
-                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
-                    cve_dict["package"] = pkg.name
-                    cve_dict["cve"] = eachCVE.id
-                    cve_dict["version"] = version
-                    cve_dict["score"] = eachCVE.score[1]
-                    cve_dict["url"] = eachCVE.url
-                    cve_list.append(cve_dict)
-                
-                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
-                    print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
-                    print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ".")
-                    print("---------------------------------------------------------------------------------------------------------------------")
-                    cve_dict["package"] = pkg.name
-                    cve_dict["cve"] = eachCVE.id
-                    cve_dict["version"] = version
-                    cve_dict["score"] = eachCVE.score[1]
-                    cve_dict["url"] = eachCVE.url
-                    cve_list.append(cve_dict)
-                    for cve in cve_list:
-                        print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                    elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
+                        cve_dict["package"] = pkg.name
+                        cve_dict["cve"] = eachCVE.id
+                        cve_dict["version"] = version
+                        cve_dict["score"] = eachCVE.score[1]
+                        cve_dict["url"] = eachCVE.url
+                        cve_list.append(cve_dict)
                     
-                    print("If you still wish to install this package(s), you will need elevated privileges. Please contact your system adminstrator for instructions on how to safely install this package(s).")
-                    exit()
+                    elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
+                        print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                        print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ".")
+                        print("---------------------------------------------------------------------------------------------------------------------")
+                        cve_dict["package"] = pkg.name
+                        cve_dict["cve"] = eachCVE.id
+                        cve_dict["version"] = version
+                        cve_dict["score"] = eachCVE.score[1]
+                        cve_dict["url"] = eachCVE.url
+                        cve_list.append(cve_dict)
+                        for cve in cve_list:
+                            print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                        
+                        print("If you still wish to install this package(s), you will need elevated privileges. Please contact your system adminstrator for instructions on how to safely install this package(s).")
+                        exit()
 
-            if cve_list: 
-                print("WARNING: This package contains known vulnerabilities. For more information, click the link associated with a vulnerability below. Continuing install...")
-                print("--------------------------------------------------------------------------------------------------------------------------------------------------------")  
-            for cve in cve_list:
-                print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                if cve_list: 
+                    print("WARNING: This package contains known vulnerabilities. For more information, click the link associated with a vulnerability below. Continuing install...")
+                    print("--------------------------------------------------------------------------------------------------------------------------------------------------------")  
+                for cve in cve_list:
+                    print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+
+            except Exception:
+                print("The Rate Limit for requests to the National Vulnerability Database Library has been met. Please wait a few moments before running again.")
+                exit()
 
             term_title.next_pkg(pkg)
             term_title.set('Processing {0}'.format(pkg.name))
