@@ -43,6 +43,9 @@ class Maven(Package):
             '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:-:*:*:*:*:*:*',
             '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:alpha1:*:*:*:*:*:*',
             '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:beta1:*:*:*:*:*:*',
+            '3.8.5':'cpe:2.3:a:apache:maven:3.8.5:*:*:*:*:*:*',
+            '3.3.9':'cpe:2.3:a:apache:maven:3.3.9:*:*:*:*:*:*',
+            '3.8.4':'cpe:2.3:a:apache:maven:3.8.4:*:*:*:*:*:*'
           }
 
     depends_on('java', type='run')
