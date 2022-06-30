@@ -32,10 +32,11 @@ import glob
 import heapq
 import itertools
 import os
+from os.path import exists
+import json
 import shutil
 import sys
 import time
-import json
 from collections import defaultdict
 
 import six
@@ -870,7 +871,6 @@ class PackageInstaller(object):
             else:
                 lock.release_read()
 
-
     def _prepare_for_install(self, task):
         """
         Check the database and leftover installation directories/files and
@@ -1537,7 +1537,6 @@ class PackageInstaller(object):
         # back on failure
         return InstallAction.OVERWRITE
 
-    
     def install(self):
         """
         Install the requested package(s) and or associated dependencies.
@@ -1570,44 +1569,80 @@ class PackageInstaller(object):
             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
             '''TODO: have users set a environment variable equal to api_key and reference it earlier'''
             version = pkg.version
-            print("version is ", version)
-            r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
-            # by default includes V2 scores that don't apply to specified version
-            #so for cve scores between 1-6 we do nothing
-            #between 6.1-8.9  we throw a warning and print vulnerability description
-            #above 8.9 we block the install
+            repo = spack.repo.path
+            path_to_pkg = repo.filename_for_package_name(pkg.name)
+            path_parent = os.path.dirname(path_to_pkg)
+            file_exists = exists(path_parent+"/cve.json")
+            cve_json_path = path_parent+"/cve.json"
+            warning = False
+            # By default includes V2 scores that don't apply to specified versions
+            # CVE scores between 1-6 are "safe" and do not print warning or block messages
+            # CVE scores between 6.1-8.9 are "safe-yet-vulnerable" and print warning messages to make the user aware of vulnerabilities
+            # CVE scores 9.0 or above are completely blocked and a block message appears telling the user why
 
-            for eachCVE in r:
-                cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
-                if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
-                    pass
+             
+            if(file_exists):
+                with open(cve_json_path, 'r') as json_file:
+                    cve_loader = json.load(json_file)
+                    for cves in cve_loader:
+                        for vers_key, data in cves.items():
+                            if(vers_key == str(version) and data["score"] in range(0, cvss_warn)):
+                                pass
+                            elif vers_key == str(version) and data["score"] >= cvss_warn and data["score"] < cvss_thresh_block:
+                                if(warning == False):
+                                    print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
+                                    warning = True
+                                print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                                print("-"*80)
+                            elif vers_key == str(version) and data["score"] >= cvss_thresh_block:
+                                print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                                print("The package", pkg.name, version, "has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the associated link below.")
+                                print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+                                print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                                print("-"*80)
+                                exit() 
 
-                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
-                    cve_dict["package"] = pkg.name
-                    cve_dict["cve"] = eachCVE.id
-                    cve_dict["version"] = version
-                    cve_dict["score"] = eachCVE.score[1]
-                    cve_dict["url"] = eachCVE.url
-                    cve_list.append(cve_dict)
-                
-                elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
-                    print("BLOCKED INSTALLATION: your installation was BLOCKED due to having one or more CRITCAL vulnerabilities")
-                    cve_dict["package"] = pkg.name
-                    cve_dict["cve"] = eachCVE.id
-                    cve_dict["version"] = version
-                    cve_dict["score"] = eachCVE.score[1]
-                    cve_dict["url"] = eachCVE.url
-                    cve_list.append(cve_dict)
+            else:
+                try:
+                    r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
+                    for eachCVE in r:
+                        cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
+                        if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
+                            pass
+
+                        elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
+                            cve_dict["package"] = pkg.name
+                            cve_dict["cve"] = eachCVE.id
+                            cve_dict["version"] = version
+                            cve_dict["score"] = eachCVE.score[1]
+                            cve_dict["url"] = eachCVE.url
+                            cve_list.append(cve_dict)
+                        
+                        elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
+                            print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                            print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the link associated with a vulnerability below.")
+                            print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+                            cve_dict["package"] = pkg.name
+                            cve_dict["cve"] = eachCVE.id
+                            cve_dict["version"] = version
+                            cve_dict["score"] = eachCVE.score[1]
+                            cve_dict["url"] = eachCVE.url
+                            cve_list.append(cve_dict)
+                            for cve in cve_list:
+                                print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                            
+                            exit()
+
+                    if cve_list: 
+                        print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
+                        print("--------------------------------------------------------------------------------------------------------------------------------------------------------")  
                     for cve in cve_list:
                         print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+
+                except Exception:
+                    print("The Rate Limit for requests to the National Vulnerability Database Library has been met. Please wait a few moments before running again.")
                     exit()
 
-            if cve_list: 
-                print("WARNING: the following vulnerabilities were found in the following package: ")
-                print("------------------------------------------------------------------------------")  
-            for cve in cve_list:
-                print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
-    
             term_title.next_pkg(pkg)
             term_title.set('Processing {0}'.format(pkg.name))
             tty.debug('Processing {0}: task={1}'.format(pkg_id, task))
