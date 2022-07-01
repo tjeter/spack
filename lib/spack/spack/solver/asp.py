@@ -1825,12 +1825,12 @@ class SpackSolverSetup(object):
         self.possible_virtuals = set(
             x.name for x in specs if x.virtual
         )
+        #possible is possible dependencies
         possible = spack.package_base.possible_dependencies(
             *specs,
             virtuals=self.possible_virtuals,
             deptype=spack.dependency.all_deptypes
         )
-
         # Fail if we already know an unreachable node is requested
         for spec in specs:
             missing_deps = [str(d) for d in spec.traverse()
@@ -1839,7 +1839,6 @@ class SpackSolverSetup(object):
                 raise spack.spec.InvalidDependencyError(spec.name, missing_deps)
 
         pkgs = set(possible)
-
         # driver is used by all the functions below to add facts and
         # rules to generate an ASP program.
         self.gen = driver
