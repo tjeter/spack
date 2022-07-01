@@ -4,7 +4,7 @@ import inspect
 import textwrap
 
 from six.moves import zip_longest
-
+from six import string_types
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
@@ -46,6 +46,13 @@ def setup_parser(subparser):
 def section_title(s):
     return header_color + s + plain_format
 
+
+def packagize(pkg):
+    if isinstance(pkg, string_types):
+        return spack.repo.path.get_pkg_class(pkg)
+    else:
+        return pkg
+
 def cve_refresh(pkg):
     color.cprint('')
     color.cprint(section_title('Known CVEs: '))
@@ -58,6 +65,7 @@ def cve_refresh(pkg):
     
     cve_dict = {}
     json_list = []
+
 
     for i in pkg.cpe:
         r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
@@ -78,8 +86,38 @@ def cve_refresh(pkg):
         else:
             pass
     '''
+def cve_deps(pkg):
+    color.cprint('')
+    color.cprint(section_title('JSON Data: '))
+    deps = sorted(pkg.dependencies_of_type('build'))
+    for d in deps:
+        #pkgconfig does not exist (???) and is called pkgconf again (???)
+        if d == "pkgconfig":
+            d = 'pkgconf'
+        
+        dep = packagize(d)
+        repo = spack.repo.path
+        path_to_pkg = repo.filename_for_package_name(dep.name)
+        path_parent = os.path.dirname(path_to_pkg)
+        cve_json_path = path_parent+"/cve.json"
+        file_exists = exists(path_parent+"/cve.json")
+        
+        for i in dep.cpe:
+            r = (nvdlib.searchCVE(cpeName=dep.cpe[i], key=api_key))
+        # by default includes V2 scores that don't apply to specified version
+            for eachCVE in r:
+                if eachCVE.score[0] == 'V3':
+                    cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
+                    cve_dict[i]["cve"] = eachCVE.id
+                    cve_dict[i]["score"] = eachCVE.score[1]
+                    cve_dict[i]["url"] = eachCVE.url
+                    json_list.append(cve_dict)
+            # and eachCVE.score[2] == "CRITICAL":
 
-def cve_to_json(pkg):
+        with open(cve_json_path, 'w') as json_file:
+            json.dump(json_list, json_file)
+
+def read_json(pkg):
     repo = spack.repo.path
     path_to_pkg = repo.filename_for_package_name(pkg.name)
     path_parent = os.path.dirname(path_to_pkg)
@@ -87,15 +125,40 @@ def cve_to_json(pkg):
     color.cprint(section_title('JSON Data: '))
     file_exists = exists(path_parent+"/cve.json")
     cve_json_path = path_parent+"/cve.json"
+    deps = sorted(pkg.dependencies_of_type('build'))
+    
+    for d in deps:
+        #pkgconfig does not exist (???) and is called pkgconf again (???)
+        if d == "pkgconfig":
+            d = 'pkgconf'
+        
+        dep = packagize(d)
+        dep_repo = spack.repo.path
+        dep_path_to_pkg = repo.filename_for_package_name(dep.name)
+        dep_path_parent = os.path.dirname(path_to_pkg)
+        dep_cve_json_path = path_parent+"/cve.json"
+        dep_file_exists = exists(path_parent+"/cve.json")
+        if dep_file_exists:
+            with open(dep_cve_json_path, 'r') as json_file:
+                cve_loader = json.load(json_file)
+                for cves in cve_loader:
+                    for version, data in cves.items():
+                       print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                       print("-"*90)
+        else:
+            print("file could not be found check permissions and if cve.json exists for", pkg.name)
+
     if file_exists:
         with open(cve_json_path, 'r') as json_file:
             cve_loader = json.load(json_file)
             for cves in cve_loader:
                 for version, data in cves.items():
-                   print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-                   print("-"*80)
+                   print(pkg.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                   print("-"*90)
     else:
         print("file could not be found check permissions and if cve.json exists for", pkg.name)
+
+
 
 def cve(parser, args):
     pkg = spack.repo.get(args.package)
@@ -110,9 +173,9 @@ def cve(parser, args):
         '{0}:   '
     ).format(pkg.build_system_class) + pkg.name
     color.cprint(header)
-
     color.cprint('')
     color.cprint(section_title('Description:'))
+    
     if pkg.__doc__:
         color.cprint(color.cescape(pkg.format_doc(indent=4)))
     else:
@@ -125,7 +188,8 @@ def cve(parser, args):
         (args.all or args.refresh, cve_refresh)
     ]
     if file_exists:
-        cve_to_json(pkg)
+        read_json(pkg)
     else:
         cve_refresh(pkg)
-        cve_to_json(pkg)
+        cve_deps(pkg)
+        read_json(pkg)
