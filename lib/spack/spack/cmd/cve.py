@@ -36,24 +36,26 @@ def setup_parser(subparser):
     )
 
     options = [
-        ('--refresh'),
+        ('--refresh', cve_refresh.__doc__),
     ]
     for opt, help_comment in options:
         subparser.add_argument(opt, action='store_true', help=help_comment)
 
     arguments.add_common_arguments(subparser, ['package'])
 
+def section_title(s):
+    return header_color + s + plain_format
 
 def cve_refresh(pkg):
     color.cprint('')
     color.cprint(section_title('Known CVEs: '))
-    
+
     repo = spack.repo.path
     path_to_pkg = repo.filename_for_package_name(pkg.name)
     path_parent = os.path.dirname(path_to_pkg)
     file_exists = exists(path_parent+"/cve.json")
     cve_json_path = path_parent+"/cve.json"
-    
+
     cve_dict = {}
     json_list = []
 
@@ -66,8 +68,6 @@ def cve_refresh(pkg):
                 cve_dict[i]["cve"] = eachCVE.id
                 cve_dict[i]["score"] = eachCVE.score[1]
                 cve_dict[i]["url"] = eachCVE.url
-                print(i,"|", eachCVE.id, "|",  str(eachCVE.score[0]), "|", str(eachCVE.score[1]), "|", eachCVE.url)
-                print("-"*80)
                 json_list.append(cve_dict)
         # and eachCVE.score[2] == "CRITICAL":
 
@@ -87,13 +87,15 @@ def cve_to_json(pkg):
     color.cprint(section_title('JSON Data: '))
     file_exists = exists(path_parent+"/cve.json")
     cve_json_path = path_parent+"/cve.json"
-
-    with open(cve_json_path, 'r') as json_file:
-        cve_loader = json.load(json_file)
-        for cves in cve_loader:
-            for version, data in cves.items():
-               print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-               print("-"*80)
+    if file_exists:
+        with open(cve_json_path, 'r') as json_file:
+            cve_loader = json.load(json_file)
+            for cves in cve_loader:
+                for version, data in cves.items():
+                   print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                   print("-"*80)
+    else:
+        print("file could not be found check permissions and if cve.json exists for", pkg.name)
 
 def cve(parser, args):
     pkg = spack.repo.get(args.package)
@@ -103,8 +105,6 @@ def cve(parser, args):
     file_exists = exists(path_parent+"/cve.json")
     cve_json_path = path_parent+"/cve.json"
 
-    if(args == '--refresh' or file_exists = False):
-        cve_refresh(pkg)
     # Output core package information
     header = section_title(
         '{0}:   '
@@ -122,9 +122,10 @@ def cve(parser, args):
 
     # Now output optional information in expected order
     sections = [
-        (args.all or args.refresh),
+        (args.all or args.refresh, cve_refresh)
     ]
-    for print_it, func in sections:
-        if print_it:
-            func(pkg)
-    color.cprint('')
+    if file_exists:
+        cve_to_json(pkg)
+    else:
+        cve_refresh(pkg)
+        cve_to_json(pkg)
