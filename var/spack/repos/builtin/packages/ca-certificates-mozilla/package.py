@@ -31,7 +31,25 @@ class CaCertificatesMozilla(Package):
     version('2019-11-27', sha256='0d98a1a961aab523c9dc547e315e1d79e887dea575426ff03567e455fc0b66b4', expand=False)
     version('2019-10-16', sha256='5cd8052fcf548ba7e08899d8458a32942bf70450c9af67a0850b4c711804a2e4', expand=False)
     version('2019-08-28', sha256='38b6230aa4bee062cd34ee0ff6da173250899642b1937fc130896290b6bd91e3', expand=False)
-
+    cpe ={
+            '2022-03-29':'',
+            '2022-03-18':'',
+            '2022-02-01':'',
+            '2021-10-26':'',
+            '2021-09-30':'',
+            '2021-07-05':'',
+            '2021-05-25':'',
+            '2021-04-13':'',
+            '2021-01-19':'',
+            '2020-12-08':'',
+            '2020-10-14':'',
+            '2020-07-22':'',
+            '2020-06-24':'',
+            '2020-01-01':'',
+            '2019-11-27':'',
+            '2019-10-16':'',
+            '2019-08-28':''   
+    }
     # Make spack checksum work
     def url_for_version(self, version):
         return "https://curl.se/ca/cacert-{0}.pem".format(version)
