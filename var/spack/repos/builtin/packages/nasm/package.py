@@ -21,7 +21,12 @@ class Nasm(Package):
     version('2.14.02', sha256='b34bae344a3f2ed93b2ca7bf25f1ed3fb12da89eeda6096e3551fd66adeae9fc')
     version('2.13.03', sha256='23e1b679d64024863e2991e5c166e19309f0fe58a9765622b35bd31be5b2cc99')
     version('2.11.06', sha256='3a72476f3cb45294d303f4d34f20961b15323ac24e84eb41bc130714979123bb')
-
+    cpe = {
+            '2.15.05':'cpe:2.3:a:nasm:netwide_assembler:2.15.05:*:*:*:*:*:*:*',
+            '2.14.02':'cpe:2.3:a:nasm:netwide_assembler:2.14.02:*:*:*:*:*:*:*',
+            '2.13.03':'cpe:2.3:a:nasm:netwide_assembler:2.13.03:*:*:*:*:*:*:*',
+            '2.11.06':'cpe:2.3:a:nasm:netwide_assembler:2.11.06:*:*:*:*:*:*:*'
+    }
     # Fix compilation with GCC 8
     # https://bugzilla.nasm.us/show_bug.cgi?id=3392461
     patch('https://src.fedoraproject.org/rpms/nasm/raw/0cc3eb244bd971df81a7f02bc12c5ec259e1a5d6/f/0001-Remove-invalid-pure_func-qualifiers.patch', level=1, sha256='ac9f315d204afa6b99ceefa1fe46d4eed2b8a23c7315d32d33c0f378d930e950', when='@2.13.03 %gcc@8:')
