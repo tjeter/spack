@@ -32,23 +32,23 @@ class CaCertificatesMozilla(Package):
     version('2019-10-16', sha256='5cd8052fcf548ba7e08899d8458a32942bf70450c9af67a0850b4c711804a2e4', expand=False)
     version('2019-08-28', sha256='38b6230aa4bee062cd34ee0ff6da173250899642b1937fc130896290b6bd91e3', expand=False)
     cpe ={
-            '2022-03-29':'',
-            '2022-03-18':'',
-            '2022-02-01':'',
-            '2021-10-26':'',
-            '2021-09-30':'',
-            '2021-07-05':'',
-            '2021-05-25':'',
-            '2021-04-13':'',
-            '2021-01-19':'',
-            '2020-12-08':'',
-            '2020-10-14':'',
-            '2020-07-22':'',
-            '2020-06-24':'',
-            '2020-01-01':'',
-            '2019-11-27':'',
-            '2019-10-16':'',
-            '2019-08-28':''   
+            '2022-03-29':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2022-03-18':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2022-02-01':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-10-26':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-09-30':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-07-05':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-05-25':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-04-13':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2021-01-19':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2020-12-08':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2020-10-14':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2020-07-22':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2020-06-24':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2020-01-01':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2019-11-27':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2019-10-16':'cpe:2.3:a:mozilla:ca-certs:2022-03-29',
+            '2019-08-28':'cpe:2.3:a:mozilla:ca-certs:2022-03-29'   
     }
     # Make spack checksum work
     def url_for_version(self, version):
