@@ -37,6 +37,7 @@ def setup_parser(subparser):
 
     options = [
         ('--refresh', cve_refresh.__doc__),
+        ('--dep', cve_deps.__doc__)
     ]
     for opt, help_comment in options:
         subparser.add_argument(opt, action='store_true', help=help_comment)
@@ -88,7 +89,6 @@ def cve_refresh(pkg):
     '''
 def cve_deps(pkg):
     color.cprint('')
-    color.cprint(section_title('JSON Data: '))
     deps = sorted(pkg.dependencies_of_type('build'))
     for d in deps:
         #pkgconfig does not exist (???) and is called pkgconf again (???)
@@ -101,7 +101,7 @@ def cve_deps(pkg):
         path_parent = os.path.dirname(path_to_pkg)
         cve_json_path = path_parent+"/cve.json"
         file_exists = exists(path_parent+"/cve.json")
-        
+        json_list = []        
         for i in dep.cpe:
             r = (nvdlib.searchCVE(cpeName=dep.cpe[i], key=api_key))
         # by default includes V2 scores that don't apply to specified version
@@ -113,7 +113,6 @@ def cve_deps(pkg):
                     cve_dict[i]["url"] = eachCVE.url
                     json_list.append(cve_dict)
             # and eachCVE.score[2] == "CRITICAL":
-
         with open(cve_json_path, 'w') as json_file:
             json.dump(json_list, json_file)
 
@@ -121,34 +120,17 @@ def read_json(pkg):
     repo = spack.repo.path
     path_to_pkg = repo.filename_for_package_name(pkg.name)
     path_parent = os.path.dirname(path_to_pkg)
-    color.cprint('')
-    color.cprint(section_title('JSON Data: '))
     file_exists = exists(path_parent+"/cve.json")
     cve_json_path = path_parent+"/cve.json"
     deps = sorted(pkg.dependencies_of_type('build'))
-    
-    for d in deps:
-        #pkgconfig does not exist (???) and is called pkgconf again (???)
-        if d == "pkgconfig":
-            d = 'pkgconf'
-        
-        dep = packagize(d)
-        dep_repo = spack.repo.path
-        dep_path_to_pkg = repo.filename_for_package_name(dep.name)
-        dep_path_parent = os.path.dirname(path_to_pkg)
-        dep_cve_json_path = path_parent+"/cve.json"
-        dep_file_exists = exists(path_parent+"/cve.json")
-        if dep_file_exists:
-            with open(dep_cve_json_path, 'r') as json_file:
-                cve_loader = json.load(json_file)
-                for cves in cve_loader:
-                    for version, data in cves.items():
-                       print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-                       print("-"*90)
-        else:
-            print("file could not be found check permissions and if cve.json exists for", pkg.name)
+    title_bool = False
 
     if file_exists:
+        title_pkg_bool = False
+        if title_pkg_bool == False:
+            color.cprint('')
+            color.cprint(section_title('Package '))
+            title_pkg_bool = True
         with open(cve_json_path, 'r') as json_file:
             cve_loader = json.load(json_file)
             for cves in cve_loader:
@@ -158,6 +140,31 @@ def read_json(pkg):
     else:
         print("file could not be found check permissions and if cve.json exists for", pkg.name)
 
+    if title_bool == False:
+        color.cprint('')
+        color.cprint(section_title('Dependencies '))
+        title_bool = True
+    for d in deps:
+        #pkgconfig does not exist (???) and is called pkgconf again (???)
+        if d == "pkgconfig":
+            d = 'pkgconf'
+    
+        dep = packagize(d)
+        dep_repo = spack.repo.path
+        dep_path_to_pkg = repo.filename_for_package_name(dep.name)
+        dep_path_parent = os.path.dirname(dep_path_to_pkg)
+        dep_cve_json_path = dep_path_parent+"/cve.json"
+        dep_file_exists = exists(dep_path_parent+"/cve.json")
+        
+        if dep_file_exists:
+            with open(dep_cve_json_path, 'r') as json_file:
+                cve_loader = json.load(json_file)
+                for cves in cve_loader:
+                    for version, data in cves.items():
+                       print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                       print("-"*90)
+        else:
+            print("file could not be found check permissions and if cve.json exists for", pkg.name)
 
 
 def cve(parser, args):
@@ -185,8 +192,14 @@ def cve(parser, args):
 
     # Now output optional information in expected order
     sections = [
-        (args.all or args.refresh, cve_refresh)
+        (args.all or args.refresh, cve_refresh),
+        (args.all or args.dep, cve_deps)
+
     ]
+    for print_it, func in sections:
+        if print_it:
+            func(pkg)
+
     if file_exists:
         read_json(pkg)
     else:
