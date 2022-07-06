@@ -17,9 +17,9 @@ class Apr(AutotoolsPackage):
     version('1.5.2', sha256='1af06e1720a58851d90694a984af18355b65bb0d047be03ec7d659c746d6dbdb')
 
     cpe = {
-            '1.7.0':'cpe:2.3:a:apache:apr:1.7.0',
-            '1.6.2':'cpe:2.3:a:apache:apr:1.6.2',
-            '1.5.2':'cpe:2.3:a:apache:apr:1.5.2'
+            '1.7.0':'cpe:2.3:a:apache:portable_runtime:1.7.0:*:*:*:*:*:*:*',
+            '1.6.2':'cpe:2.3:a:apache:portable_runtime:1.6.2:*:*:*:*:*:*:*',
+            '1.5.2':'cpe:2.3:a:apache:portable_runtime:1.5.2:*:*:*:*:*:*:*'
           }
 
     patch('missing_includes.patch', when='@1.7.0')
