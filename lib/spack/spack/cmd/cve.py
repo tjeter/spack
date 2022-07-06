@@ -22,7 +22,7 @@ import json
 import nvdlib
 api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
 
-description = 'get common vulnerabilities/exposures (CVEs)'
+description = "get common vulnerabilities/exposures (CVEs) for a package and its dependencies; and stores this info in a json file"
 section = 'basic'
 level = 'short'
 
@@ -36,7 +36,7 @@ def setup_parser(subparser):
     )
 
     options = [
-        ('--refresh', cve_refresh.__doc__),
+        ('--update', cve_refresh.__doc__),
         ('--dep', cve_deps.__doc__)
     ]
     for opt, help_comment in options:
@@ -101,7 +101,8 @@ def cve_deps(pkg):
         path_parent = os.path.dirname(path_to_pkg)
         cve_json_path = path_parent+"/cve.json"
         file_exists = exists(path_parent+"/cve.json")
-        json_list = []        
+        json_list = []
+
         for i in dep.cpe:
             r = (nvdlib.searchCVE(cpeName=dep.cpe[i], key=api_key))
         # by default includes V2 scores that don't apply to specified version
@@ -138,7 +139,7 @@ def read_json(pkg):
                    print(pkg.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
                    print("-"*90)
     else:
-        print("file could not be found check permissions and if cve.json exists for", pkg.name)
+        print("file could not be found check permissions and if", cve_json_path, "exists for ", pkg.name)
 
     if title_bool == False:
         color.cprint('')
@@ -164,7 +165,7 @@ def read_json(pkg):
                        print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
                        print("-"*90)
         else:
-            print("file could not be found check permissions and if cve.json exists for", pkg.name)
+            print("file could not be found check permissions and if", dep_cve_json_path, "exists for ", pkg.name)
 
 
 def cve(parser, args):
@@ -192,7 +193,7 @@ def cve(parser, args):
 
     # Now output optional information in expected order
     sections = [
-        (args.all or args.refresh, cve_refresh),
+        (args.all or args.update, cve_refresh),
         (args.all or args.dep, cve_deps)
 
     ]
