@@ -55,7 +55,7 @@ class Pmix(AutotoolsPackage):
     version('2.1.2',    sha256='94bb9c801c51a6caa1b8cef2b85ecf67703a5dfa4d79262e6668c37c744bb643')
     version('2.0.1',    sha256='ba6e0f32936b1859741adb221e18b2c1ee7dc53a6b374b9f7831adf1692b15fd')
     version('1.2.5',    sha256='a2b02d489ee730c06ee40e7f9ffcebb6c35bcb4f95153fab7c4276a3add6ae31')
-
+    cpe = {'1.2.5':'cpe:2.3:a:pmix_project:pmix:1.2.5'}
     variant('pmi_backwards_compatibility',
             default=True,
             description="Toggle pmi backwards compatibility")
