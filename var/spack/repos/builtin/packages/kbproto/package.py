@@ -17,5 +17,9 @@ class Kbproto(AutotoolsPackage, XorgPackage):
 
     version('1.0.7', sha256='828cb275b91268b1a3ea950d5c0c5eb076c678fdf005d517411f89cc8c3bb416')
 
+    cpe = {
+            '1.0.7':'cpe:2.3:a:freedesktop:kbproto:1.0.7:*:*:*:*:*:*:*'
+          }
+
     depends_on('pkgconfig', type='build')
     depends_on('util-macros', type='build')

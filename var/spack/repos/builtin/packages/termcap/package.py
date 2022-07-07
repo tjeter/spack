@@ -16,3 +16,8 @@ class Termcap(AutotoolsPackage):
 
     version('1.3.1', sha256='91a0e22e5387ca4467b5bcb18edf1c51b930262fd466d5fda396dd9d26719100')
     version('1.3',   sha256='3eb4b98ae08408ca65dd9275f3c8e56e2feac1261fae914a9b21273db51cf000')
+
+    cpe = {
+            '1.3':'cpe:2.3:a:gnu:termcap:1.3:*:*:*:*:*:*:*',
+            '1.3.1':'cpe:2.3:a:gnu:termcap:1.3.1:*:*:*:*:*:*:*'
+          }

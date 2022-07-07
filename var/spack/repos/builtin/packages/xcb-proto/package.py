@@ -19,6 +19,15 @@ class XcbProto(AutotoolsPackage):
     version('1.12', sha256='cfa49e65dd390233d560ce4476575e4b76e505a0e0bacdfb5ba6f8d0af53fd59')
     version('1.11', sha256='d12152193bd71aabbdbb97b029717ae6d5d0477ab239614e3d6193cc0385d906')
 
+    cpe = { 
+            '1.11':'cpe:2.3:a:freedesktop:xcb-proto:1.11:*:*:*:*:*:*:*',
+            '1.12':'cpe:2.3:a:freedesktop:xcb-proto:1.12:*:*:*:*:*:*:*',
+            '1.13':'cpe:2.3:a:freedesktop:xcb-proto:1.13:*:*:*:*:*:*:*',
+            '1.14':'cpe:2.3:a:freedesktop:xcb-proto:1.14:*:*:*:*:*:*:*',
+            '1.14.1':'cpe:2.3:a:freedesktop:xcb-proto:1.14.1:*:*:*:*:*:*:*'
+          }
+
+
     # TODO: uncomment once build deps can be resolved separately
     # See #7646, #4145, #4063, and #2548 for details
     # extends('python')

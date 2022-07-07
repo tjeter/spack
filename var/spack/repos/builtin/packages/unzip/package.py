@@ -14,6 +14,10 @@ class Unzip(MakefilePackage):
 
     version('6.0', sha256='036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37')
 
+    cpe = {
+            '6.0':'cpe:2.3:a:unzip_project:unzip:6.0:*:*:*:*:*:*:*'
+          }
+
     # The Cray cc wrapper doesn't handle the '-s' flag (strip) cleanly.
     @when('platform=cray')
     def patch(self):

@@ -24,6 +24,14 @@ class Libpng(AutotoolsPackage):
     version('1.5.30', sha256='7d76275fad2ede4b7d87c5fd46e6f488d2a16b5a69dc968ffa840ab39ba756ed')
     version('1.2.57', sha256='0f4620e11fa283fedafb474427c8e96bf149511a1804bdc47350963ae5cf54d8')
 
+    cpe = {
+            '1.2.57':'cpe:2.3:a:libpng:libpng:1.2.57:-:*:*:*:*:*:*',
+            '1.2.57':'cpe:2.3:a:libpng:libpng:1.2.57:beta:*:*:*:*:*:*',
+            '1.5.30':'cpe:2.3:a:libpng:libpng:1.5.30:-:*:*:*:*:*:*',
+            '1.5.30':'cpe:2.3:a:libpng:libpng:1.5.30:beta:*:*:*:*:*:*',
+            '1.6.37':'cpe:2.3:a:libpng:libpng:1.6.37:*:*:*:*:*:*:*'
+          }
+
     depends_on('zlib@1.0.4:')  # 1.2.5 or later recommended
 
     def configure_args(self):

@@ -14,5 +14,9 @@ class Fontsproto(AutotoolsPackage, XorgPackage):
 
     version('2.1.3', sha256='72c44e63044b2b66f6fa112921621ecc20c71193982de4f198d9a29cda385c5e')
 
+    cpe = {
+            '2.1.3':'cpe:2.3:a:freedesktop:fontsproto:2.1.3:*:*:*:*:*:*:*'
+          }
+
     depends_on('pkgconfig', type='build')
     depends_on('util-macros', type='build')
