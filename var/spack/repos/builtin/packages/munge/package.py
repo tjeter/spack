@@ -19,7 +19,12 @@ class Munge(AutotoolsPackage):
     version('0.5.12', sha256='e972e3c3e947995a99e023f5758047db16cfe2f0c2c9ca76399dc1511fa71be8')
     version('0.5.11', sha256='8e075614f81cb0a6df21a0aafdc825498611a04429d0876f074fc828739351a5',
             url='https://github.com/dun/munge/releases/download/munge-0.5.11/munge-0.5.11.tar.bz2')
-
+    cpe = {
+            '0.5.14':'cpe:2.3:a:opensuse:munge:0.5.14:*:*:*:*:*:*:*',
+            '0.5.13':'cpe:2.3:a:opensuse:munge:0.5.13:*:*:*:*:*:*:*',
+            '0.5.12':'cpe:2.3:a:opensuse:munge:0.5.12:*:*:*:*:*:*:*',
+            '0.5.11':'cpe:2.3:a:opensuse:munge:0.5.11:*:*:*:*:*:*:*'
+    }
     variant('localstatedir', default='PREFIX/var', values=any,
             description='Set local state path (possibly to /var)')
 
