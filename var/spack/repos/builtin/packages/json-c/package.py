@@ -17,7 +17,14 @@ class JsonC(CMakePackage):
     version('0.12.1', sha256='2a136451a7932d80b7d197b10441e26e39428d67b1443ec43bbba824705e1123')
     version('0.12',   sha256='000c01b2b3f82dcb4261751eb71f1b084404fb7d6a282f06074d3c17078b9f3f')
     version('0.11',   sha256='28dfc65145dc0d4df1dfe7701ac173c4e5f9347176c8983edbfac9149494448c')
-
+    cpe = {
+            '0.15':'cpe:2.3:a:json-c_project:json-c:0.15:*:*:*:*:*:*:*', 
+            '0.14':'cpe:2.3:a:json-c_project:json-c:0.14:*:*:*:*:*:*:*', 
+            '0.13.1':'cpe:2.3:a:json-c_project:json-c:0.13.1:*:*:*:*:*:*:*',
+            '0.12.1':'cpe:2.3:a:json-c_project:json-c:0.12.1:*:*:*:*:*:*:*',
+            '0.12':'cpe:2.3:a:json-c_project:json-c:0.12:*:*:*:*:*:*:*', 
+            '0.11':'cpe:2.3:a:json-c_project:json-c:0.11:*:*:*:*:*:*:*' 
+    }
     depends_on('autoconf', when='@:0.13.1', type='build')
 
     parallel = False
