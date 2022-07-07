@@ -66,7 +66,33 @@ class Hdf5(CMakePackage):
     version('1.8.13', sha256='82f6b38eec103b4fccfbf14892786e0c27a8135d3252d8601cf5bf20066d38c1', preferred=True)
     version('1.8.12', sha256='b5cccea850096962b5fd9e96f22c4f47d2379224bb41130d9bc038bb6c37dfcb', preferred=True)
     version('1.8.10', sha256='4813b79c5fb8701a625b9924b8203bc7154a77f9b826ad4e034144b4056a160a', preferred=True)
+    cpe = {
+            '1.12.2':'cpe:2.3:a:hdfgroup:hdf5:1.12.2:*:*:*:*:*:*:*',
+            '1.12.1':'cpe:2.3:a:hdfgroup:hdf5:1.12.1:*:*:*:*:*:*:*',
+            '1.12.0':'cpe:2.3:a:hdfgroup:hdf5:1.12.9:*:*:*:*:*:*:*',
+            '1.10.9':'cpe:2.3:a:hdfgroup:hdf5:1.10.9:*:*:*:*:*:*:*',
+            '1.10.8':'cpe:2.3:a:hdfgroup:hdf5:1.10.8:*:*:*:*:*:*:*',
+            '1.10.7':'cpe:2.3:a:hdfgroup:hdf5:1.10.7:*:*:*:*:*:*:*',
+            '1.10.6':'cpe:2.3:a:hdfgroup:hdf5:1.10.6:*:*:*:*:*:*:*',
+            '1.10.5':'cpe:2.3:a:hdfgroup:hdf5:1.10.5:*:*:*:*:*:*:*',
+            '1.10.4':'cpe:2.3:a:hdfgroup:hdf5:1.10.4:*:*:*:*:*:*:*',
+            '1.10.3':'cpe:2.3:a:hdfgroup:hdf5:1.10.3:*:*:*:*:*:*:*',
+            '1.10.2':'cpe:2.3:a:hdfgroup:hdf5:1.10.2:*:*:*:*:*:*:*',
+            '1.10.1':'cpe:2.3:a:hdfgroup:hdf5:1.10.1:*:*:*:*:*:*:*',
+            '1.10.0':'cpe:2.3:a:hdfgroup:hdf5:1.10.0:*:*:*:*:*:*:*',
+            '1.8.22':'cpe:2.3:a:hdfgroup:hdf5:1.8.22:*:*:*:*:*:*:*',
+            '1.8.21':'cpe:2.3:a:hdfgroup:hdf5:1.8.21:*:*:*:*:*:*:*',
+            '1.8.19':'cpe:2.3:a:hdfgroup:hdf5:1.8.19:*:*:*:*:*:*:*',
+            '1.8.18':'cpe:2.3:a:hdfgroup:hdf5:1.8.18:*:*:*:*:*:*:*',
+            '1.8.17':'cpe:2.3:a:hdfgroup:hdf5:1.8.17:*:*:*:*:*:*:*',
+            '1.8.16':'cpe:2.3:a:hdfgroup:hdf5:1.8.16:*:*:*:*:*:*:*',
+            '1.8.15':'cpe:2.3:a:hdfgroup:hdf5:1.8.15:*:*:*:*:*:*:*',
+            '1.8.14':'cpe:2.3:a:hdfgroup:hdf5:1.8.14:*:*:*:*:*:*:*',
+            '1.8.13':'cpe:2.3:a:hdfgroup:hdf5:1.8.13:*:*:*:*:*:*:*',
+            '1.8.12':'cpe:2.3:a:hdfgroup:hdf5:1.8.12:*:*:*:*:*:*:*',
+            '1.8.10':'cpe:2.3:a:hdfgroup:hdf5:1.8.10:*:*:*:*:*:*:*'
 
+    }
     variant('shared', default=True,
             description='Builds a shared version of the library')
 
