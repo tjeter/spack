@@ -37,8 +37,8 @@ def setup_parser(subparser):
 
     options = [
         ('--update', cve_refresh.__doc__),
-        ('--dep', cve_deps.__doc__)
-        ('-d', cve_deps.__doc__)
+        ('--dep', cve_deps.__doc__),
+        ('-d', cve_deps.__doc__),
         ('-u', cve_refresh.__doc__)
     ]
     for opt, help_comment in options:
