@@ -24,7 +24,15 @@ class Lz4(MakefilePackage):
     version('1.8.1.2', sha256='12f3a9e776a923275b2dc78ae138b4967ad6280863b77ff733028ce89b8123f9')
     version('1.7.5',   sha256='0190cacd63022ccb86f44fa5041dc6c3804407ad61550ca21c382827319e7e7e')
     version('1.3.1',   sha256='9d4d00614d6b9dec3114b33d1224b6262b99ace24434c53487a0c8fd0b18cfed')
-
+    cpe = {
+            '1.9.3':'cpe:2.3:a:lz4_project:lz4:1.9.3:*:*:*:*:*:*:*', 
+            '1.9.2':'cpe:2.3:a:lz4_project:lz4:1.9.2:*:*:*:*:*:*:*', 
+            '1.9.0':'cpe:2.3:a:lz4_project:lz4:1.9.0:*:*:*:*:*:*:*', 
+            '1.8.3':'cpe:2.3:a:lz4_project:lz4:1.8.3:*:*:*:*:*:*:*', 
+            '1.8.1.2':'cpe:2.3:a:lz4_project:lz4:1.8.1.2:*:*:*:*:*:*:*',
+            '1.7.5':'cpe:2.3:a:lz4_project:lz4:1.7.5:*:*:*:*:*:*:*', 
+            '1.3.1':'cpe:2.3:a:lz4_project:lz4:1.3.1:*:*:*:*:*:*:*' 
+    }
     depends_on('valgrind', type='test')
 
     variant('libs', default='shared,static', values=('shared', 'static'),
