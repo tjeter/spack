@@ -25,7 +25,7 @@ from os.path import exists
 import json
 
 import nvdlib
-api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
+api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
 
 description = 'get detailed information on a particular package'
 section = 'basic'
@@ -58,7 +58,6 @@ def setup_parser(subparser):
         ('--no-dependencies', 'do not ' + print_dependencies.__doc__),
         ('--no-variants', 'do not ' + print_variants.__doc__),
         ('--no-versions', 'do not ' + print_versions.__doc__),
-        #('--cves', print_cves.__doc__),
         ('--phases', print_phases.__doc__),
         ('--tags', print_tags.__doc__),
         ('--tests', print_tests.__doc__),
@@ -393,7 +392,6 @@ def print_cves(pkg):
     else:
         for i in pkg.cpe:
             r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
-        # by default includes V2 scores that don't apply to specified version
             for eachCVE in r:
                 if eachCVE.score[0] == 'V3':
                     cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
@@ -403,15 +401,9 @@ def print_cves(pkg):
                     print(i,"|", eachCVE.id, "|",  str(eachCVE.score[0]), "|", str(eachCVE.score[1]), "|", eachCVE.url)
                     print("-"*80)
                     json_list.append(cve_dict)
-            # and eachCVE.score[2] == "CRITICAL":
         
         with open(cve_json_path, 'w') as json_file:
             json.dump(json_list, json_file)
-    '''if eachCVE.score[0] == 'V3': #and len(eachCVE.id) == len(set(eachCVE.id)):
-            print(eachCVE.id, str(eachCVE.score[1]), eachCVE.url)
-        else:
-            pass
-    '''
 
 def cve_to_json(pkg):
     repo = spack.repo.path
