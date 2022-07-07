@@ -62,7 +62,9 @@ class Hwloc(AutotoolsPackage):
     version('1.11.2', sha256='d11f091ed54c56c325ffca1083113a405fcd8a25d5888af64f5cd6cf587b7b0a')
     version('1.11.1', sha256='b41f877d79b6026640943d57ef25311299378450f2995d507a5e633da711be61')
     version('1.9',    sha256='9fb572daef35a1c8608d1a6232a4a9f56846bab2854c50562dfb9a7be294f4e8')
-
+    cpe = {
+            '1.9':'cpe:2.3:a:openmpi:hwloc:1.9'
+    }
     variant('nvml', default=False, description="Support NVML device discovery")
     variant('gl', default=False, description="Support GL device discovery")
     variant('cuda', default=False, description="Support CUDA devices")
