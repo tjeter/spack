@@ -91,7 +91,28 @@ _versions = {
 
 class Openjdk(Package):
     """The free and opensource java implementation"""
+    cpe = {
+        '1.8.0_40-b25':'cpe:2.3:a:oracle:openjdk:8:update40:*:*:*:*:*:*',
+        '1.8.0_202-b08':'cpe:2.3:a:oracle:openjdk:8:update40:*:*:*:*:*:*',
+        '1.8.0_222-b10':'cpe:2.3:a:oracle:openjdk:8:update40:*:*:*:*:*:*',
+        '1.8.0_191-b12':'cpe:2.3:a:oracle:openjdk:8:update40:*:*:*:*:*:*',
+        '1.8.0_265-b01':'cpe:2.3:a:oracle:openjdk:8:update40:*:*:*:*:*:*',
+        '11.0.0-2020-01-01':'cpe:2.3:a:oracle:openjdk:11:*:*:*:*:*:*:*',
+        '11.0.9.1_1':'cpe:2.3:a:oracle:openjdk:11.0.9:*:*:*:*:*:*:*',
+        '10.0.2':'cpe:2.3:a:oracle:openjdk:10.0.2:*:*:*:*:*:*:*',
+        '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
+        '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
+        '11.0.8_10':'cpe:2.3:a:oracle:openjdk:11.0.8:*:*:*:*:*:*:*',
+        '11.0.12_7':'cpe:2.3:a:oracle:openjdk:11.0.12:*:*:*:*:*:*:*',
+        '11.0.14.1-1':'cpe:2.3:a:oracle:openjdk:11.0.14:*:*:*:*:*:*:*',
+        '11.0.15_10':'cpe:2.3:a:oracle:openjdk:11.0.15:*:*:*:*:*:*:*',
+        '16.0.2':'cpe:2.3:a:oracle:openjdk:16.0.2:*:*:*:*:*:*:*',
+        '17.0.0_35':'cpe:2.3:a:oracle:openjdk:17:*:*:*:*:*:*:*',
+        '17.0.2_8':'cpe:2.3:a:oracle:openjdk:17.0.2:*:*:*:*:*:*:*',
+        '17.0.3_7':'cpe:2.3:a:oracle:openjdk:17.0.3:*:*:*:*:*:*:*'
 
+
+    }
     homepage = "https://jdk.java.net"
     preferred_prefix = "11."
 
