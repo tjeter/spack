@@ -14,6 +14,10 @@ class Libxinerama(AutotoolsPackage, XorgPackage):
 
     version('1.1.3', sha256='0ba243222ae5aba4c6a3d7a394c32c8b69220a6872dbb00b7abae8753aca9a44')
 
+    cpe = {
+            '1.1.3':'cpe:2.3:a:x:libxinerama:1.1.3:*:*:*:*:*:*:*'
+          }
+
     depends_on('libx11')
     depends_on('libxext')
 

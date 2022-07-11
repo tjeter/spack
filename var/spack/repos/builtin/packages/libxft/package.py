@@ -18,6 +18,10 @@ class Libxft(AutotoolsPackage, XorgPackage):
 
     version('2.3.2', sha256='26cdddcc70b187833cbe9dc54df1864ba4c03a7175b2ca9276de9f05dce74507')
 
+    cpe = {
+            '2.3.2':'cpe:2.3:a:freedesktop:libxft:2.3.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('freetype@2.1.6:')
     depends_on('fontconfig@2.5.92:')
     depends_on('libx11')

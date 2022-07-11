@@ -14,6 +14,10 @@ class Libxext(AutotoolsPackage, XorgPackage):
 
     version('1.3.3', sha256='eb0b88050491fef4716da4b06a4d92b4fc9e76f880d6310b2157df604342cfe5')
 
+    cpe = {
+           '1.3.3' :'cpe:2.3:a:x:libxext:1.3.3:*:*:*:*:*:*:*'
+          }
+
     depends_on('libx11@1.6:')
 
     depends_on('xproto@7.0.13:')

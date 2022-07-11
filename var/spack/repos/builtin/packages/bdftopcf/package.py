@@ -19,6 +19,10 @@ class Bdftopcf(AutotoolsPackage, XorgPackage):
 
     version('1.0.5', sha256='78a5ec945de1d33e6812167b1383554fda36e38576849e74a9039dc7364ff2c3')
 
+    cpe = {
+            '1.0.5':'cpe:2.3:a:freedesktop:bdftopcf:1.0.5:*:*:*:*:*:*:*'
+          }
+
     depends_on('libxfont')
 
     depends_on('pkgconfig', type='build')

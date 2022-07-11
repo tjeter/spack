@@ -19,7 +19,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
     homepage = "https://www.openssl.org"
 
     # URL must remain http:// so Spack can bootstrap curl
-    url = "https://www.openssl.org/source/openssl-1.1.1o.tar.gz"
+    url = "https://www.openssl.org/source/openssl-3.0.5.tar.gz"
     list_url = "https://www.openssl.org/source/old/"
     list_depth = 1
 
@@ -39,7 +39,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
 
     # The latest stable version is the 1.1.1 series. This is also our Long Term
     # Support (LTS) version, supported until 11th September 2023.
-    version('1.1.1q', sha256='d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca', preferred=True)
+    version('1.1.1q', sha256='d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca')
     version('1.1.1p', sha256='bf61b62aaa66c7c7639942a94de4c9ae8280c08f17d4eac2e44644d9fc8ace6f', deprecated=True)
     version('1.1.1o', sha256='9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f', deprecated=True)
     version('1.1.1n', sha256='40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a', deprecated=True)

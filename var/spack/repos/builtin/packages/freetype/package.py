@@ -28,6 +28,24 @@ class Freetype(AutotoolsPackage):
     version('2.7',    sha256='7b657d5f872b0ab56461f3bd310bd1c5ec64619bd15f0d8e08282d494d9cfea4')
     version('2.5.3',  sha256='41217f800d3f40d78ef4eb99d6a35fd85235b64f81bc56e4812d7672fca7b806')
 
+    cpe = {
+            '2.5.3':'cpe:2.3:a:freetype:freetype:2.5.3:*:*:*:*:*:*:*',
+            '2.7':'cpe:2.3:a:freetype:freetype:2.7:*:*:*:*:*:*:*',
+            '2.7':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.7:*:*:*:*:*:*:*',
+            '2.7.1':'cpe:2.3:a:freetype:freetype:2.7.1:*:*:*:*:*:*:*',
+            '2.7.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.7.1:*:*:*:*:*:*:*',
+            '2.9.1':'cpe:2.3:a:freetype:freetype:2.9.1:*:*:*:*:*:*:*',
+            '2.9.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.9.1:*:*:*:*:*:*:*',
+            '2.10.0':'cpe:2.3:a:freetype:freetype:2.10.0:*:*:*:*:*:*:*',
+            '2.10.0':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.0:*:*:*:*:*:*:*',
+            '2.10.1':'cpe:2.3:a:freetype:freetype:2.10.1:*:*:*:*:*:*:*',
+            '2.10.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.1:*:*:*:*:*:*:*',
+            '2.11.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.11.1:*:*:*:*:*:*:*',
+            '2.11.0':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.11.0:*:*:*:*:*:*:*',
+            '2.10.4':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.4:*:*:*:*:*:*:*',
+            '2.10.2':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.2:*:*:*:*:*:*:*'
+          }
+
     depends_on('bzip2')
     depends_on('libpng')
     depends_on('pkgconfig', type='build')

@@ -12,10 +12,21 @@ class Libx11(AutotoolsPackage, XorgPackage):
     homepage = "https://www.x.org/"
     xorg_mirror_path = "lib/libX11-1.6.7.tar.gz"
 
+    version('1.8',   sha256='68e0a30c4248b9f41492891a4b49672c3b0c59e84c4868144f03eef01ebc5eea')
+    version('1.7.3', sha256='59e9cfce4f1415d1fd6081e1da4d15ae6db52c000dc2e12beadd7f3dc431bae7')
     version('1.7.0', sha256='c48ec61785ec68fc6a9a6aca0a9578393414fe2562e3cc9cca30234345c7b6ac')
     version('1.6.7', sha256='f62ab88c2a87b55e1dc338726a55bb6ed8048084fe6a3294a7ae324ca45159d1')
     version('1.6.5', sha256='3abce972ba62620611fab5b404dafb852da3da54e7c287831c30863011d28fb3')
     version('1.6.3', sha256='0b03b9d22f4c9e59b4ba498f294e297f013cae27050dfa0f3496640200db5376')
+
+    cpe = {
+            '1.6.3':'cpe:2.3:a:x.org:libx11:1.6.3:*:*:*:*:*:*:*',
+            '1.6.5':'cpe:2.3:a:x.org:libx11:1.6.5:*:*:*:*:*:*:*',
+            '1.6.7':'cpe:2.3:a:x.org:libx11:1.6.7:*:*:*:*:*:*:*',
+            '1.7.0':'cpe:2.3:a:x.org:libx11:1.7.0:*:*:*:*:*:*:*',
+            '1.7.3':'cpe:2.3:a:x.org:libx11:1.7.3:*:*:*:*:*:*:*',
+            '1.8':'cpe:2.3:a:x.org:libx11:1.8:*:*:*:*:*:*:*'
+          }
 
     depends_on('libxcb@1.1.92:')
 

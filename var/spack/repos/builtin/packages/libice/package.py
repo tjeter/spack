@@ -14,6 +14,10 @@ class Libice(AutotoolsPackage, XorgPackage):
 
     version('1.0.9', sha256='7812a824a66dd654c830d21982749b3b563d9c2dfe0b88b203cefc14a891edc0')
 
+    cpe = {
+            '1.0.9':'cpe:2.3:a:freedesktop:libice:1.0.9:*:*:*:*:*:*:*'
+          }
+
     depends_on('xproto')
     depends_on('xtrans')
     depends_on('pkgconfig', type='build')
