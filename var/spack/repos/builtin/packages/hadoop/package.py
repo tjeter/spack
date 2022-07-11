@@ -26,7 +26,19 @@ class Hadoop(Package):
     version('2.8.5',  sha256='f9c726df693ce2daa4107886f603270d66e7257f77a92c9886502d6cd4a884a4')
     version('2.7.7',  sha256='d129d08a2c9dafec32855a376cbd2ab90c6a42790898cabbac6be4d29f9c2026')
     version('2.7.5',  sha256='0bfc4d9b04be919be2fdf36f67fa3b4526cdbd406c512a7a1f5f1b715661f831')
-
+    cpe = {
+            '3.3.2':'cpe:2.3:a:apache:hadoop:3.3.2:*:*:*:*:*:*:*',
+            '3.3.0':'cpe:2.3:a:apache:hadoop:3.3.0:*:*:*:*:*:*:*',
+            '3.2.2':'cpe:2.3:a:apache:hadoop:3.2.2:*:*:*:*:*:*:*',
+            '3.2.1':'cpe:2.3:a:apache:hadoop:3.2.1:*:*:*:*:*:*:*',
+            '3.1.3':'cpe:2.3:a:apache:hadoop:3.1.3:*:*:*:*:*:*:*',
+            '2.10.1':'cpe:2.3:a:apache:hadoop:2.10.1:*:*:*:*:*:*:*',
+            '2.10.0':'cpe:2.3:a:apache:hadoop:2.10.0:*:*:*:*:*:*:*',
+            '2.9.2':'cpe:2.3:a:apache:hadoop:2.9.2:*:*:*:*:*:*:*',
+            '2.8.5':'cpe:2.3:a:apache:hadoop:2.8.5:*:*:*:*:*:*:*',
+            '2.7.7':'cpe:2.3:a:apache:hadoop:2.7.7:*:*:*:*:*:*:*',
+            '2.7.5':'cpe:2.3:a:apache:hadoop:2.7.5:*:*:*:*:*:*:*' 
+    }
     depends_on('java', type='run')
 
     def install(self, spec, prefix):
