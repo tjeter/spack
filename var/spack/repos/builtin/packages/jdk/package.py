@@ -61,19 +61,19 @@ class Jdk(Package):
     version('1.8.0_131-b11', sha256='62b215bdfb48bace523723cdbb2157c665e6a25429c73828a32f00e587301236',
             url='https://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz')
     cpe = { 
-        '1.8.0_131':'cpe:2.3:a:oracle:jdk:1.8.0:update131:*:*:*:*:*:*',
-        '1.8.0_141':'cpe:2.3:a:oracle:jdk:1.8.0:update141:*:*:*:*:*:*',
-        '1.8.0_202':'cpe:2.3:a:oracle:jdk:1.8.0:update202:*:*:*:*:*:*',
-        '1.8.0_212':'cpe:2.3:a:oracle:jdk:1.8.0:update212:*:*:*:*:*:*',
-        '1.8.0_231':'cpe:2.3:a:oracle:jdk:1.8.0:update231:*:*:*:*:*:*',
-        '1.8.0_241':'cpe:2.3:a:oracle:jdk:1.8.0:update241:*:*:*:*:*:*',
-        '10.0.1':'cpe:2.3:a:oracle:openjdk:10.0.1:*:*:*:*:*:*:*',
-        '10.0.2':'cpe:2.3:a:oracle:openjdk:10.0.2:*:*:*:*:*:*:*',
-        '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
-        '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
-        '12.0.1':'cpe:2.3:a:oracle:openjdk:12.0.1:*:*:*:*:*:*:*',
-        '12.0.2':'cpe:2.3:a:oracle:openjdk:12.0.2:*:*:*:*:*:*:*',
-        '14.0.2':'cpe:2.3:a:oracle:openjdk:14.0.2:*:*:*:*:*:*:*'
+        '1.8.0_131-b11':'cpe:2.3:a:oracle:jdk:1.8.0:update131:*:*:*:*:*:*',
+        '1.8.0_141-b15':'cpe:2.3:a:oracle:jdk:1.8.0:update141:*:*:*:*:*:*',
+        '1.8.0_202-b08':'cpe:2.3:a:oracle:jdk:1.8.0:update202:*:*:*:*:*:*',
+        '1.8.0_212-b10':'cpe:2.3:a:oracle:jdk:1.8.0:update212:*:*:*:*:*:*',
+        '1.8.0_231-b11':'cpe:2.3:a:oracle:jdk:1.8.0:update231:*:*:*:*:*:*',
+        '1.8.0_241-b07':'cpe:2.3:a:oracle:jdk:1.8.0:update241:*:*:*:*:*:*',
+        '10.0.1':'cpe:2.3:a:oracle:jdk:10.0.1:*:*:*:*:*:*:*',
+        '10.0.2':'cpe:2.3:a:oracle:jdk:10.0.2:*:*:*:*:*:*:*',
+        '11.0.1':'cpe:2.3:a:oracle:jdk:11.0.1:*:*:*:*:*:*:*',
+        '11.0.2':'cpe:2.3:a:oracle:jdk:11.0.2:*:*:*:*:*:*:*',
+        '12.0.1':'cpe:2.3:a:oracle:jdk:12.0.1:*:*:*:*:*:*:*',
+        '12.0.2':'cpe:2.3:a:oracle:jdk:12.0.2:*:*:*:*:*:*:*',
+        '14.0.2':'cpe:2.3:a:oracle:jdk:14.0.2:*:*:*:*:*:*:*'
 
     } 
     provides('java@14', when='@14.0:14')
