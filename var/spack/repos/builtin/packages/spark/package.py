@@ -22,6 +22,7 @@ class Spark(Package):
     depends_on('java', type=('build', 'run'))
     depends_on('hadoop', when='+hadoop', type=('build', 'run'))
 
+    version('3.3.0', sha256='1271a576ffde9fbea49a237a77cb1b340c21957454b83b1eb27c8c383f4b8b91')
     version('3.1.1', sha256='2d16f527016993e69a7c801233e661a170e3099ae2d9b950f7457729d63062f4')
     version('3.0.2', sha256='1a904f9bfa44a1218cb440c99800dd2ae729249a73c63b3bb10e431ed5b58406')
     version('3.0.1', sha256='ddda310ac09e3f2da9c33ad278b1665fbad2411d8da127d0de86b90019e962dc')
@@ -35,7 +36,8 @@ class Spark(Package):
     version('1.6.0', sha256='9f62bc1d1f7668becd1fcedd5ded01ad907246df287d2525cfc562d88a3676da')
 
     cpe = {
-            '3.1.1':'cpe:2.3:a:apache:spark:3.6.3:*:*:*:*:*:*:*',
+            '3.3.0':'cpe:2.3:a:apache:spark:3.3.0:*:*:*:*:*:*:*',
+            '3.1.1':'cpe:2.3:a:apache:spark:3.1.1:*:*:*:*:*:*:*',
             '3.0.2':'cpe:2.3:a:apache:spark:3.0.2:*:*:*:*:*:*:*',
             '3.0.1':'cpe:2.3:a:apache:spark:3.0.1:*:*:*:*:*:*:*',
             '2.4.7':'cpe:2.3:a:apache:spark:2.4.7:*:*:*:*:*:*:*',
