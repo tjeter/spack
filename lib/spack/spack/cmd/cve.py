@@ -23,7 +23,7 @@ import json
 import nvdlib
 api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
 
-description = 'get common vulnerabilities/exposures (CVEs)'
+description = 'get common vulnerabilities/exposures (CVEs) for a package and its dependencies while storing them into a JSON file'
 section = 'basic'
 level = 'short'
 
@@ -37,7 +37,7 @@ def setup_parser(subparser):
     )
 
     options = [
-        ('--refresh', cve_refresh.__doc__),
+        ('--update', cve_update.__doc__),
         ('--dep', cve_deps.__doc__)
     ]
     for opt, help_comment in options:
@@ -54,7 +54,9 @@ def packagize(pkg):
     else:
         return pkg
 
-def cve_refresh(pkg):
+def cve_update(pkg):
+    """update the current CVE list"""
+
     color.cprint('')
     color.cprint(section_title('Known CVEs: '))
 
@@ -81,6 +83,8 @@ def cve_refresh(pkg):
         json.dump(json_list, json_file)
 
 def cve_deps(pkg):
+    """get/update CVEs for dependencies"""
+
     deps = sorted(pkg.dependencies_of_type('build'))
     
     for d in deps:
@@ -159,7 +163,7 @@ def read_json(pkg):
                        print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
                        print("-"*90)
         else:
-            print("File could not be found. Check permissions and if 'cve.json' exists for", pkg.name)
+            print("File could not be found. Check permissions and if 'cve.json' exists for", dep.name)
 
 
 def cve(parser, args):
@@ -187,7 +191,7 @@ def cve(parser, args):
 
     # Now output optional information in expected order
     sections = [
-        (args.all or args.refresh, cve_refresh)
+        (args.all or args.update, cve_refresh),
         (args.all or args.dep, cve_deps)
     ]
     for print_it, func in sections:
@@ -197,6 +201,6 @@ def cve(parser, args):
     if file_exists:
         read_json(pkg)
     else:
-        cve_refresh(pkg)
+        cve_update(pkg)
         cve_deps(pkg)
         read_json(pkg)
