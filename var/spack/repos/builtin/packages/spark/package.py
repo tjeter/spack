@@ -34,6 +34,23 @@ class Spark(Package):
     version('1.6.1', sha256='3d67678c5cb5eeba1cab125219fa2f9f17609368ea462e3993d2eae7c8f37207')
     version('1.6.0', sha256='9f62bc1d1f7668becd1fcedd5ded01ad907246df287d2525cfc562d88a3676da')
 
+    cpe = {
+            '3.1.1':'cpe:2.3:a:apache:spark:3.6.3:*:*:*:*:*:*:*',
+            '3.0.2':'cpe:2.3:a:apache:spark:3.0.2:*:*:*:*:*:*:*',
+            '3.0.1':'cpe:2.3:a:apache:spark:3.0.1:*:*:*:*:*:*:*',
+            '2.4.7':'cpe:2.3:a:apache:spark:2.4.7:*:*:*:*:*:*:*',
+            '2.3.0':'cpe:2.3:a:apache:spark:2.3.0:*:*:*:*:*:*:*',
+            '2.1.0':'cpe:2.3:a:apache:spark:2.1.0:*:*:*:*:*:*:*',
+            '2.0.2':'cpe:2.3:a:apache:spark:2.0.2:*:*:*:*:*:*:*',
+            '2.0.0':'cpe:2.3:a:apache:spark:2.0.0:*:*:*:*:*:*:*',
+            '1.6.2':'cpe:2.3:a:apache:spark:1.6.2:*:*:*:*:*:*:*',
+            '1.6.1':'cpe:2.3:a:apache:spark:1.6.1:*:*:*:*:*:*:*',
+            '1.6.0':'cpe:2.3:a:apache:spark:1.6.0:*:*:*:*:*:*:*'
+
+
+
+    }
+
     def install(self, spec, prefix):
 
         def install_dir(dirname):
