@@ -167,7 +167,7 @@ def read_json(pkg):
                        print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
                        print("-"*90)
         else:
-            print("file could not be found check permissions and if", dep_cve_json_path, "exists for ", pkg.name)
+            print("file could not be found check permissions and if", dep_cve_json_path, "exists for ", dep.name)
 
 
 def cve(parser, args):
