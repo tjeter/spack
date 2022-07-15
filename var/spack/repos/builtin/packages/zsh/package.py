@@ -21,7 +21,15 @@ class Zsh(AutotoolsPackage):
     version('5.4.2', sha256='a80b187b6b770f092ea1f53e89021d06c03d8bbe6a5e996bcca3267de14c5e52')
     version('5.3.1', sha256='fc886cb2ade032d006da8322c09a7e92b2309177811428b121192d44832920da')
     version('5.1.1', sha256='74e9453b5470b3c0970f9f93cfd603d241c3d7b1968adc0e4b3951073e8d3dec')
+    cpe = {
+            '5.8':'cpe:2.3:a:zsh:zsh:5.8:-:*:*:*:*:*:*', 
+            '5.7.1':'cpe:2.3:a:zsh:zsh:5.7.1:-:*:*:*:*:*:*',
+            '5.6.2':'cpe:2.3:a:zsh:zsh:5.6.2:-:*:*:*:*:*:*',
+            '5.4.2':'cpe:2.3:a:zsh:zsh:5.4.2:-:*:*:*:*:*:*',
+            '5.3.1':'cpe:2.3:a:zsh:zsh:5.3.1:-:*:*:*:*:*:*',
+            '5.1.1':'cpe:2.3:a:zsh:zsh:5.1.1:-:*:*:*:*:*:*'
 
+    }
     # Testing for terminal related things causes failures in e.g. Jenkins.
     # See e.g. https://www.zsh.org/mla/users/2003/msg00845.html,
     # although the name of the option has evolved since then.
