@@ -15,7 +15,11 @@ class Libuser(AutotoolsPackage):
     version('0.62', sha256='a58ff4fabb01a25043b142185a33eeea961109dd60d4b40b6a9df4fa3cace20b')
     version('0.61', sha256='0a114a52446e12781e2ffdf26f59df0d14e7809c7db5e551d3cf61c4e398751d')
     version('0.60', sha256='b1f73408ebfee79eb01a47c5879a2cdef6a00b75ee24870de7df1b816ff483eb')
-
+    cpe = {
+            '0.62':'cpe:2.3:a:libuser_project:libuser:0.62:*:*:*:*:*:*:*',
+            '0.61':'cpe:2.3:a:libuser_project:libuser:0.61:*:*:*:*:*:*:*',
+            '0.60':'cpe:2.3:a:libuser_project:libuser:0.60:*:*:*:*:*:*:*'
+    }
     depends_on('glib')
     depends_on('linux-pam')
     depends_on('popt')
