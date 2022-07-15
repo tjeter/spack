@@ -22,7 +22,16 @@ class Libarchive(AutotoolsPackage):
     version('3.1.2', sha256='eb87eacd8fe49e8d90c8fdc189813023ccc319c5e752b01fb6ad0cc7b2c53d5e')
     version('3.1.1', sha256='4968f9a3f2405ec7e07d5f6e78b36f21bceee6196df0a795165f89774bbbc6d8')
     version('3.1.0', sha256='64b15dfa623b323da8fc9c238b5bca962ec3b38dcdfd2ed86f5f509e578a3524')
-
+    cpe = {
+            '3.5.2':'cpe:2.3:a:libarchive:libarchive:3.5.2:*:*:*:*:*:*:*',
+            '3.5.1':'cpe:2.3:a:libarchive:libarchive:3.5.1:*:*:*:*:*:*:*',
+            '3.4.1':'cpe:2.3:a:libarchive:libarchive:3.4.1:*:*:*:*:*:*:*',
+            '3.3.2':'cpe:2.3:a:libarchive:libarchive:3.3.2:*:*:*:*:*:*:*',
+            '3.2.1':'cpe:2.3:a:libarchive:libarchive:3.2.1:*:*:*:*:*:*:*',
+            '3.1.2':'cpe:2.3:a:libarchive:libarchive:3.1.2:*:*:*:*:*:*:*',
+            '3.1.1':'cpe:2.3:a:libarchive:libarchive:3.1.1:*:*:*:*:*:*:*',
+            '3.1.0':'cpe:2.3:a:libarchive:libarchive:3.1.0:*:*:*:*:*:*:*'
+    }
     variant('libs', default='static,shared', values=('static', 'shared'),
             multi=True, description='What libraries to build')
 
