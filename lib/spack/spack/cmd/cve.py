@@ -170,6 +170,7 @@ def read_json(pkg):
             print("file could not be found check permissions and if", dep_cve_json_path, "exists for ", dep.name)
 
 
+
 def cve(parser, args):
     pkg = spack.repo.get(args.package)
     repo = spack.repo.path

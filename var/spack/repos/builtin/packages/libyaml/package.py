@@ -26,7 +26,21 @@ class Libyaml(AutotoolsPackage):
     version('0.1.3', sha256='a8bbad7e5250b3735126b7e3bd9f6fce9db19d6be7cc13abad17a24b59ec144a')
     version('0.1.2', sha256='5beb94529cc7ac79b17e354f9b03aea311f5af17be5d48bc39e6f1db5059f70f')
     version('0.1.1', sha256='76444692a94de4e6776a1bdf3b735e8f016bb374ae7c60496f8032fdc6085889')
+    cpe = {
+            '0.2.5':'cpe:2.3:a:pyyaml:libyaml:0.2.5:*:*:*:*:*:*:*',
+            '0.2.4':'cpe:2.3:a:pyyaml:libyaml:0.2.4:*:*:*:*:*:*:*',
+            '0.2.3':'cpe:2.3:a:pyyaml:libyaml:0.2.3:*:*:*:*:*:*:*',
+            '0.2.2':'cpe:2.3:a:pyyaml:libyaml:0.2.2:*:*:*:*:*:*:*',
+            '0.2.1':'cpe:2.3:a:pyyaml:libyaml:0.2.1:*:*:*:*:*:*:*',
+            '0.1.7':'cpe:2.3:a:pyyaml:libyaml:0.1.7:*:*:*:*:*:*:*',
+            '0.1.6':'cpe:2.3:a:pyyaml:libyaml:0.1.6:*:*:*:*:*:*:*',
+            '0.1.5':'cpe:2.3:a:pyyaml:libyaml:0.1.5:*:*:*:*:*:*:*',
+            '0.1.4':'cpe:2.3:a:pyyaml:libyaml:0.1.4:*:*:*:*:*:*:*',
+            '0.1.3':'cpe:2.3:a:pyyaml:libyaml:0.1.3:*:*:*:*:*:*:*',
+            '0.1.2':'cpe:2.3:a:pyyaml:libyaml:0.1.2:*:*:*:*:*:*:*',
+            '0.1.1':'cpe:2.3:a:pyyaml:libyaml:0.1.1:*:*:*:*:*:*:*'
 
+    }
     depends_on('automake', when='@master')
     depends_on('autoconf', when='@master')
     depends_on('libtool',  when='@master')

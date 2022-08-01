@@ -413,23 +413,6 @@ def print_cves(pkg):
             pass
     '''
 
-def cve_to_json(pkg):
-    repo = spack.repo.path
-    path_to_pkg = repo.filename_for_package_name(pkg.name)
-    path_parent = os.path.dirname(path_to_pkg)
-    color.cprint('')
-    color.cprint(section_title('JSON Data: '))
-    file_exists = exists(path_parent+"/cve.json")
-    cve_json_path = path_parent+"/cve.json"
-
-    with open(cve_json_path, 'r') as json_file:
-        cve_loader = json.load(json_file)
-        for cves in cve_loader:
-            for version, data in cves.items():
-               print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-               print("-"*80)
-
-
 def print_virtuals(pkg):
     """output virtual packages"""
 
@@ -487,5 +470,4 @@ def info(parser, args):
         if print_it:
             func(pkg)
     print_cves(pkg)
-    cve_to_json(pkg)
     color.cprint('')

@@ -1575,32 +1575,39 @@ class PackageInstaller(object):
             file_exists = exists(path_parent+"/cve.json")
             cve_json_path = path_parent+"/cve.json"
             warning = False
+            allowlist_path = path_parent+"/allowlist.json"
+            allowlist_exists = exists(path_parent+"/allowlist.json")
             # By default includes V2 scores that don't apply to specified versions
             # CVE scores between 1-6 are "safe" and do not print warning or block messages
             # CVE scores between 6.1-8.9 are "safe-yet-vulnerable" and print warning messages to make the user aware of vulnerabilities
             # CVE scores 9.0 or above are completely blocked and a block message appears telling the user why
 
-             
+            '''{allow:[cves]'''
             if(file_exists):
-                with open(cve_json_path, 'r') as json_file:
+                with open(cve_json_path, 'r') as json_file, open(allowlist_path, 'r') as json_allowlist:
                     cve_loader = json.load(json_file)
+                    allowlist = json.load(json_allowlist)
                     for cves in cve_loader:
                         for vers_key, data in cves.items():
-                            if(vers_key == str(version) and data["score"] in range(0, cvss_warn)):
-                                pass
-                            elif vers_key == str(version) and data["score"] >= cvss_warn and data["score"] < cvss_thresh_block:
-                                if(warning == False):
-                                    print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
-                                    warning = True
-                                print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-                                print("-"*80)
-                            elif vers_key == str(version) and data["score"] >= cvss_thresh_block:
-                                print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
-                                print("The package", pkg.name, version, "has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the associated link below.")
-                                print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-                                print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
-                                print("-"*80)
-                                exit() 
+                            for allowed in allowlist['allow']:
+                                if(vers_key == str(version) and data["score"] in range(0, cvss_warn)):
+                                    pass
+                                elif vers_key == str(version) and data["score"] >= cvss_warn and data["score"] < cvss_thresh_block:
+                                    if(warning == False):
+                                        print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
+                                        warning = True
+                                    print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                                    print("-"*80)
+                                elif vers_key == str(version) and data["score"] >= cvss_thresh_block:
+                                    if(data['cve'] == allowed):
+                                        pass
+                                    else:
+                                        print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                                        print("The package", pkg.name, version, "has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the associated link below.")
+                                        print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+                                        print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
+                                        print("-"*80)
+                                        exit() 
 
             else:
                 try:
@@ -1619,19 +1626,25 @@ class PackageInstaller(object):
                             cve_list.append(cve_dict)
                         
                         elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
-                            print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
-                            print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the link associated with a vulnerability below.")
-                            print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
-                            cve_dict["package"] = pkg.name
-                            cve_dict["cve"] = eachCVE.id
-                            cve_dict["version"] = version
-                            cve_dict["score"] = eachCVE.score[1]
-                            cve_dict["url"] = eachCVE.url
-                            cve_list.append(cve_dict)
-                            for cve in cve_list:
-                                print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
-                            
-                            exit()
+                            with open(allowlist_path, 'r') as json_allowlist:
+                                allowlist = json.load(json_allowlist)
+                                for allowed in allowlist['allow']:
+                                    if(cve_dict['cve'] == allowed):
+                                        pass
+                                    else:
+                                        print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
+                                        print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the link associated with a vulnerability below.")
+                                        print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+                                        cve_dict["package"] = pkg.name
+                                        cve_dict["cve"] = eachCVE.id
+                                        cve_dict["version"] = version
+                                        cve_dict["score"] = eachCVE.score[1]
+                                        cve_dict["url"] = eachCVE.url
+                                        cve_list.append(cve_dict)
+                                        for cve in cve_list:
+                                            print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
+                                        
+                                        exit()
 
                     if cve_list: 
                         print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")

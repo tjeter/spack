@@ -21,7 +21,12 @@ class Gnuconfig(Package):
 
     version('master', branch='master')
     version('2021-08-14', sha256='69b6d2868e70167ba1bdb9030b49beeb20f00b37e30825e83fd04291d96bc5f7')
+    cpe = {
+            'master':'cpe:2.3:a:gnu:gnuconfig:master:*:*:*:*:*:*:*', 
+            '2021-08-14':'cpe:2.3:a:gnu:gnuconfig:2021-08-14:*:*:*:*:*:*:*'
 
+
+    }
     def install(self, spec, prefix):
         with working_dir(self.stage.source_path):
             install('config.sub', prefix)

@@ -18,4 +18,11 @@ class Utf8proc(CMakePackage):
     version('2.5.0', sha256='d4e8dfc898cfd062493cb7f42d95d70ccdd3a4cd4d90bec0c71b47cca688f1be')
     version('2.4.0', sha256='b2e5d547c1d94762a6d03a7e05cea46092aab68636460ff8648f1295e2cdfbd7')
 
+    cpe = {
+            '2.6.1':'cpe:2.3:a:juliastring:utf8proc:2.6.1:*:*:*:*:*:*:*',
+            '2.6.0':'cpe:2.3:a:juliastring:utf8proc:2.6.0:*:*:*:*:*:*:*',
+            '2.5.0':'cpe:2.3:a:juliastring:utf8proc:2.5.0:*:*:*:*:*:*:*',
+            '2.4.0':'cpe:2.3:a:juliastring:utf8proc:2.4.0:*:*:*:*:*:*:*'
+
+    }
     depends_on('cmake@2.8.12:', type='build')

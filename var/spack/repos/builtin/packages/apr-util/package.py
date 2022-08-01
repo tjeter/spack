@@ -17,9 +17,6 @@ class AprUtil(AutotoolsPackage):
     version('1.5.4', sha256='976a12a59bc286d634a21d7be0841cc74289ea9077aa1af46be19d1a6e844c19')
 
     cpe = {
-            '1.5.4':'cpe:2.3:a:apache:portable_runtime_utility:1.5.4:*:*:*:*:*:*:*',
-            '1.6.0':'cpe:2.3:a:apache:portable_runtime_utility:1.6.0:*:*:*:*:*:*:*',
-            '1.6.1':'cpe:2.3:a:apache:portable_runtime_utility:1.6.1:*:*:*:*:*:*:*',
             '1.6.1':'cpe:2.3:a:apache:apr-util:1.6.1:*:*:*:*:*:*:*',
             '1.6.0':'cpe:2.3:a:apache:apr-util:1.6.0:*:*:*:*:*:*:*',
             '1.5.4':'cpe:2.3:a:apache:apr-util:1.5.4:*:*:*:*:*:*:*'
