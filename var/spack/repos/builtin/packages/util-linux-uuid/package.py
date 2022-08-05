@@ -19,9 +19,9 @@ class UtilLinuxUuid(AutotoolsPackage):
     version('2.36',   sha256='82942cd877a989f6d12d4ce2c757fb67ec53d8c5cd9af0537141ec5f84a2eea3')
 
     cpe = {
-            '2.37.4':'cpe:2.3:a:kernel:util-linux-uuid:2.37.4',
-            '2.36.2':'cpe:2.3:a:kernel:util-linux-uuid:2.36.2',
-            '2.36':'cpe:2.3:a:kernel:util-linux-uuid:2.36'
+            '2.37.4':'cpe:2.3:a:kernel:util-linux:2.37.4:*:*:*:*:*:*:*',
+            '2.36.2':'cpe:2.3:a:kernel:util-linux:2.36.2:*:*:*:*:*:*:*',
+            '2.36':'cpe:2.3:a:kernel:util-linux:2.36:*:*:*:*:*:*:*'
           }
 
     conflicts('%gcc@:4', when='@2.37:')
