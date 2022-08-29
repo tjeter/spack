@@ -41,7 +41,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
     # Support (LTS) version, supported until 11th September 2023.
     version('1.1.1q', sha256='d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca')
     version('1.1.1p', sha256='bf61b62aaa66c7c7639942a94de4c9ae8280c08f17d4eac2e44644d9fc8ace6f', deprecated=True)
-    version('1.1.1o', sha256='9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f', deprecated=True)
+    version('1.1.1o', sha256='9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f', preferred=True)
     version('1.1.1n', sha256='40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a', deprecated=True)
     version('1.1.1m', sha256='f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96', deprecated=True)
     version('1.1.1l', sha256='0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1', deprecated=True)

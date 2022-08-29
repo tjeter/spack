@@ -57,8 +57,8 @@ def packagize(pkg):
 def cve_update(pkg):
     """update the current CVE list"""
 
-    color.cprint('')
-    color.cprint(section_title('Known CVEs: '))
+#    color.cprint('')
+#    color.cprint(section_title('Known CVEs: '))
 
     repo = spack.repo.path
     path_to_pkg = repo.filename_for_package_name(pkg.name)
@@ -127,7 +127,7 @@ def read_json(pkg):
         title_pkg_bool = False
         if title_pkg_bool == False:
             color.cprint('')
-            color.cprint(section_title('Package '))
+            color.cprint(section_title('Package CVEs:'))
             title_pkg_bool = True
         with open(cve_json_path, 'r') as json_file:
             cve_loader = json.load(json_file)
@@ -140,7 +140,7 @@ def read_json(pkg):
 
     if title_bool == False:
         color.cprint('')
-        color.cprint(section_title('Dependencies '))
+        color.cprint(section_title('Dependency CVEs:'))
         title_bool = True
 
     for d in deps:
@@ -191,7 +191,7 @@ def cve(parser, args):
 
     # Now output optional information in expected order
     sections = [
-        (args.all or args.update, cve_refresh),
+        (args.all or args.update, cve_update),
         (args.all or args.dep, cve_deps)
     ]
     for print_it, func in sections:
