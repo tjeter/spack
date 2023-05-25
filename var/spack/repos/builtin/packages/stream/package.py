@@ -16,6 +16,10 @@ class Stream(MakefilePackage):
 
     version('5.10')
 
+    cpe = {
+
+          }
+
     variant('openmp', default=False, description='Build with OpenMP support')
 
     def edit(self, spec, prefix):
