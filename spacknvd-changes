@@ -1,0 +1,3377 @@
+commit d39bfd979c584c2f3648ab675b4823bad0716daf
+Author: Tre' Jeter <tjeter97@gmail.com>
+Date:   Tue Jun 14 13:19:24 2022 -0400
+
+    spack-nvd commit
+
+diff --git a/etc/spack/defaults/packages.yaml b/etc/spack/defaults/packages.yaml
+index 71bac6f..243a227 100644
+--- a/etc/spack/defaults/packages.yaml
++++ b/etc/spack/defaults/packages.yaml
+@@ -58,6 +58,81 @@ packages:
+       xxd: [xxd-standalone, vim]
+       yacc: [bison, byacc]
+       ziglang: [zig]
++  torque:
++    buildable: false
++    externals:
++    - spec: torque@6.0.0
++      prefix: /usr
++    - spec: torque@5.1.2
++      prefix: /usr
++    - spec: torque@5.1.1.2
++      prefix: /usr
++    - spec: torque@5.1.1
++      prefix: /usr
++    - spec: torque@5.0.2
++      prefix: /usr
++    - spec: torque@5.0.1.h2
++      prefix: /usr
++    - spec: torque@5.0.1
++      prefix: /usr
++    - spec: torque@5.0.0
++      prefix: /usr
++    - spec: torque@4.5.0
++      prefix: /usr
++    - spec: torque@4.2.9
++      prefix: /usr
++    - spec: torque@4.2.8
++      prefix: /usr
++    - spec: torque@4.2.7
++      prefix: /usr
++    - spec: torque@4.2.6.1.h1
++      prefix: /usr
++    - spec: torque@4.2.6.1
++      prefix: /usr
++    - spec: torque@4.2.6
++      prefix: /usr
++    - spec: torque@4.2.5
++      prefix: /usr
++    - spec: torque@4.2.4
++      prefix: /usr
++    - spec: torque@4.2.3
++      prefix: /usr
++    - spec: torque@4.2.2
++      prefix: /usr
++    - spec: torque@4.2.1
++      prefix: /usr
++    - spec: torque@4.2.0
++      prefix: /usr
++    - spec: torque@4.1.6
++      prefix: /usr
++    - spec: torque@4.1.5
++      prefix: /usr
++    - spec: torque@4.1.4
++      prefix: /usr
++    - spec: torque@4.1.3
++      prefix: /usr
++    - spec: torque@4.1.2
++      prefix: /usr
++    - spec: torque@4.1.1
++      prefix: /usr
++    - spec: torque@4.1.0
++      prefix: /usr
++    - spec: torque@4.0.3
++      prefix: /usr
++    - spec: torque@4.0.2
++      prefix: /usr
++    - spec: torque@4.0.1
++      prefix: /usr
++    - spec: torque@4.0.0
++      prefix: /usr
++    - spec: torque@3.0.5
++      prefix: /usr
++    - spec: torque@3.0.4
++      prefix: /usr
++    - spec: torque@3.0.3
++      prefix: /usr
++    - spec: torque@3.0.2
++      prefix: /usr
+     permissions:
+       read: world
+       write: user
+diff --git a/lib/spack/spack/cmd/cve.py b/lib/spack/spack/cmd/cve.py
+new file mode 100644
+index 0000000..3877d16
+--- /dev/null
++++ b/lib/spack/spack/cmd/cve.py
+@@ -0,0 +1,206 @@
++from __future__ import print_function
++
++import inspect
++import textwrap
++
++from six.moves import zip_longest
++from six import string_types
++
++import llnl.util.tty as tty
++import llnl.util.tty.color as color
++from llnl.util.tty.colify import colify
++
++import spack.cmd.common.arguments as arguments
++import spack.fetch_strategy as fs
++import spack.paths
++import spack.repo
++import spack.spec
++from spack.package_base import has_test_method, preferred_version
++import os
++from os.path import exists
++import json
++
++import nvdlib
++api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
++
++description = 'get common vulnerabilities/exposures (CVEs) for a package and its dependencies while storing them into a JSON file'
++section = 'basic'
++level = 'short'
++
++header_color = '@*b'
++plain_format = '@.'
++
++def setup_parser(subparser):
++    subparser.add_argument(
++        '-a', '--all', action='store_true', default=False,
++        help="output all package information"
++    )
++
++    options = [
++        ('--update', cve_update.__doc__),
++        ('--dep', cve_deps.__doc__)
++    ]
++    for opt, help_comment in options:
++        subparser.add_argument(opt, action='store_true', help=help_comment)
++
++    arguments.add_common_arguments(subparser, ['package'])
++
++def section_title(s):
++    return header_color + s + plain_format
++
++def packagize(pkg):
++    if isinstance(pkg, string_types):
++        return spack.repo.path.get_pkg_class(pkg)
++    else:
++        return pkg
++
++def cve_update(pkg):
++    """update the current CVE list"""
++
++#    color.cprint('')
++#    color.cprint(section_title('Known CVEs: '))
++
++    repo = spack.repo.path
++    path_to_pkg = repo.filename_for_package_name(pkg.name)
++    path_parent = os.path.dirname(path_to_pkg)
++    file_exists = exists(path_parent+"/cve.json")
++    cve_json_path = path_parent+"/cve.json"
++
++    cve_dict = {}
++    json_list = []
++
++    for i in pkg.cpe:
++        r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
++        for eachCVE in r:
++            if eachCVE.score[0] == 'V3':
++                cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
++                cve_dict[i]["cve"] = eachCVE.id
++                cve_dict[i]["score"] = eachCVE.score[1]
++                cve_dict[i]["url"] = eachCVE.url
++                json_list.append(cve_dict)
++
++    with open(cve_json_path, 'w') as json_file:
++        json.dump(json_list, json_file)
++
++def cve_deps(pkg):
++    """get/update CVEs for dependencies"""
++
++    deps = sorted(pkg.dependencies_of_type('build'))
++    
++    for d in deps:
++        # 'pkgconfig' does not exist, this replaces it properly with 'pkgconf'
++        if d == "pkgconfig":
++            d = 'pkgconf'
++
++        dep = packagize(d)
++        repo = spack.repo.path
++        path_to_pkg = repo.filename_for_package_name(dep.name)
++        path_parent = os.path.dirname(path_to_pkg)
++        cve_json_path = path_parent+"/cve.json"
++        file_exists = exists(path_parent+"/cve.json")
++        json_list = []
++
++        for i in dep.cpe:
++            r = (nvdlib.searchCVE(cpeName=dep.cpe[i], key=api_key))
++            for eachCVE in r:
++                if eachCVE.score[0] == 'V3':
++                    cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
++                    cve_dict[i]["cve"] = eachCVE.id
++                    cve_dict[i]["score"] = eachCVE.score[1]
++                    cve_dict[i]["url"] = eachCVE.url
++                    json_list.append(cve_dict)
++        
++        with open(cve_json_path, 'w') as json_file:
++            json.dump(json_list, json_file)
++
++def read_json(pkg):
++    repo = spack.repo.path
++    path_to_pkg = repo.filename_for_package_name(pkg.name)
++    path_parent = os.path.dirname(path_to_pkg)
++    file_exists = exists(path_parent+"/cve.json")
++    cve_json_path = path_parent+"/cve.json"
++    deps = sorted(pkg.dependencies_of_type('build'))
++
++    title_bool = False
++
++    if file_exists:
++        title_pkg_bool = False
++        if title_pkg_bool == False:
++            color.cprint('')
++            color.cprint(section_title('Package CVEs:'))
++            title_pkg_bool = True
++        with open(cve_json_path, 'r') as json_file:
++            cve_loader = json.load(json_file)
++            for cves in cve_loader:
++                for version, data in cves.items():
++                   print(pkg.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
++                   print("-"*90)
++    else:
++        print("File could not be found. Check permissions and if 'cve.json' exists for", pkg.name)
++
++    if title_bool == False:
++        color.cprint('')
++        color.cprint(section_title('Dependency CVEs:'))
++        title_bool = True
++
++    for d in deps:
++        # 'pkgconfig' does not exist, this replaces it properly with 'pkgconf'
++        if d == "pkgconfig":
++            d = 'pkgconf'
++
++        dep = packagize(d)
++        dep_repo = spack.repo.path
++        dep_path_to_pkg = repo.filename_for_package_name(dep.name)
++        dep_path_parent = os.path.dirname(dep_path_to_pkg)
++        dep_cve_json_path = dep_path_parent+"/cve.json"
++        dep_file_exists = exists(dep_path_parent+"/cve.json")
++        
++        if dep_file_exists:
++            with open(dep_cve_json_path, 'r') as json_file:
++                cve_loader = json.load(json_file)
++                for cves in cve_loader:
++                    for version, data in cves.items():
++                       print(dep.name, "|", version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
++                       print("-"*90)
++        else:
++            print("File could not be found. Check permissions and if 'cve.json' exists for", dep.name)
++
++
++def cve(parser, args):
++    pkg = spack.repo.get(args.package)
++    repo = spack.repo.path
++    path_to_pkg = repo.filename_for_package_name(pkg.name)
++    path_parent = os.path.dirname(path_to_pkg)
++    file_exists = exists(path_parent+"/cve.json")
++    cve_json_path = path_parent+"/cve.json"
++
++    # Output core package information
++    header = section_title(
++        '{0}:   '
++    ).format(pkg.build_system_class) + pkg.name
++    color.cprint(header)
++
++    color.cprint('')
++    color.cprint(section_title('Description:'))
++    if pkg.__doc__:
++        color.cprint(color.cescape(pkg.format_doc(indent=4)))
++    else:
++        color.cprint("    None")
++
++    color.cprint(section_title('Homepage: ') + pkg.homepage)
++
++    # Now output optional information in expected order
++    sections = [
++        (args.all or args.update, cve_update),
++        (args.all or args.dep, cve_deps)
++    ]
++    for print_it, func in sections:
++        if print_it:
++            func(pkg)
++
++    if file_exists:
++        read_json(pkg)
++    else:
++        cve_update(pkg)
++        cve_deps(pkg)
++        read_json(pkg)
+diff --git a/lib/spack/spack/cmd/info.py b/lib/spack/spack/cmd/info.py
+index 31ea53f..8bafca7 100644
+--- a/lib/spack/spack/cmd/info.py
++++ b/lib/spack/spack/cmd/info.py
+@@ -16,9 +16,16 @@
+ 
+ import spack.cmd.common.arguments as arguments
+ import spack.fetch_strategy as fs
++import spack.paths
+ import spack.repo
+ import spack.spec
+ from spack.package_base import has_test_method, preferred_version
++import os
++from os.path import exists
++import json
++
++import nvdlib
++api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
+ 
+ description = 'get detailed information on a particular package'
+ section = 'basic'
+@@ -362,6 +369,42 @@ def print_versions(pkg):
+                 line = version('    {0}'.format(pad(v))) + color.cescape(url)
+                 color.cprint(line)
+ 
++def print_cves(pkg):
++    color.cprint('')
++    color.cprint(section_title('Known CVEs: '))
++    
++    repo = spack.repo.path
++    path_to_pkg = repo.filename_for_package_name(pkg.name)
++    path_parent = os.path.dirname(path_to_pkg)
++    file_exists = exists(path_parent+"/cve.json")
++    cve_json_path = path_parent+"/cve.json"
++    
++    cve_dict = {}
++    json_list = []
++
++    if(file_exists):
++        with open(cve_json_path, 'r') as json_file:
++            cve_loader = json.load(json_file)
++            for cves in cve_loader:
++                for version, data in cves.items():
++                   print(version, "|", data["cve"], "|",  data["score"], "|",  data["url"])
++                   print("-"*80)
++    else:
++        for i in pkg.cpe:
++            r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
++            for eachCVE in r:
++                if eachCVE.score[0] == 'V3':
++                    cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
++                    cve_dict[i]["cve"] = eachCVE.id
++                    cve_dict[i]["score"] = eachCVE.score[1]
++                    cve_dict[i]["url"] = eachCVE.url
++                    print(i,"|", eachCVE.id, "|",  str(eachCVE.score[0]), "|", str(eachCVE.score[1]), "|", eachCVE.url)
++                    print("-"*80)
++                    json_list.append(cve_dict)
++        
++        with open(cve_json_path, 'w') as json_file:
++            json.dump(json_list, json_file)
++
+ 
+ def print_virtuals(pkg):
+     """output virtual packages"""
+@@ -409,6 +452,7 @@ def info(parser, args):
+         (args.all or args.detectable, print_detectable),
+         (args.all or args.tags, print_tags),
+         (args.all or not args.no_versions, print_versions),
++        #(args.all or args.cves, print_cves),
+         (args.all or not args.no_variants, print_variants),
+         (args.all or args.phases, print_phases),
+         (args.all or not args.no_dependencies, print_dependencies),
+@@ -418,5 +462,5 @@ def info(parser, args):
+     for print_it, func in sections:
+         if print_it:
+             func(pkg)
+-
++    print_cves(pkg)
+     color.cprint('')
+diff --git a/lib/spack/spack/concretize.py b/lib/spack/spack/concretize.py
+index 520b003..7b9a58e 100644
+--- a/lib/spack/spack/concretize.py
++++ b/lib/spack/spack/concretize.py
+@@ -43,6 +43,9 @@
+ from spack.package_prefs import PackagePrefs, is_spec_buildable, spec_externals
+ from spack.version import Version, VersionList, VersionRange, ver
+ 
++import nvdlib
++api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
++
+ #: impements rudimentary logic for ABI compatibility
+ _abi = llnl.util.lang.Singleton(lambda: spack.abi.ABI())
+ 
+@@ -196,6 +199,7 @@ def concretize_version(self, spec):
+ 
+         # List of versions we could consider, in sorted order
+         pkg_versions = spec.package_class.versions
++        print("Package Versions: ", pkg_versions)
+         usable = [v for v in pkg_versions
+                   if any(v.satisfies(sv) for sv in spec.versions)]
+ 
+diff --git a/lib/spack/spack/installer.py b/lib/spack/spack/installer.py
+index 45ee081..49cadd0 100644
+--- a/lib/spack/spack/installer.py
++++ b/lib/spack/spack/installer.py
+@@ -32,6 +32,8 @@
+ import heapq
+ import itertools
+ import os
++from os.path import exists
++import json
+ import shutil
+ import sys
+ import time
+@@ -59,6 +61,9 @@
+ from spack.util.executable import which
+ from spack.util.timer import Timer
+ 
++import nvdlib
++api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
++
+ #: Counter to support unique spec sequencing that is used to ensure packages
+ #: with the same priority are (initially) processed in the order in which they
+ #: were added (see https://docs.python.org/2/library/heapq.html).
+@@ -1558,8 +1563,99 @@ def install(self):
+             spack.hooks.on_install_start(task.request.pkg.spec)
+             install_args = task.request.install_args
+             keep_prefix = install_args.get('keep_prefix')
+-
++            cve_list = []
++            cvss_thresh_block = 9
++            cvss_warn = 7
+             pkg, pkg_id, spec = task.pkg, task.pkg_id, task.pkg.spec
++            '''TODO: have users set a environment variable equal to api_key and reference it earlier'''
++            version = pkg.version
++            repo = spack.repo.path
++            path_to_pkg = repo.filename_for_package_name(pkg.name)
++            path_parent = os.path.dirname(path_to_pkg)
++            file_exists = exists(path_parent+"/cve.json")
++            cve_json_path = path_parent+"/cve.json"
++            warning = False
++            allowlist_path = path_parent+"/allowlist.json"
++            allowlist_exists = exists(path_parent+"/allowlist.json")
++            # By default includes V2 scores that don't apply to specified versions
++            # CVE scores between 1-6 are "safe" and do not print warning or block messages
++            # CVE scores between 6.1-8.9 are "safe-yet-vulnerable" and print warning messages to make the user aware of vulnerabilities
++            # CVE scores 9.0 or above are completely blocked and a block message appears telling the user why
++
++             
++            if(file_exists):
++                with open(cve_json_path, 'r') as json_file, open(allowlist_path, 'r') as json_allowlist:
++                    cve_loader = json.load(json_file)
++                    allowlist = json.load(json_allowlist)
++                    for cves in cve_loader:
++                        for vers_key, data in cves.items():
++                            for allowed in allowlist['allow']:
++                                if(vers_key == str(version) and data["score"] in range(0, cvss_warn)):
++                                    pass
++                                
++                                elif vers_key == str(version) and data["score"] >= cvss_warn and data["score"] < cvss_thresh_block:
++                                    if(warning == False):
++                                        print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
++                                        warning = True
++                                    print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
++                                    print("-"*80)
++                                
++                                elif vers_key == str(version) and data["score"] >= cvss_thresh_block:
++                                    print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
++                                    print("The package", pkg.name, version, "has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the associated link below.")
++                                    print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
++                                    print(vers_key, "|", data["cve"], "|",  data["score"], "|",  data["url"])
++                                    print("-"*80)
++                                    exit() 
++
++            else:
++                try:
++                    r = (nvdlib.searchCVE(cpeName=pkg.cpe[str(version)], key=api_key))
++                    for eachCVE in r:
++                        cve_dict = {"cve":None, "package":None, "version":None,"score":None, "url":None}
++                        if eachCVE.score[0] == 'V3' and eachCVE.score[1] in range(0, cvss_warn):
++                            pass
++
++                        elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_warn and eachCVE.score[1] < cvss_thresh_block:
++                            cve_dict["package"] = pkg.name
++                            cve_dict["cve"] = eachCVE.id
++                            cve_dict["version"] = version
++                            cve_dict["score"] = eachCVE.score[1]
++                            cve_dict["url"] = eachCVE.url
++                            cve_list.append(cve_dict)
++                        
++                        elif eachCVE.score[0] == 'V3' and eachCVE.score[1] >= cvss_thresh_block:
++                            with open(allowlist_path, 'r') as json_allowlist:
++                                allowlist = json.load(json_allowlist)
++                                for allowed in allowlist['allow']:
++                                    if(cve_dict['cve'] == allowed):
++                                        pass
++                                    else:
++                                        print("BLOCKED INSTALLATION: Attempted to install a critically vulnerable package.")
++                                        print("The package(s) you are trying to install has a CVE score above the allowable threshold of", cvss_thresh_block, ". For more information, click the link associated with a vulnerability below.")
++                                        print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
++                                        cve_dict["package"] = pkg.name
++                                        cve_dict["cve"] = eachCVE.id
++                                        cve_dict["version"] = version
++                                        cve_dict["score"] = eachCVE.score[1]
++                                        cve_dict["url"] = eachCVE.url
++                                        cve_list.append(cve_dict)
++                                        for cve in cve_list:
++                                            print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
++                                        
++                                        exit()
++
++                    if cve_list: 
++                        print("WARNING: The package", pkg.name, version, "contains known vulnerabilities. For more information, click the associated link below. Continuing install...")
++                        print("--------------------------------------------------------------------------------------------------------------------------------------------------------")  
++                    for cve in cve_list:
++                        print(cve['package'], cve['version'], cve['cve'], cve['score'], cve['url'])
++                
++                except Exception:
++                    print("Two possible problems encountered: 1.) The package or dependency attempting to be installed does not have a CPE dictionary or 2.) The Rate Limit for requests to the National Vulnerability Database has been met.")
++                    print("Possible solutions: 1.) Add a proper CPE dictionary to the package and dependencies and 2.) Hault requests to NVD for a few moments. The request rate limit is 100 requests per every rolling 60 seconds.") 
++                    exit()
++                
+             term_title.next_pkg(pkg)
+             term_title.set('Processing {0}'.format(pkg.name))
+             tty.debug('Processing {0}: task={1}'.format(pkg_id, task))
+diff --git a/lib/spack/spack/solver/asp.py b/lib/spack/spack/solver/asp.py
+index bcdb929..80d51cb 100644
+--- a/lib/spack/spack/solver/asp.py
++++ b/lib/spack/spack/solver/asp.py
+@@ -735,6 +735,7 @@ def __init__(self, tests=False):
+         # If False allows for input specs that are not solved
+         self.concretize_everything = True
+ 
++
+     def pkg_version_rules(self, pkg):
+         """Output declared versions of a package.
+ 
+diff --git a/spack_setup.sh b/spack_setup.sh
+new file mode 100755
+index 0000000..fa7cb75
+--- /dev/null
++++ b/spack_setup.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++export MYSPACK=${HOME}/local/spack
++mkdir -p ${MYSPACK}
++git clone git@github.com:tjeter/spack.git ${MYSPACK}
++export SPACK_USER_CONFIG_PATH=${MYSPACK}/user_config
++export SPACK_SYSTEM_CONFIG_PATH=${MYSPACK}/sys_config
++export SPACK_USER_CACHE_PATH=${MYSPACK}/user_cache
++export TEMPDIR=${MYSPACK}/tmp
++mkdir -p \
++	${SPACK_USER_CONFIG_PATH}  \
++	${SPACK_SYSTEM_CONFIG_PATH}\
++	${SPACK_USER_CACHE_PATH}   \
++	${TEMPDIR}
++
+diff --git a/var/spack/repos/builtin/packages/apr-util/package.py b/var/spack/repos/builtin/packages/apr-util/package.py
+index a8c6c7e..b0c03ae 100644
+--- a/var/spack/repos/builtin/packages/apr-util/package.py
++++ b/var/spack/repos/builtin/packages/apr-util/package.py
+@@ -16,6 +16,15 @@ class AprUtil(AutotoolsPackage):
+     version('1.6.0', sha256='483ef4d59e6ac9a36c7d3fd87ad7b9db7ad8ae29c06b9dd8ff22dda1cc416389')
+     version('1.5.4', sha256='976a12a59bc286d634a21d7be0841cc74289ea9077aa1af46be19d1a6e844c19')
+ 
++    cpe = {
++            '1.5.4':'cpe:2.3:a:apache:portable_runtime_utility:1.5.4:*:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:apache:portable_runtime_utility:1.6.0:*:*:*:*:*:*:*',
++            '1.6.1':'cpe:2.3:a:apache:portable_runtime_utility:1.6.1:*:*:*:*:*:*:*',
++            '1.6.1':'cpe:2.3:a:apache:apr-util:1.6.1:*:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:apache:apr-util:1.6.0:*:*:*:*:*:*:*',
++            '1.5.4':'cpe:2.3:a:apache:apr-util:1.5.4:*:*:*:*:*:*:*'
++          }
++
+     variant('crypto', default=True,  description='Enable crypto support')
+     variant('gdbm',   default=False, description='Enable GDBM support')
+     variant('pgsql',  default=False, description='Enable PostgreSQL support')
+diff --git a/var/spack/repos/builtin/packages/apr/package.py b/var/spack/repos/builtin/packages/apr/package.py
+index cc62311..aaf66a7 100644
+--- a/var/spack/repos/builtin/packages/apr/package.py
++++ b/var/spack/repos/builtin/packages/apr/package.py
+@@ -16,6 +16,12 @@ class Apr(AutotoolsPackage):
+     version('1.6.2', sha256='4fc24506c968c5faf57614f5d0aebe0e9d0b90afa47a883e1a1ca94f15f4a42e')
+     version('1.5.2', sha256='1af06e1720a58851d90694a984af18355b65bb0d047be03ec7d659c746d6dbdb')
+ 
++    cpe = {
++            '1.7.0':'cpe:2.3:a:apache:apr:1.7.0',
++            '1.6.2':'cpe:2.3:a:apache:apr:1.6.2',
++            '1.5.2':'cpe:2.3:a:apache:apr:1.5.2'
++          }
++
+     patch('missing_includes.patch', when='@1.7.0')
+ 
+     depends_on('uuid', type='link')
+diff --git a/var/spack/repos/builtin/packages/autoconf/package.py b/var/spack/repos/builtin/packages/autoconf/package.py
+index e1e6e9c..49123d8 100644
+--- a/var/spack/repos/builtin/packages/autoconf/package.py
++++ b/var/spack/repos/builtin/packages/autoconf/package.py
+@@ -21,6 +21,14 @@ class Autoconf(AutotoolsPackage, GNUMirrorPackage):
+     version('2.62', sha256='83aa747e6443def0ebd1882509c53f5a2133f502ddefa21b3de141c433914bdd')
+     version('2.59', sha256='9cd05c73c5fcb1f5ccae53dd6cac36bb8cb9c7b3e97ffae5a7c05c72594c88d8')
+ 
++    cpe = {
++            '2.71':'cpe:2.3:a:gnu:autoconf:2.71',
++            '2.70':'cpe:2.3:a:gnu:autoconf:2.70',
++            '2.69':'cpe:2.3:a:gnu:autoconf:2.69',
++            '2.62':'cpe:2.3:a:gnu:autoconf:2.62',
++            '2.59':'cpe:2.3:a:gnu:autoconf:2.59'
++          }
++
+     # https://savannah.gnu.org/support/?110396
+     patch('https://git.savannah.gnu.org/cgit/autoconf.git/patch/?id=05972f49ee632cd98057a3caf82ebfb9574846da',
+           sha256='eaa3f69d927a853313a0b06e2117c51adab6377a2278549b05abc5df93643e16',
+diff --git a/var/spack/repos/builtin/packages/automake/package.py b/var/spack/repos/builtin/packages/automake/package.py
+index 4172c59..d74d544 100644
+--- a/var/spack/repos/builtin/packages/automake/package.py
++++ b/var/spack/repos/builtin/packages/automake/package.py
+@@ -23,6 +23,18 @@ class Automake(AutotoolsPackage, GNUMirrorPackage):
+     version('1.13.4', sha256='4c93abc0bff54b296f41f92dd3aa1e73e554265a6f719df465574983ef6f878c')
+     version('1.11.6', sha256='53dbf1945401c43f4ce19c1971baecdbf8bc32e0f37fa3f49fe7b6992d0d2030')
+ 
++    cpe = {
++            '1.16.5':'cpe:2.3:a:gnu:automake:1.16.5:*:*:*:*:*:*:*',
++            '1.16.3':'cpe:2.3:a:gnu:automake:1.16.3:*:*:*:*:*:*:*',
++            '1.16.2':'cpe:2.3:a:gnu:automake:1.16.2:*:*:*:*:*:*:*',
++            '1.16.1':'cpe:2.3:a:gnu:automake:1.16.1:*:*:*:*:*:*:*',
++            '1.15.1':'cpe:2.3:a:gnu:automake:1.15.1:*:*:*:*:*:*:*',
++            '1.15':'cpe:2.3:a:gnu:automake:1.15:*:*:*:*:*:*:*',
++            '1.14.1':'cpe:2.3:a:gnu:automake:1.14.1:*:*:*:*:*:*:*',
++            '1.13.4':'cpe:2.3:a:gnu:automake:1.13.4:*:*:*:*:*:*:*',
++            '1.11.6':'cpe:2.3:a:gnu:automake:1.11.6:*:*:*:*:*:*:*'
++          }
++
+     depends_on('autoconf', type='build')
+     depends_on('perl', type=('build', 'run'))
+ 
+diff --git a/var/spack/repos/builtin/packages/bazel/package.py b/var/spack/repos/builtin/packages/bazel/package.py
+index 751403f..b5b46d2 100644
+--- a/var/spack/repos/builtin/packages/bazel/package.py
++++ b/var/spack/repos/builtin/packages/bazel/package.py
+@@ -20,6 +20,20 @@ class Bazel(Package):
+ 
+     tags = ['build-tools']
+ 
++
++    version('5.2.0',  sha256='820a94dbb14071ed6d8c266cf0c080ecb265a5eea65307579489c4662c2d582a')
++    version('5.1.1',  sha256='7f5d3bc1d344692b2400f3765fd4b5c0b636eb4e7a8a7b17923095c7b56a4f78')
++    version('5.1.0',  sha256='4de301f509fc6d0cbc697b2017384ecdc94df8f36245bbcbedc7ea6780acc9f5')
++    version('5.0.0',  sha256='072dd62d237dbc11e0bac02e118d8c2db4d0ba3ba09f1a0eb1e2a460fb8419db')
++    version('4.2.2',  sha256='9981d0d53a356c4e87962847750a97c9e8054e460854748006c80f0d7e2b2d33')
++    version('4.2.1',  sha256='12ea7aa11e2bdb12de1dceb9939a22e96f5a480437cb17c123379d8e0fdf5e82')
++
++#    version('5.2.0',  sha256='af7be4c0056fa893b2cc04b6d53fc9dd6b17122822c4890aaf54c01aa9ff9bf7')
++#    version('5.1.1',  sha256='b8fc5ee8f48a0f7ff0a72f8457aaefb5807777162caf6967c5648f73ae320cf3')
++#    version('5.1.0',  sha256='10b9748cf67b8b6f7275be7d61e67e03c88efddc02b9ce4ed5f716dbf0fdcfe0')
++#    version('5.0.0',  sha256='720c42ca793d6ff3050121140c17e3511f7e8306b252ebfb4310b124dbdac10c')
++#    version('4.2.2',  sha256='097f8bb3bc9aa8ccbda8bac1a3db72764461662ba1f7e2db20249bfab8b22d79')
++#    version('4.2.1',  sha256='7218ae58d0225582d38cc2fbeb6d48f9532e6cff7f4288828e055dae4324ab5b')
+     version('4.0.0',  sha256='d350f80e70654932db252db380d2ec0144a00e86f8d9f2b4c799ffdb48e9cdd1')
+     version('3.7.2',  sha256='de255bb42163a915312df9f4b86e5b874b46d9e8d4b72604b5123c3a845ed9b1')
+     version('3.7.1',  sha256='c9244e5905df6b0190113e26082c72d58b56b1b0dec66d076f083ce4089b0307')
+@@ -110,6 +124,14 @@ class Bazel(Package):
+     version('0.1.4',  sha256='f3c395f5cd78cfef96f4008fe842f327bc8b03b77f46999387bc0ad223b5d970')
+     version('0.1.1',  sha256='c6ae19610b936a0aa940b44a3626d6e660fc457a8187d295cdf0b21169453d20')
+ 
++    cpe = {
++            '0.4.1':'cpe:2.3:a:google:bazel:0.4.1:*:*:*:*:visual_studio:*:*',
++            '-':'cpe:2.3:a:google:bazel:-:*:*:*:*:visual_studio:*:*',
++            '0.2.0':'cpe:2.3:a:google:bazel:0.2.0:*:*:*:*:visual_studio:*:*',
++            '0.3.0':'cpe:2.3:a:google:bazel:0.3.0:*:*:*:*:visual_studio:*:*',
++            '0.4.0':'cpe:2.3:a:google:bazel:0.4.0:*:*:*:*:visual_studio:*:*'
++          }
++
+     variant('nodepfail', default=True, description='Disable failing dependency checks due to injected absolute paths - required for most builds using bazel with spack')
+ 
+     depends_on('java', type=('build', 'run'))
+diff --git a/var/spack/repos/builtin/packages/bdftopcf/package.py b/var/spack/repos/builtin/packages/bdftopcf/package.py
+index b13daad..529b867 100644
+--- a/var/spack/repos/builtin/packages/bdftopcf/package.py
++++ b/var/spack/repos/builtin/packages/bdftopcf/package.py
+@@ -19,6 +19,10 @@ class Bdftopcf(AutotoolsPackage, XorgPackage):
+ 
+     version('1.0.5', sha256='78a5ec945de1d33e6812167b1383554fda36e38576849e74a9039dc7364ff2c3')
+ 
++    cpe = {
++            '1.0.5':'cpe:2.3:a:freedesktop:bdftopcf:1.0.5:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libxfont')
+ 
+     depends_on('pkgconfig', type='build')
+diff --git a/var/spack/repos/builtin/packages/berkeley-db/package.py b/var/spack/repos/builtin/packages/berkeley-db/package.py
+index 5f1e689..b85e438 100644
+--- a/var/spack/repos/builtin/packages/berkeley-db/package.py
++++ b/var/spack/repos/builtin/packages/berkeley-db/package.py
+@@ -23,6 +23,15 @@ class BerkeleyDb(AutotoolsPackage):
+     version('6.0.35', sha256='24421affa8ae436fe427ae4f5f2d1634da83d3d55a5ad6354a98eeedb825de55', deprecated=True)
+     version('5.3.28', sha256='e0a992d740709892e81f9d93f06daf305cf73fb81b545afe72478043172c3628')
+ 
++    cpe = {
++            '18.1.40':'cpe:2.3:a:oracle:berkeley_db:18.4.0:*:*:*:*:*:*:*',
++            '18.1.32':'cpe:2.3:a:oracle:berkeley_db:18.1.32:*:*:*:*:*:*:*',
++            '6.2.32':'cpe:2.3:a:oracle:berkeley_db:6.2.32:*:*:*:*:*:*:*',
++            '6.1.29':'cpe:2.3:a:oracle:berkeley_db:6.1.29:*:*:*:*:*:*:*',
++            '6.0.35':'cpe:2.3:a:oracle:berkeley_db:6.0.35:*:*:*:*:*:*:*',
++            '5.3.28':'cpe:2.3:a:oracle:berkeley_db:5.3.28:*:*:*:*:*:*:*'
++          }
++
+     variant('docs', default=False)
+     variant('cxx', default=True, description='Build with C++ API')
+     variant('stl', default=True, description='Build with C++ STL API')
+diff --git a/var/spack/repos/builtin/packages/binutils/package.py b/var/spack/repos/builtin/packages/binutils/package.py
+index 7d71674..e6b2514 100644
+--- a/var/spack/repos/builtin/packages/binutils/package.py
++++ b/var/spack/repos/builtin/packages/binutils/package.py
+@@ -39,6 +39,28 @@ class Binutils(AutotoolsPackage, GNUMirrorPackage):
+     version('2.23.2', sha256='fe914e56fed7a9ec2eb45274b1f2e14b0d8b4f41906a5194eac6883cfe5c1097')
+     version('2.20.1', sha256='71d37c96451333c5c0b84b170169fdcb138bbb27397dc06281905d9717c8ed64')
+ 
++    cpe = {
++            '2.20.1':'cpe:2.3:a:gnu:binutils:2.20.1:*:*:*:*:*:*:*',
++            '2.23.2':'cpe:2.3:a:gnu:binutils:2.23.2:*:*:*:*:*:*:*',
++            '2.24':'cpe:2.3:a:gnu:binutils:2.24:*:*:*:*:*:*:*',
++            '2.25':'cpe:2.3:a:gnu:binutils:2.25:*:*:*:*:*:*:*',
++            '2.25.1':'cpe:2.3:a:gnu:binutils:2.25.1:*:*:*:*:*:*:*',
++            '2.26':'cpe:2.3:a:gnu:binutils:2.26:*:*:*:*:*:*:*',
++            '2.27':'cpe:2.3:a:gnu:binutils:2.27:*:*:*:*:*:*:*',
++            '2.28':'cpe:2.3:a:gnu:binutils:2.28:*:*:*:*:*:*:*',
++            '2.29.1':'cpe:2.3:a:gnu:binutils:2.29.1:*:*:*:*:*:*:*',
++            '2.31.1':'cpe:2.3:a:gnu:binutils:2.31.1:*:*:*:*:*:*:*',
++            '2.32':'cpe:2.3:a:gnu:binutils:2.32:*:*:*:*:*:*:*',
++            '2.33.1':'cpe:2.3:a:gnu:binutils:2.33.1:*:*:*:*:*:*:*',
++            '2.34':'cpe:2.3:a:gnu:binutils:2.34:*:*:*:*:*:*:*',
++            '2.35':'cpe:2.3:a:gnu:binutils:2.35:*:*:*:*:*:*:*',
++            '2.35.1':'cpe:2.3:a:gnu:binutils:2.35.1:*:*:*:*:*:*:*',
++            '2.35.2':'cpe:2.3:a:gnu:binutils:2.35.2:*:*:*:*:*:*:*',
++            '2.36.1':'cpe:2.3:a:gnu:binutils:2.36.1:*:*:*:*:*:*:*',
++            '2.37':'cpe:2.3:a:gnu:binutils:2.37:*:*:*:*:*:*:*',
++            '2.38':'cpe:2.3:a:gnu:binutils:2.38:*:*:*:*:*:*:*'
++          }
++
+     variant('plugins', default=True,
+             description="enable plugins, needed for gold linker")
+     variant('gold', default=False,
+diff --git a/var/spack/repos/builtin/packages/bison/package.py b/var/spack/repos/builtin/packages/bison/package.py
+index 39fcae6..1d2416f 100644
+--- a/var/spack/repos/builtin/packages/bison/package.py
++++ b/var/spack/repos/builtin/packages/bison/package.py
+@@ -48,6 +48,34 @@ class Bison(AutotoolsPackage, GNUMirrorPackage):
+     version('3.0.4', sha256='b67fd2daae7a64b5ba862c66c07c1addb9e6b1b05c5f2049392cfd8a2172952e')
+     version('2.7',   sha256='19bbe7374fd602f7a6654c131c21a15aebdc06cc89493e8ff250cb7f9ed0a831')
+ 
++    cpe = {
++            '2.7':'cpe:2.3:a:gnu:bison:2.7:*:*:*:*:*:*:*',
++            '3.0.4':'cpe:2.3:a:gnu:bison:3.0.4:*:*:*:*:*:*:*',
++            '3.0.5':'cpe:2.3:a:gnu:bison:3.0.5:*:*:*:*:*:*:*',
++            '3.3.2':'cpe:2.3:a:gnu:bison:3.3.2:*:*:*:*:*:*:*',
++            '3.4.1':'cpe:2.3:a:gnu:bison:3.4.1:*:*:*:*:*:*:*',
++            '3.4.2':'cpe:2.3:a:gnu:bison:3.4.2:*:*:*:*:*:*:*',
++            '3.5':'cpe:2.3:a:gnu:bison:3.5:*:*:*:*:*:*:*',
++            '3.5.1':'cpe:2.3:a:gnu:bison:3.5.1:*:*:*:*:*:*:*',
++            '3.5.2':'cpe:2.3:a:gnu:bison:3.5.2:*:*:*:*:*:*:*',
++            '3.5.3':'cpe:2.3:a:gnu:bison:3.5.3:*:*:*:*:*:*:*',
++            '3.6':'cpe:2.3:a:gnu:bison:3.6:*:*:*:*:*:*:*',
++            '3.6.1':'cpe:2.3:a:gnu:bison:3.6.1:*:*:*:*:*:*:*',
++            '3.6.2':'cpe:2.3:a:gnu:bison:3.6.2:*:*:*:*:*:*:*',
++            '3.6.3':'cpe:2.3:a:gnu:bison:3.6.3:*:*:*:*:*:*:*',
++            '3.6.4':'cpe:2.3:a:gnu:bison:3.6.4:*:*:*:*:*:*:*',
++            '3.7':'cpe:2.3:a:gnu:bison:3.7:*:*:*:*:*:*:*',
++            '3.7.1':'cpe:2.3:a:gnu:bison:3.7.1:*:*:*:*:*:*:*',
++            '3.7.2':'cpe:2.3:a:gnu:bison:3.7.2:*:*:*:*:*:*:*',
++            '3.7.3':'cpe:2.3:a:gnu:bison:3.7.3:*:*:*:*:*:*:*',
++            '3.7.4':'cpe:2.3:a:gnu:bison:3.7.4:*:*:*:*:*:*:*',
++            '3.7.5':'cpe:2.3:a:gnu:bison:3.7.5:*:*:*:*:*:*:*',
++            '3.7.6':'cpe:2.3:a:gnu:bison:3.7.6:*:*:*:*:*:*:*',
++            '3.8':'cpe:2.3:a:gnu:bison:3.8:*:*:*:*:*:*:*',
++            '3.8.1':'cpe:2.3:a:gnu:bison:3.8.1:*:*:*:*:*:*:*',
++            '3.8.2':'cpe:2.3:a:gnu:bison:3.8.2:*:*:*:*:*:*:*'
++          }
++
+     # https://lists.gnu.org/archive/html/bug-bison/2019-08/msg00008.html
+     patch('parallel.patch', when='@3.4.2')
+ 
+diff --git a/var/spack/repos/builtin/packages/bzip2/package.py b/var/spack/repos/builtin/packages/bzip2/package.py
+index 63a0357..c66f76e 100644
+--- a/var/spack/repos/builtin/packages/bzip2/package.py
++++ b/var/spack/repos/builtin/packages/bzip2/package.py
+@@ -24,6 +24,12 @@ class Bzip2(Package, SourcewarePackage):
+     version('1.0.7', sha256='e768a87c5b1a79511499beb41500bcc4caf203726fff46a6f5f9ad27fe08ab2b')
+     version('1.0.6', sha256='a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd')
+ 
++    cpe = {
++            '1.0.8':'cpe:2.3:a:bzip:bzip2:1.0.8:*:*:*:*:*:*:*',
++            '1.0.7':'cpe:2.3:a:bzip:bzip2:1.0.7:*:*:*:*:*:*:*',
++            '1.0.6':'cpe:2.3:a:bzip:bzip2:1.0.6:*:*:*:*:*:*:*'
++          }
++
+     variant('shared', default=True, description='Enables the build of shared libraries.')
+     variant('pic', default=False, description='Build static libraries with PIC')
+     variant('debug', default=False, description='Enable debug symbols and disable optimization')
+diff --git a/var/spack/repos/builtin/packages/c-ares/package.py b/var/spack/repos/builtin/packages/c-ares/package.py
+index 86c3ae6..0d48760 100644
+--- a/var/spack/repos/builtin/packages/c-ares/package.py
++++ b/var/spack/repos/builtin/packages/c-ares/package.py
+@@ -17,6 +17,12 @@ class CAres(CMakePackage):
+     version('1.15.0', sha256='7deb7872cbd876c29036d5f37e30c4cbc3cc068d59d8b749ef85bb0736649f04')
+     version('1.13.0', sha256='7c48c57706a38691041920e705d2a04426ad9c68d40edd600685323f214b2d57')
+ 
++    cpe = {
++            'master':'cpe:2.3:a:c-ares_project:c-ares:master:*:*:*:*:*:*:*',
++            '1.13.0':'cpe:2.3:a:c-ares_project:c-ares:1.13.0:*:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:c-ares_project:c-ares:1.15.0:*:*:*:*:*:*:*'
++          }
++
+     def url_for_version(self, version):
+         url = "https://github.com/c-ares/c-ares/archive/cares-{0}.tar.gz"
+         return url.format(version.underscored)
+diff --git a/var/spack/repos/builtin/packages/diffutils/package.py b/var/spack/repos/builtin/packages/diffutils/package.py
+index 9e8e60e..7ed5cbe 100644
+--- a/var/spack/repos/builtin/packages/diffutils/package.py
++++ b/var/spack/repos/builtin/packages/diffutils/package.py
+@@ -23,6 +23,12 @@ class Diffutils(AutotoolsPackage, GNUMirrorPackage):
+     version('3.7', sha256='b3a7a6221c3dc916085f0d205abf6b8e1ba443d4dd965118da364a1dc1cb3a26')
+     version('3.6', sha256='d621e8bdd4b573918c8145f7ae61817d1be9deb4c8d2328a65cea8e11d783bd6')
+ 
++    cpe = {
++            '3.6':'cpe:2.3:a:gnu:diffutils:3.6:*:*:*:*:*:*:*',
++            '3.7':'cpe:2.3:a:gnu:diffutils:3.7:*:*:*:*:*:*:*',
++            '3.8':'cpe:2.3:a:gnu:diffutils:3.8:*:*:*:*:*:*:*'
++          }
++
+     build_directory = 'spack-build'
+ 
+     patch('nvhpc.patch', when='@3.7 %nvhpc')
+diff --git a/var/spack/repos/builtin/packages/dnsmasq/package.py b/var/spack/repos/builtin/packages/dnsmasq/package.py
+index c32df4e..5d86d92 100644
+--- a/var/spack/repos/builtin/packages/dnsmasq/package.py
++++ b/var/spack/repos/builtin/packages/dnsmasq/package.py
+@@ -25,6 +25,23 @@ class Dnsmasq(MakefilePackage):
+     version('2.71', sha256='7d8c64f66a396442e01b639df3ea6b4e02ba88cbe206c80be8de68b6841634c4')
+     version('2.70', sha256='8eb7bf53688d6aaede5c90cfd2afcce04803a4efbddfbeecc6297180749e98af')
+ 
++    cpe = {
++            '2.7':'cpe:2.3:a:thekelleys:dnsmasq:2.7:*:*:*:*:*:*:*',
++            '2.8':'cpe:2.3:a:thekelleys:dnsmasq:2.8:*:*:*:*:*:*:*',
++            '2.70':'cpe:2.3:a:thekelleys:dnsmasq:2.70:*:*:*:*:*:*:*',
++            '2.71':'cpe:2.3:a:thekelleys:dnsmasq:2.71:*:*:*:*:*:*:*',
++            '2.72':'cpe:2.3:a:thekelleys:dnsmasq:2.72:*:*:*:*:*:*:*',
++            '2.73':'cpe:2.3:a:thekelleys:dnsmasq:2.73:*:*:*:*:*:*:*',
++            '2.74':'cpe:2.3:a:thekelleys:dnsmasq:2.74:*:*:*:*:*:*:*',
++            '2.76':'cpe:2.3:a:thekelleys:dnsmasq:2.76:*:*:*:*:*:*:*',
++            '2.78':'cpe:2.3:a:thekelleys:dnsmasq:2.78:*:*:*:*:*:*:*',
++            '2.75':'cpe:2.3:a:thekelleys:dnsmasq:2.75:*:*:*:*:*:*:*',
++            '2.77':'cpe:2.3:a:thekelleys:dnsmasq:2.77:*:*:*:*:*:*:*',
++            '2.79':'cpe:2.3:a:thekelleys:dnsmasq:2.79:*:*:*:*:*:*:*',
++            '2.80':'cpe:2.3:a:thekelleys:dnsmasq:2.80:*:*:*:*:*:*:*',
++            '2.81':'cpe:2.3:a:thekelleys:dnsmasq:2.81:*:*:*:*:*:*:*'
++          }
++    
+     def install(self, spec, prefix):
+         mkdirp(prefix.bin)
+         install('./src/dnsmasq', prefix.bin)
+diff --git a/var/spack/repos/builtin/packages/expat/package.py b/var/spack/repos/builtin/packages/expat/package.py
+index e065446..de81c3f 100644
+--- a/var/spack/repos/builtin/packages/expat/package.py
++++ b/var/spack/repos/builtin/packages/expat/package.py
+@@ -33,6 +33,24 @@ class Expat(AutotoolsPackage):
+     version('2.2.2', sha256='4376911fcf81a23ebd821bbabc26fd933f3ac74833f74924342c29aad2c86046', deprecated=True)
+     version('2.2.0', sha256='d9e50ff2d19b3538bd2127902a89987474e1a4db8e43a66a4d1a712ab9a504ff', deprecated=True)
+ 
++    cpe = {
++            '2.4.8':'cpe:2.3:a:libexpat_project:libexpat:2.4.8:*:*:*:*:*:*:*',
++            '2.4.7':'cpe:2.3:a:libexpat_project:libexpat:2.4.7:*:*:*:*:*:*:*',
++            '2.4.6':'cpe:2.3:a:libexpat_project:libexpat:2.4.6:*:*:*:*:*:*:*',
++            '2.4.5':'cpe:2.3:a:libexpat_project:libexpat:2.4.5:*:*:*:*:*:*:*',
++            '2.4.4':'cpe:2.3:a:libexpat_project:libexpat:2.4.4:*:*:*:*:*:*:*',
++            '2.4.3':'cpe:2.3:a:libexpat_project:libexpat:2.4.3:*:*:*:*:*:*:*',
++            '2.4.1':'cpe:2.3:a:libexpat_project:libexpat:2.4.1:*:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:libexpat_project:libexpat:2.4.0:*:*:*:*:*:*:*',
++            '2.3.0':'cpe:2.3:a:libexpat_project:libexpat:2.3.0:*:*:*:*:*:*:*',
++            '2.2.10':'cpe:2.3:a:libexpat_project:libexpat:2.2.10:*:*:*:*:*:*:*',
++            '2.2.9':'cpe:2.3:a:libexpat_project:libexpat:2.2.9:*:*:*:*:*:*:*',
++            '2.2.6':'cpe:2.3:a:libexpat_project:libexpat:2.2.6:*:*:*:*:*:*:*',
++            '2.2.5':'cpe:2.3:a:libexpat_project:libexpat:2.2.5:*:*:*:*:*:*:*',
++            '2.2.2':'cpe:2.3:a:libexpat_project:libexpat:2.2.2:*:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:libexpat_project:libexpat:2.2.0:*:*:*:*:*:*:*'
++          }
++
+     # Version 2.2.2 introduced a requirement for a high quality
+     # entropy source.  "Older" linux systems (aka CentOS 7) do not
+     # support get_random so we'll provide a high quality source via
+diff --git a/var/spack/repos/builtin/packages/font-util/package.py b/var/spack/repos/builtin/packages/font-util/package.py
+index 5c7eb27..aa423f8 100644
+--- a/var/spack/repos/builtin/packages/font-util/package.py
++++ b/var/spack/repos/builtin/packages/font-util/package.py
+@@ -15,6 +15,11 @@ class FontUtil(AutotoolsPackage, XorgPackage):
+     version('1.3.2', sha256='f115a3735604de1e852a4bf669be0269d8ce8f21f8e0e74ec5934b31dadc1e76')
+     version('1.3.1', sha256='34ebb0c9c14e0a392cdd5ea055c92489ad88d55ae148b2f1cfded0f3f63f2b5b')
+ 
++    cpe = {
++            '1.3.1':'cpe:2.3:a:freedesktop:font-util:1.3.1:*:*:*:*:*:*:*',
++            '1.3.2':'cpe:2.3:a:freedesktop:font-util:1.3.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('autoconf', type='build')
+     depends_on('automake', type='build')
+ 
+diff --git a/var/spack/repos/builtin/packages/fontconfig/package.py b/var/spack/repos/builtin/packages/fontconfig/package.py
+index 73ea3a8..26a3d0b 100644
+--- a/var/spack/repos/builtin/packages/fontconfig/package.py
++++ b/var/spack/repos/builtin/packages/fontconfig/package.py
+@@ -18,6 +18,15 @@ class Fontconfig(AutotoolsPackage):
+     version('2.12.1', sha256='a9f42d03949f948a3a4f762287dbc16e53a927c91a07ee64207ebd90a9e5e292')
+     version('2.11.1', sha256='b6b066c7dce3f436fdc0dfbae9d36122b38094f4f53bd8dffd45e195b0540d8d')
+ 
++    cpe = {
++            '2.11.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.11.1:*:*:*:*:*:*:*',
++            '2.12.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.12.1:*:*:*:*:*:*:*',
++            '2.12.3':'cpe:2.3:a:fontconfig_project:fontconfig:2.12.3:*:*:*:*:*:*:*',
++            '2.13.1':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.1:*:*:*:*:*:*:*',
++            '2.13.93':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.93:*:*:*:*:*:*:*',
++            '2.13.94':'cpe:2.3:a:fontconfig_project:fontconfig:2.13.94:*:*:*:*:*:*:*'
++          }
++
+     depends_on('freetype')
+     depends_on('gperf', type='build', when='@2.12.2:')
+     depends_on('libxml2')
+diff --git a/var/spack/repos/builtin/packages/fontsproto/package.py b/var/spack/repos/builtin/packages/fontsproto/package.py
+index 154ab16..23b1622 100644
+--- a/var/spack/repos/builtin/packages/fontsproto/package.py
++++ b/var/spack/repos/builtin/packages/fontsproto/package.py
+@@ -14,5 +14,9 @@ class Fontsproto(AutotoolsPackage, XorgPackage):
+ 
+     version('2.1.3', sha256='72c44e63044b2b66f6fa112921621ecc20c71193982de4f198d9a29cda385c5e')
+ 
++    cpe = {
++            '2.1.3':'cpe:2.3:a:freedesktop:fontsproto:2.1.3:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/freetype/package.py b/var/spack/repos/builtin/packages/freetype/package.py
+index 8837f23..b238738 100644
+--- a/var/spack/repos/builtin/packages/freetype/package.py
++++ b/var/spack/repos/builtin/packages/freetype/package.py
+@@ -28,6 +28,24 @@ class Freetype(AutotoolsPackage):
+     version('2.7',    sha256='7b657d5f872b0ab56461f3bd310bd1c5ec64619bd15f0d8e08282d494d9cfea4')
+     version('2.5.3',  sha256='41217f800d3f40d78ef4eb99d6a35fd85235b64f81bc56e4812d7672fca7b806')
+ 
++    cpe = {
++            '2.5.3':'cpe:2.3:a:freetype:freetype:2.5.3:*:*:*:*:*:*:*',
++            '2.7':'cpe:2.3:a:freetype:freetype:2.7:*:*:*:*:*:*:*',
++            '2.7':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.7:*:*:*:*:*:*:*',
++            '2.7.1':'cpe:2.3:a:freetype:freetype:2.7.1:*:*:*:*:*:*:*',
++            '2.7.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.7.1:*:*:*:*:*:*:*',
++            '2.9.1':'cpe:2.3:a:freetype:freetype:2.9.1:*:*:*:*:*:*:*',
++            '2.9.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.9.1:*:*:*:*:*:*:*',
++            '2.10.0':'cpe:2.3:a:freetype:freetype:2.10.0:*:*:*:*:*:*:*',
++            '2.10.0':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.0:*:*:*:*:*:*:*',
++            '2.10.1':'cpe:2.3:a:freetype:freetype:2.10.1:*:*:*:*:*:*:*',
++            '2.10.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.1:*:*:*:*:*:*:*',
++            '2.11.1':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.11.1:*:*:*:*:*:*:*',
++            '2.11.0':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.11.0:*:*:*:*:*:*:*',
++            '2.10.4':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.4:*:*:*:*:*:*:*',
++            '2.10.2':'cpe:2.3:a:freedesktop:freetype_demo_programs:2.10.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('bzip2')
+     depends_on('libpng')
+     depends_on('pkgconfig', type='build')
+diff --git a/var/spack/repos/builtin/packages/gcc/package.py b/var/spack/repos/builtin/packages/gcc/package.py
+index cfa6d94..993d1de 100644
+--- a/var/spack/repos/builtin/packages/gcc/package.py
++++ b/var/spack/repos/builtin/packages/gcc/package.py
+@@ -83,6 +83,27 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
+     version('4.6.4', sha256='35af16afa0b67af9b8eb15cafb76d2bc5f568540552522f5dc2c88dd45d977e8')
+     version('4.5.4', sha256='eef3f0456db8c3d992cbb51d5d32558190bc14f3bc19383dd93acc27acc6befc')
+ 
++    cpe = {
++            '-':'cpe:2.3:a:gnu:gcc:-:*:*:*:*:*:*:*',
++            '4.8.5':'cpe:2.3:a:gnu:libgomp:4.8.5:*:*:*:*:*:*:*',
++            '4.9.4':'cpe:2.3:a:gnu:gcc:4.9.4:*:*:*:*:*:*:*',
++            '4.5.4':'cpe:2.3:a:gnu:gcc:4.5.4:*:*:*:*:*:*:*',
++            '4.6.4':'cpe:2.3:a:gnu:gcc:4.6.4:*:*:*:*:*:*:*',
++            '4.7.4':'cpe:2.3:a:gnu:gcc:4.7.4:*:*:*:*:*:*:*',
++            '4.8.4':'cpe:2.3:a:gnu:gcc:4.8.4:*:*:*:*:*:*:*',
++            '4.8.5':'cpe:2.3:a:gnu:gcc:4.8.5:*:*:*:*:*:*:*',
++            '4.9.1':'cpe:2.3:a:gnu:gcc:4.9.1:*:*:*:*:*:*:*',
++            '4.9.2':'cpe:2.3:a:gnu:gcc:4.9.2:*:*:*:*:*:*:*',
++            '4.9.3':'cpe:2.3:a:gnu:gcc:4.9.3:*:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:gnu:libssp:-:*:*:*:*:*:*:*',
++            '7.5.0':'cpe:2.3:a:gnu:gcc:7.5.0:*:*:*:*:*:*:*',
++            '8.4.0':'cpe:2.3:a:gnu:gcc:8.4.0:*:*:*:*:*:*:*',
++            '9.2.0':'cpe:2.3:a:gnu:gcc:9.2.0:*:*:*:*:*:*:*',
++            '9.3.0':'cpe:2.3:a:gnu:gcc:9.3.0:*:*:*:*:*:*:*',
++            '10.1.0':'cpe:2.3:a:gnu:gcc:10.1.0:*:*:*:*:*:*:*',
++            '10.2.0':'cpe:2.3:a:gnu:gcc:10.2.0:*:*:*:*:*:*:*'
++           }
++
+     # We specifically do not add 'all' variant here because:
+     # (i) Ada, Go, Jit, and Objective-C++ are not default languages.
+     # In that respect, the name 'all' is rather misleading.
+diff --git a/var/spack/repos/builtin/packages/gdb/package.py b/var/spack/repos/builtin/packages/gdb/package.py
+index 91a6f6f..b45cdb9 100644
+--- a/var/spack/repos/builtin/packages/gdb/package.py
++++ b/var/spack/repos/builtin/packages/gdb/package.py
+@@ -18,7 +18,8 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
+     gnu_mirror_path = "gdb/gdb-11.2.tar.gz"
+ 
+     maintainers = ['robertu94']
+-
++    
++    version('12.1',   sha256='87296a3a9727356b56712c793704082d5df0ff36a34ca9ec9734fc9a8bdfdaab') 
+     version('11.2',   sha256='b558b66084835e43b6361f60d60d314c487447419cdf53adf83a87020c367290')
+     version('11.1',   sha256='cc2903474e965a43d09c3b263952d48ced39dd22ce2d01968f3aa181335fcb9c')
+     version('10.2',   sha256='b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350')
+@@ -36,6 +37,23 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
+     version('7.11.1', sha256='57e9e9aa3172ee16aa1e9c66fef08b4393b51872cc153e3f1ffdf18a57440586')
+     version('7.10.1', sha256='ff14f8050e6484508c73cbfa63731e57901478490ca1672dc0b5e2b03f6af622')
+ 
++    cpe = {
++            '-':'cpe:2.3:a:gnu:gdb:-:*:*:*:*:*:*:*',
++            '7.11.1':'cpe:2.3:a:gnu:gdb:7.11.1:*:*:*:*:*:*:*',
++            '7.12.1':'cpe:2.3:a:gnu:gdb:7.12.1:*:*:*:*:*:*:*',
++            '8.0':'cpe:2.3:a:gnu:gdb:8.0:*:*:*:*:*:*:*',
++            '8.0.1':'cpe:2.3:a:gnu:gdb:8.0.1:*:*:*:*:*:*:*',
++            '7.10.1':'cpe:2.3:a:gnu:gdb:7.10.1:*:*:*:*:*:*:*',
++            '8.1':'cpe:2.3:a:gnu:gdb:8.1:*:*:*:*:*:*:*',
++            '8.2':'cpe:2.3:a:gnu:gdb:8.2:*:*:*:*:*:*:*',
++            '8.2.1':'cpe:2.3:a:gnu:gdb:8.2.1:*:*:*:*:*:*:*',
++            '8.3':'cpe:2.3:a:gnu:gdb:8.3:*:*:*:*:*:*:*',
++            '8.3.1':'cpe:2.3:a:gnu:gdb:8.3.1:*:*:*:*:*:*:*',
++            '9.1':'cpe:2.3:a:gnu:gdb:9.1:*:*:*:*:*:*:*',
++            '9.2':'cpe:2.3:a:gnu:gdb:9.2:*:*:*:*:*:*:*',
++            '10.1':'cpe:2.3:a:gnu:gdb:10.1:*:*:*:*:*:*:*'
++          }
++
+     variant('python', default=True, description='Compile with Python support')
+     variant('xz', default=True, description='Compile with lzma support')
+     variant('source-highlight', default=False, description='Compile with source-highlight support')
+diff --git a/var/spack/repos/builtin/packages/gdbm/package.py b/var/spack/repos/builtin/packages/gdbm/package.py
+index c82553b..9e5421e 100644
+--- a/var/spack/repos/builtin/packages/gdbm/package.py
++++ b/var/spack/repos/builtin/packages/gdbm/package.py
+@@ -29,6 +29,22 @@ class Gdbm(AutotoolsPackage, GNUMirrorPackage):
+     version('1.9.1',  sha256='6025852637772b0699f2294b5f14fd4a084bca3c8161d29d64d1f30d6d1a9aed')
+     version('1.9',    sha256='f85324d7de3777db167581fd5d3493d2daa3e85e195a8ae9afc05b34551b6e57')
+ 
++    cpe = {
++            '1.23':'cpe:2.3:a:gnu:gdbm:1.23',
++            '1.22':'cpe:2.3:a:gnu:gdbm:1.22',
++            '1.21':'cpe:2.3:a:gnu:gdbm:1.21',
++            '1.20':'cpe:2.3:a:gnu:gdbm:1.20',
++            '1.19':'cpe:2.3:a:gnu:gdbm:1.19',
++            '1.18.1':'cpe:2.3:a:gnu:gdbm:1.18.1',
++            '1.14.1':'cpe:2.3:a:gnu:gdbm:1.14.1',
++            '1.13':'cpe:2.3:a:gnu:gdbm:1.13',
++            '1.12':'cpe:2.3:a:gnu:gdbm:1.12',
++            '1.11':'cpe:2.3:a:gnu:gdbm:1.11',
++            '1.10':'cpe:2.3:a:gnu:gdbm:1.10',
++            '1.9.1':'cpe:2.3:a:gnu:gdbm:1.91',
++            '1.9':'cpe:2.3:a:gnu:gdbm:1.9'
++          }
++
+     depends_on("readline")
+ 
+     patch('macOS.patch', when='@1.21 platform=darwin')
+diff --git a/var/spack/repos/builtin/packages/gettext/package.py b/var/spack/repos/builtin/packages/gettext/package.py
+index 7048e64..1a5d879 100644
+--- a/var/spack/repos/builtin/packages/gettext/package.py
++++ b/var/spack/repos/builtin/packages/gettext/package.py
+@@ -22,6 +22,14 @@ class Gettext(AutotoolsPackage, GNUMirrorPackage):
+     version('0.19.8.1', sha256='105556dbc5c3fbbc2aa0edb46d22d055748b6f5c7cd7a8d99f8e7eb84e938be4')
+     version('0.19.7',   sha256='378fa86a091cec3acdece3c961bb8d8c0689906287809a8daa79dc0c6398d934')
+ 
++    cpe = {
++            '0.19.7':'cpe:2.3:a:gnu:gettext:0.19.7:*:*:*:*:*:*:*',
++            '0.19.8.1':'cpe:2.3:a:gnu:gettext:0.19.8.1:*:*:*:*:*:*:*',
++            '0.20.1':'cpe:2.3:a:gnu:gettext:0.20.1:*:*:*:*:*:*:*',
++            '0.20.2':'cpe:2.3:a:gnu:gettext:0.20.2:*:*:*:*:*:*:*',
++            '0.21':'cpe:2.3:a:gnu:gettext:0.21:*:*:*:*:*:*:*'
++          }
++
+     # Recommended variants
+     variant('curses',   default=True, description='Use libncurses')
+     variant('libxml2',  default=True, description='Use libxml2')
+diff --git a/var/spack/repos/builtin/packages/gnuconfig/package.py b/var/spack/repos/builtin/packages/gnuconfig/package.py
+index 7b84d28..8addc41 100644
+--- a/var/spack/repos/builtin/packages/gnuconfig/package.py
++++ b/var/spack/repos/builtin/packages/gnuconfig/package.py
+@@ -22,6 +22,10 @@ class Gnuconfig(Package):
+     version('master', branch='master')
+     version('2021-08-14', sha256='69b6d2868e70167ba1bdb9030b49beeb20f00b37e30825e83fd04291d96bc5f7')
+ 
++    cpe = {
++            '2021-08-14':'cpe:2.3:a:gnu:gnuconfig:2021-08-14:*:*:*:*:*:*:*'
++          }
++
+     def install(self, spec, prefix):
+         with working_dir(self.stage.source_path):
+             install('config.sub', prefix)
+diff --git a/var/spack/repos/builtin/packages/gperf/package.py b/var/spack/repos/builtin/packages/gperf/package.py
+index d330a41..eb522df 100644
+--- a/var/spack/repos/builtin/packages/gperf/package.py
++++ b/var/spack/repos/builtin/packages/gperf/package.py
+@@ -20,4 +20,9 @@ class Gperf(AutotoolsPackage, GNUMirrorPackage):
+     version('3.1',   sha256='588546b945bba4b70b6a3a616e80b4ab466e3f33024a352fc2198112cdbb3ae2')
+     version('3.0.4', sha256='767112a204407e62dbc3106647cf839ed544f3cf5d0f0523aaa2508623aad63e')
+ 
++    cpe = {
++            '3.0.4':'cpe:2.3:a:gnu:gperf:3.0.4:*:*:*:*:*:*:*',
++            '3.1':'cpe:2.3:a:gnu:gperf:3.1:*:*:*:*:*:*:*'
++          }
++
+     # NOTE: `make check` is known to fail tests
+diff --git a/var/spack/repos/builtin/packages/httpd/package.py b/var/spack/repos/builtin/packages/httpd/package.py
+index a457864..80a180b 100644
+--- a/var/spack/repos/builtin/packages/httpd/package.py
++++ b/var/spack/repos/builtin/packages/httpd/package.py
+@@ -26,6 +26,13 @@ class Httpd(AutotoolsPackage):
+     depends_on('apr-util')
+     depends_on('pcre')
+ 
++    cpe = {
++            '2.4.38':'cpe:2.3:a:apache:http_server:2.4.38:*:*:*:*:*:*:*',
++            '2.4.39':'cpe:2.3:a:apache:http_server:2.4.39:*:*:*:*:*:*:*',
++            '2.4.41':'cpe:2.3:a:apache:http_server:2.4.41:*:*:*:*:*:*:*',
++            '2.4.43':'cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*'
++          }
++
+     def configure_args(self):
+         spec = self.spec
+         config_args = [
+diff --git a/var/spack/repos/builtin/packages/igraph/package.py b/var/spack/repos/builtin/packages/igraph/package.py
+index d6a3f83..39e5a50 100644
+--- a/var/spack/repos/builtin/packages/igraph/package.py
++++ b/var/spack/repos/builtin/packages/igraph/package.py
+@@ -14,4 +14,8 @@ class Igraph(AutotoolsPackage):
+ 
+     version('0.7.1', sha256='d978030e27369bf698f3816ab70aa9141e9baf81c56cc4f55efbe5489b46b0df')
+ 
++    cpe = {
++            '0.7.1':'cpe:2.3:a:igraph:igraph:0.7.1:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libxml2')
+diff --git a/var/spack/repos/builtin/packages/inputproto/package.py b/var/spack/repos/builtin/packages/inputproto/package.py
+index 5e5cb2f..4bf12f9 100644
+--- a/var/spack/repos/builtin/packages/inputproto/package.py
++++ b/var/spack/repos/builtin/packages/inputproto/package.py
+@@ -17,5 +17,9 @@ class Inputproto(AutotoolsPackage, XorgPackage):
+ 
+     version('2.3.2', sha256='10eaadd531f38f7c92ab59ef0708ca195caf3164a75c4ed99f0c04f2913f6ef3')
+ 
++    cpe = {
++            '2.3.2':'cpe:2.3:a:freedesktop:inputproto:2.3.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/jdk/package.py b/var/spack/repos/builtin/packages/jdk/package.py
+index 506df98..021e058 100644
+--- a/var/spack/repos/builtin/packages/jdk/package.py
++++ b/var/spack/repos/builtin/packages/jdk/package.py
+@@ -61,6 +61,22 @@ class Jdk(Package):
+     version('1.8.0_131-b11', sha256='62b215bdfb48bace523723cdbb2157c665e6a25429c73828a32f00e587301236',
+             url='https://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz')
+ 
++    cpe = { 
++            '1.8.0_131':'cpe:2.3:a:oracle:jdk:1.8.0:update131:*:*:*:*:*:*',
++            '1.8.0_141':'cpe:2.3:a:oracle:jdk:1.8.0:update141:*:*:*:*:*:*',
++            '1.8.0_202':'cpe:2.3:a:oracle:jdk:1.8.0:update202:*:*:*:*:*:*',
++            '1.8.0_212':'cpe:2.3:a:oracle:jdk:1.8.0:update212:*:*:*:*:*:*',
++            '1.8.0_231':'cpe:2.3:a:oracle:jdk:1.8.0:update231:*:*:*:*:*:*',
++            '1.8.0_241':'cpe:2.3:a:oracle:jdk:1.8.0:update241:*:*:*:*:*:*',
++            '10.0.1':'cpe:2.3:a:oracle:openjdk:10.0.1:*:*:*:*:*:*:*',
++            '10.0.2':'cpe:2.3:a:oracle:openjdk:10.0.2:*:*:*:*:*:*:*',
++            '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
++            '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
++            '12.0.1':'cpe:2.3:a:oracle:openjdk:12.0.1:*:*:*:*:*:*:*',
++            '12.0.2':'cpe:2.3:a:oracle:openjdk:12.0.2:*:*:*:*:*:*:*',
++            '14.0.2':'cpe:2.3:a:oracle:openjdk:14.0.2:*:*:*:*:*:*:*'
++          } 
++
+     provides('java@14', when='@14.0:14')
+     provides('java@13', when='@13.0:13')
+     provides('java@12', when='@12.0:12')
+diff --git a/var/spack/repos/builtin/packages/kbproto/package.py b/var/spack/repos/builtin/packages/kbproto/package.py
+index 9da7d77..99aba5f 100644
+--- a/var/spack/repos/builtin/packages/kbproto/package.py
++++ b/var/spack/repos/builtin/packages/kbproto/package.py
+@@ -17,5 +17,9 @@ class Kbproto(AutotoolsPackage, XorgPackage):
+ 
+     version('1.0.7', sha256='828cb275b91268b1a3ea950d5c0c5eb076c678fdf005d517411f89cc8c3bb416')
+ 
++    cpe = {
++            '1.0.7':'cpe:2.3:a:freedesktop:kbproto:1.0.7:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/libbsd/package.py b/var/spack/repos/builtin/packages/libbsd/package.py
+index 5dc351f..f915fdd 100644
+--- a/var/spack/repos/builtin/packages/libbsd/package.py
++++ b/var/spack/repos/builtin/packages/libbsd/package.py
+@@ -30,6 +30,19 @@ class Libbsd(AutotoolsPackage):
+     version('0.8.7', sha256='f548f10e5af5a08b1e22889ce84315b1ebe41505b015c9596bad03fd13a12b31')
+     version('0.8.6', sha256='467fbf9df1f49af11f7f686691057c8c0a7613ae5a870577bef9155de39f9687')
+ 
++    cpe = {
++            '0.8.6':'cpe:2.3:a:freedesktop:libbsd:0.8.6:*:*:*:*:*:*:*',
++            '0.8.7':'cpe:2.3:a:freedesktop:libbsd:0.8.7:*:*:*:*:*:*:*',
++            '0.9.0':'cpe:2.3:a:freedesktop:libbsd:0.9.0:*:*:*:*:*:*:*',
++            '0.9.1':'cpe:2.3:a:freedesktop:libbsd:0.9.1:*:*:*:*:*:*:*',
++            '0.10.0':'cpe:2.3:a:freedesktop:libbsd:0.10.0:*:*:*:*:*:*:*',
++            '0.11.0':'cpe:2.3:a:freedesktop:libbsd:0.11.0:*:*:*:*:*:*:*',
++            '0.11.1':'cpe:2.3:a:freedesktop:libbsd:0.11.1:*:*:*:*:*:*:*',
++            '0.11.2':'cpe:2.3:a:freedesktop:libbsd:0.11.2:*:*:*:*:*:*:*',
++            '0.11.3':'cpe:2.3:a:freedesktop:libbsd:0.11.3:*:*:*:*:*:*:*',
++            '0.11.5':'cpe:2.3:a:freedesktop:libbsd:0.11.5:*:*:*:*:*:*:*'
++          }
++
+     patch('cdefs.h.patch', when='@0.8.6 %gcc@:4')
+     patch('local-elf.h.patch', when='@:0.10 %intel')
+ 
+diff --git a/var/spack/repos/builtin/packages/libevent/package.py b/var/spack/repos/builtin/packages/libevent/package.py
+index 1b192b7..1e3acb0 100644
+--- a/var/spack/repos/builtin/packages/libevent/package.py
++++ b/var/spack/repos/builtin/packages/libevent/package.py
+@@ -34,6 +34,24 @@ class Libevent(AutotoolsPackage):
+     version('2.0.13', sha256='e2cc3b9f03e68ff878919b1cd031a210ba9ff376283d895161afcbc25aca00a9')
+     version('2.0.12', sha256='ac0283f72e0f881e93ac3ae9497a20c78bd075c6c12506ad10e821aa1c29e5ab')
+ 
++    cpe = {
++            '2.0.12':'cpe:2.3:a:libevent_project:libevent:2.0.12:*:*:*:*:*:*:*',
++            '2.0.13':'cpe:2.3:a:libevent_project:libevent:2.0.13:*:*:*:*:*:*:*',
++            '2.0.14':'cpe:2.3:a:libevent_project:libevent:2.0.14:*:*:*:*:*:*:*',
++            '2.0.15':'cpe:2.3:a:libevent_project:libevent:2.0.15:*:*:*:*:*:*:*',
++            '2.0.16':'cpe:2.3:a:libevent_project:libevent:2.0.16:*:*:*:*:*:*:*',
++            '2.0.17':'cpe:2.3:a:libevent_project:libevent:2.0.17:*:*:*:*:*:*:*',
++            '2.0.18':'cpe:2.3:a:libevent_project:libevent:2.0.18:*:*:*:*:*:*:*',
++            '2.0.19':'cpe:2.3:a:libevent_project:libevent:2.0.19:*:*:*:*:*:*:*',
++            '2.0.20':'cpe:2.3:a:libevent_project:libevent:2.0.20:*:*:*:*:*:*:*',
++            '2.0.21':'cpe:2.3:a:libevent_project:libevent:2.0.21:*:*:*:*:*:*:*',
++            '2.0.22':'cpe:2.3:a:libevent_project:libevent:2.0.22:*:*:*:*:*:*:*',
++            '2.1.8':'cpe:2.3:a:libevent_project:libevent:2.1.8:*:*:*:*:*:*:*',
++            '2.1.10':'cpe:2.3:a:libevent_project:libevent:2.1.10:*:*:*:*:*:*:*',
++            '2.1.11':'cpe:2.3:a:libevent_project:libevent:2.1.11:*:*:*:*:*:*:*',
++            '2.1.12':'cpe:2.3:a:libevent_project:libevent:2.1.12:*:*:*:*:*:*:*'
++          }
++
+     variant('openssl', default=True,
+             description="Build with encryption enabled at the libevent level.")
+     # Versions before 2.1 do not build with OpenSSL 1.1
+diff --git a/var/spack/repos/builtin/packages/libffi/package.py b/var/spack/repos/builtin/packages/libffi/package.py
+index 94f10d1..4594233 100644
+--- a/var/spack/repos/builtin/packages/libffi/package.py
++++ b/var/spack/repos/builtin/packages/libffi/package.py
+@@ -18,6 +18,12 @@ class Libffi(AutotoolsPackage):
+     version('3.3',   url='https://sourceware.org/pub/libffi/libffi-3.3.tar.gz', sha256='72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056')
+     version('3.2.1', url='https://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz', sha256='d06ebb8e1d9a22d19e38d63fdb83954253f39bedc5d46232a05645685722ca37')
+ 
++    cpe = {
++            '3.2.1':'cpe:2.3:a:libffi_project:libffi:3.2.1:*:*:*:*:*:*:*',
++            '3.3':'cpe:2.3:a:libffi_project:libffi:3.3:rc0:*:*:*:*:*:*',
++            '3.4.2':'cpe:2.3:a:libffi_project:libffi:3.4.2:*:*:*:*:*:*:*'
++          }
++
+     patch('clang-powerpc-3.2.1.patch', when='@3.2.1%clang platform=linux')
+     # ref.: https://github.com/libffi/libffi/pull/561
+     patch('powerpc-3.3.patch', when='@3.3')
+diff --git a/var/spack/repos/builtin/packages/libfontenc/package.py b/var/spack/repos/builtin/packages/libfontenc/package.py
+index 2d8af7c..7c8a442 100644
+--- a/var/spack/repos/builtin/packages/libfontenc/package.py
++++ b/var/spack/repos/builtin/packages/libfontenc/package.py
+@@ -14,6 +14,10 @@ class Libfontenc(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.3', sha256='6fba26760ca8d5045f2b52ddf641c12cedc19ee30939c6478162b7db8b6220fb')
+ 
++    cpe = {
++            '1.1.3':'cpe:2.3:a:freedesktop:libfontenc:1.1.3:*:*:*:*:*:*:*'
++          }
++
+     depends_on('zlib')
+ 
+     depends_on('xproto')
+diff --git a/var/spack/repos/builtin/packages/libice/package.py b/var/spack/repos/builtin/packages/libice/package.py
+index b3ba192..923fd34 100644
+--- a/var/spack/repos/builtin/packages/libice/package.py
++++ b/var/spack/repos/builtin/packages/libice/package.py
+@@ -14,6 +14,10 @@ class Libice(AutotoolsPackage, XorgPackage):
+ 
+     version('1.0.9', sha256='7812a824a66dd654c830d21982749b3b563d9c2dfe0b88b203cefc14a891edc0')
+ 
++    cpe = {
++            '1.0.9':'cpe:2.3:a:freedesktop:libice:1.0.9:*:*:*:*:*:*:*'
++          }
++
+     depends_on('xproto')
+     depends_on('xtrans')
+     depends_on('pkgconfig', type='build')
+diff --git a/var/spack/repos/builtin/packages/libiconv/package.py b/var/spack/repos/builtin/packages/libiconv/package.py
+index 9b53ba4..a65683e 100644
+--- a/var/spack/repos/builtin/packages/libiconv/package.py
++++ b/var/spack/repos/builtin/packages/libiconv/package.py
+@@ -17,6 +17,12 @@ class Libiconv(AutotoolsPackage, GNUMirrorPackage):
+     version('1.15', sha256='ccf536620a45458d26ba83887a983b96827001e92a13847b45e4925cc8913178')
+     version('1.14', sha256='72b24ded17d687193c3366d0ebe7cde1e6b18f0df8c55438ac95be39e8a30613')
+ 
++    cpe = {
++            '1.16':'cpe:2.3:a:gnu:libiconv:1.16',
++            '1.15':'cpe:2.3:a:gnu:libiconv:1.15',
++            '1.14':'cpe:2.3:a:gnu:libiconv:1.14'
++          }
++
+     variant('libs', default='shared,static', values=('shared', 'static'),
+             multi=True, description='Build shared libs, static libs or both')
+ 
+diff --git a/var/spack/repos/builtin/packages/libmd/package.py b/var/spack/repos/builtin/packages/libmd/package.py
+index 235e278..86a7261 100644
+--- a/var/spack/repos/builtin/packages/libmd/package.py
++++ b/var/spack/repos/builtin/packages/libmd/package.py
+@@ -22,5 +22,13 @@ class Libmd(AutotoolsPackage):
+     version('1.0.1', sha256='e14eeb931cf85330f95ff822262d3033125488dfb2f867441e36e2d2c4a34c71')
+     version('1.0.0', sha256='f21aea69f6411cb4307cda1f6378c7ed07830202b5f4cb9e64f681fdaf2d64c7')
+ 
++    cpe = {
++            '1.0.4':'cpe:2.3:a:hadrons:libmd:1.0.4', 
++            '1.0.3':'cpe:2.3:a:hadrons:libmd:1.0.3', 
++            '1.0.2':'cpe:2.3:a:hadrons:libmd:1.0.2', 
++            '1.0.1':'cpe:2.3:a:hadrons:libmd:1.0.1', 
++            '1.0.0':'cpe:2.3:a:hadrons:libmd:1.0.0' 
++          }
++
+     # Use wrapper functions instead of __attribute__ __alias__
+     patch('nvhpc-aliases.patch', when='%nvhpc')
+diff --git a/var/spack/repos/builtin/packages/libpcap/package.py b/var/spack/repos/builtin/packages/libpcap/package.py
+index 3d0b740..9e26d4c 100644
+--- a/var/spack/repos/builtin/packages/libpcap/package.py
++++ b/var/spack/repos/builtin/packages/libpcap/package.py
+@@ -16,5 +16,11 @@ class Libpcap(AutotoolsPackage):
+     version('1.9.1',  sha256='635237637c5b619bcceba91900666b64d56ecb7be63f298f601ec786ce087094')
+     version('1.8.1',  sha256='673dbc69fdc3f5a86fb5759ab19899039a8e5e6c631749e48dcd9c6f0c83541e')
+ 
++    cpe = {
++            '1.10.0':'cpe:2.3:a:tcpdump:libpcap:1.10.0:*:*:*:*:*:*:*',
++            '1.9.1':'cpe:2.3:a:tcpdump:libpcap:1.9.1:*:*:*:*:*:*:*',
++            '1.8.1':'cpe:2.3:a:tcpdump:libpcap:1.8.1:*:*:*:*:*:*:*'
++          }
++
+     depends_on('flex', type='build')
+     depends_on('bison', type='build')
+diff --git a/var/spack/repos/builtin/packages/libpng/package.py b/var/spack/repos/builtin/packages/libpng/package.py
+index 5fec86c..71e4f03 100644
+--- a/var/spack/repos/builtin/packages/libpng/package.py
++++ b/var/spack/repos/builtin/packages/libpng/package.py
+@@ -24,6 +24,14 @@ class Libpng(AutotoolsPackage):
+     version('1.5.30', sha256='7d76275fad2ede4b7d87c5fd46e6f488d2a16b5a69dc968ffa840ab39ba756ed')
+     version('1.2.57', sha256='0f4620e11fa283fedafb474427c8e96bf149511a1804bdc47350963ae5cf54d8')
+ 
++    cpe = {
++            '1.2.57':'cpe:2.3:a:libpng:libpng:1.2.57:-:*:*:*:*:*:*',
++            '1.2.57':'cpe:2.3:a:libpng:libpng:1.2.57:beta:*:*:*:*:*:*',
++            '1.5.30':'cpe:2.3:a:libpng:libpng:1.5.30:-:*:*:*:*:*:*',
++            '1.5.30':'cpe:2.3:a:libpng:libpng:1.5.30:beta:*:*:*:*:*:*',
++            '1.6.37':'cpe:2.3:a:libpng:libpng:1.6.37:*:*:*:*:*:*:*'
++          }
++
+     depends_on('zlib@1.0.4:')  # 1.2.5 or later recommended
+ 
+     def configure_args(self):
+diff --git a/var/spack/repos/builtin/packages/libproxy/package.py b/var/spack/repos/builtin/packages/libproxy/package.py
+index bd8f2fe..ad1d27e 100644
+--- a/var/spack/repos/builtin/packages/libproxy/package.py
++++ b/var/spack/repos/builtin/packages/libproxy/package.py
+@@ -19,6 +19,14 @@ class Libproxy(CMakePackage):
+     version('0.4.14', sha256='6220a6cab837a8996116a0568324cadfd09a07ec16b930d2a330e16d5c2e1eb6')
+     version('0.4.13', sha256='d610bc0ef81a18ba418d759c5f4f87bf7102229a9153fb397d7d490987330ffd')
+ 
++    cpe = {
++            '0.4.17':'cpe:2.3:a:libproxy_project:libproxy:0.4.17:*:*:*:*:*:*:*', 
++            '0.4.16':'cpe:2.3:a:libproxy_project:libproxy:0.4.16:*:*:*:*:*:*:*',
++            '0.4.15':'cpe:2.3:a:libproxy_project:libproxy:0.4.15:*:*:*:*:*:*:*', 
++            '0.4.14':'cpe:2.3:a:libproxy_project:libproxy:0.4.14:*:*:*:*:*:*:*',
++            '0.4.13':'cpe:2.3:a:libproxy_project:libproxy:0.4.13:*:*:*:*:*:*:*'
++          }
++
+     variant('perl', default=False, description='Enable Perl bindings')
+     variant('python', default=True, description='Enable Python bindings')
+ 
+diff --git a/var/spack/repos/builtin/packages/libpthread-stubs/package.py b/var/spack/repos/builtin/packages/libpthread-stubs/package.py
+index 7938ab3..9a4c354 100644
+--- a/var/spack/repos/builtin/packages/libpthread-stubs/package.py
++++ b/var/spack/repos/builtin/packages/libpthread-stubs/package.py
+@@ -15,3 +15,9 @@ class LibpthreadStubs(AutotoolsPackage):
+ 
+     version('0.4', sha256='50d5686b79019ccea08bcbd7b02fe5a40634abcfd4146b6e75c6420cc170e9d9')
+     version('0.3', sha256='3031f466cf0b06de6b3ccbf2019d15c4fcf75229b7d226a711bc1885b3a82cde')
++
++    cpe = {
++            '0.3':'cpe:2.3:a:freedesktop:libpthread-stubs:0.3:*:*:*:*:*:*:*',
++            '0.4':'cpe:2.3:a:freedesktop:libpthread-stubs:0.4:*:*:*:*:*:*:*'
++          }
++
+diff --git a/var/spack/repos/builtin/packages/libsigsegv/package.py b/var/spack/repos/builtin/packages/libsigsegv/package.py
+index a831c99..c99cc19 100644
+--- a/var/spack/repos/builtin/packages/libsigsegv/package.py
++++ b/var/spack/repos/builtin/packages/libsigsegv/package.py
+@@ -18,6 +18,13 @@ class Libsigsegv(AutotoolsPackage, GNUMirrorPackage):
+     version('2.11', sha256='dd7c2eb2ef6c47189406d562c1dc0f96f2fc808036834d596075d58377e37a18')
+     version('2.10', sha256='8460a4a3dd4954c3d96d7a4f5dd5bc4d9b76f5754196aa245287553b26d2199a')
+ 
++    cpe = {
++            '2.13':'cpe:2.3:a:gnu:libsigsegv:2.13',
++            '2.12':'cpe:2.3:a:gnu:libsigsegv:2.12',
++            '2.11':'cpe:2.3:a:gnu:libsigsegv:2.11',
++            '2.10':'cpe:2.3:a:gnu:libsigsegv:2.10'
++          }
++
+     patch('patch.new_config_guess', when='@2.10')
+ 
+     test_requires_compiler = True
+diff --git a/var/spack/repos/builtin/packages/libsm/package.py b/var/spack/repos/builtin/packages/libsm/package.py
+index 08a4d55..ea5da2a 100644
+--- a/var/spack/repos/builtin/packages/libsm/package.py
++++ b/var/spack/repos/builtin/packages/libsm/package.py
+@@ -15,6 +15,11 @@ class Libsm(AutotoolsPackage, XorgPackage):
+     version('1.2.3', sha256='1e92408417cb6c6c477a8a6104291001a40b3bb56a4a60608fdd9cd2c5a0f320')
+     version('1.2.2', sha256='14bb7c669ce2b8ff712fbdbf48120e3742a77edcd5e025d6b3325ed30cf120f4')
+ 
++    cpe = {
++            '1.2.2':'cpe:2.3:a:freedesktop:libsm:1.2.2:*:*:*:*:*:*:*',
++            '1.2.3':'cpe:2.3:a:freedesktop:libsm:1.2.3:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libice@1.0.5:')
+     depends_on('uuid')
+ 
+diff --git a/var/spack/repos/builtin/packages/libssh/package.py b/var/spack/repos/builtin/packages/libssh/package.py
+index 23231fe..4ee0aab 100644
+--- a/var/spack/repos/builtin/packages/libssh/package.py
++++ b/var/spack/repos/builtin/packages/libssh/package.py
+@@ -15,6 +15,11 @@ class Libssh(CMakePackage):
+     version('0.8.5', sha256='07d2c431240fc88f6b06bcb36ae267f9afeedce2e32f6c42f8844b205ab5a335')
+     version('0.7.5', sha256='54e86dd5dc20e5367e58f3caab337ce37675f863f80df85b6b1614966a337095')
+ 
++    cpe = {
++            '0.8.5':'cpe:2.3:a:libssh:libssh:0.8.5:*:*:*:*:*:*:*',
++            '0.7.5':'cpe:2.3:a:libssh:libssh:0.7.5:*:*:*:*:*:*:*'
++          }
++
+     variant("gssapi", default=True, description="Build with gssapi support")
+     depends_on('openssl@:1.0', when='@:0.7')
+     depends_on('openssl')
+diff --git a/var/spack/repos/builtin/packages/libtool/package.py b/var/spack/repos/builtin/packages/libtool/package.py
+index 8354cd5..2b1cca5 100644
+--- a/var/spack/repos/builtin/packages/libtool/package.py
++++ b/var/spack/repos/builtin/packages/libtool/package.py
+@@ -22,6 +22,12 @@ class Libtool(AutotoolsPackage, GNUMirrorPackage):
+     # Version released in 2011
+     version('2.4.2', sha256='b38de44862a987293cd3d8dfae1c409d514b6c4e794ebc93648febf9afc38918', deprecated=True)
+ 
++    cpe = {
++            '2.4.7':'cpe:2.3:a:gnu:libtool:2.4.7:*:*:*:*:*:*:*',
++            '2.4.6':'cpe:2.3:a:gnu:libtool:2.4.6:*:*:*:*:*:*:*',
++            '2.4.2':'cpe:2.3:a:gnu:libtool:2.4.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('m4@1.4.6:', type='build')
+ 
+     with when('@2.4.2'):
+diff --git a/var/spack/repos/builtin/packages/libx11/package.py b/var/spack/repos/builtin/packages/libx11/package.py
+index 9ef0f1f..3fa0da5 100644
+--- a/var/spack/repos/builtin/packages/libx11/package.py
++++ b/var/spack/repos/builtin/packages/libx11/package.py
+@@ -12,11 +12,22 @@ class Libx11(AutotoolsPackage, XorgPackage):
+     homepage = "https://www.x.org/"
+     xorg_mirror_path = "lib/libX11-1.6.7.tar.gz"
+ 
++    version('1.8',   sha256='68e0a30c4248b9f41492891a4b49672c3b0c59e84c4868144f03eef01ebc5eea')
++    version('1.7.3', sha256='59e9cfce4f1415d1fd6081e1da4d15ae6db52c000dc2e12beadd7f3dc431bae7')
+     version('1.7.0', sha256='c48ec61785ec68fc6a9a6aca0a9578393414fe2562e3cc9cca30234345c7b6ac')
+     version('1.6.7', sha256='f62ab88c2a87b55e1dc338726a55bb6ed8048084fe6a3294a7ae324ca45159d1')
+     version('1.6.5', sha256='3abce972ba62620611fab5b404dafb852da3da54e7c287831c30863011d28fb3')
+     version('1.6.3', sha256='0b03b9d22f4c9e59b4ba498f294e297f013cae27050dfa0f3496640200db5376')
+ 
++    cpe = {
++            '1.6.3':'cpe:2.3:a:x.org:libx11:1.6.3:*:*:*:*:*:*:*',
++            '1.6.5':'cpe:2.3:a:x.org:libx11:1.6.5:*:*:*:*:*:*:*',
++            '1.6.7':'cpe:2.3:a:x.org:libx11:1.6.7:*:*:*:*:*:*:*',
++            '1.7.0':'cpe:2.3:a:x.org:libx11:1.7.0:*:*:*:*:*:*:*',
++            '1.7.3':'cpe:2.3:a:x.org:libx11:1.7.3:*:*:*:*:*:*:*',
++            '1.8':'cpe:2.3:a:x.org:libx11:1.8:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libxcb@1.1.92:')
+ 
+     depends_on('xproto@7.0.25:', when='@1.7.0:')
+diff --git a/var/spack/repos/builtin/packages/libxau/package.py b/var/spack/repos/builtin/packages/libxau/package.py
+index a31cfa6..97d929b 100644
+--- a/var/spack/repos/builtin/packages/libxau/package.py
++++ b/var/spack/repos/builtin/packages/libxau/package.py
+@@ -16,6 +16,10 @@ class Libxau(AutotoolsPackage, XorgPackage):
+ 
+     version('1.0.8', sha256='c343b4ef66d66a6b3e0e27aa46b37ad5cab0f11a5c565eafb4a1c7590bc71d7b')
+ 
++    cpe = {
++            '1.0.8':'cpe:2.3:a:freedesktop:libxau:1.0.8:*:*:*:*:*:*:*'
++          }
++
+     depends_on('xproto')
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/libxaw/package.py b/var/spack/repos/builtin/packages/libxaw/package.py
+index 72e5886..477f810 100644
+--- a/var/spack/repos/builtin/packages/libxaw/package.py
++++ b/var/spack/repos/builtin/packages/libxaw/package.py
+@@ -16,6 +16,11 @@ class Libxaw(AutotoolsPackage, XorgPackage):
+     version('1.0.13', sha256='7e74ac3e5f67def549722ff0333d6e6276b8becd9d89615cda011e71238ab694')
+     version('1.0.12', sha256='e32abc68d759ffb643f842329838f8b6c157e31023cc91059aabf730e7222ad2')
+ 
++    cpe = {
++            '1.0.12':'cpe:2.3:a:freedesktop:libxaw:1.0.12:*:*:*:*:*:*:*',
++            '1.0.13':'cpe:2.3:a:freedesktop:libxaw:1.0.13:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libx11')
+     depends_on('libxext')
+     depends_on('libxt')
+diff --git a/var/spack/repos/builtin/packages/libxcb/package.py b/var/spack/repos/builtin/packages/libxcb/package.py
+index f36102a..463f694 100644
+--- a/var/spack/repos/builtin/packages/libxcb/package.py
++++ b/var/spack/repos/builtin/packages/libxcb/package.py
+@@ -21,6 +21,14 @@ class Libxcb(AutotoolsPackage):
+     version('1.11.1', sha256='660312d5e64d0a5800262488042c1707a0261fa01a759bad265b1b75dd4844dd')
+     version('1.11',   sha256='4b351e1dc95eb0a1c25fa63611a6f4cf033cb63e20997c4874c80bbd1876d0b4')
+ 
++    cpe = {
++            '1.11':'cpe:2.3:a:x:libxcb:1.11:*:*:*:*:*:*:*',
++            '1.11.1':'cpe:2.3:a:x:libxcb:1.11.1:*:*:*:*:*:*:*',
++            '1.12':'cpe:2.3:a:x:libxcb:1.12:*:*:*:*:*:*:*',
++            '1.13':'cpe:2.3:a:x:libxcb:1.13:*:*:*:*:*:*:*',
++            '1.14':'cpe:2.3:a:x:libxcb:1.14:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libpthread-stubs')
+     depends_on('libxau@0.99.2:')
+     depends_on('libxdmcp')
+diff --git a/var/spack/repos/builtin/packages/libxdmcp/package.py b/var/spack/repos/builtin/packages/libxdmcp/package.py
+index 99291f2..98b1b73 100644
+--- a/var/spack/repos/builtin/packages/libxdmcp/package.py
++++ b/var/spack/repos/builtin/packages/libxdmcp/package.py
+@@ -14,6 +14,10 @@ class Libxdmcp(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.2', sha256='6f7c7e491a23035a26284d247779174dedc67e34e93cc3548b648ffdb6fc57c0')
+ 
++    cpe = {
++            '1.1.2':'cpe:2.3:a:freedesktop:libxdmcp:1.1.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('xproto')
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/libxext/package.py b/var/spack/repos/builtin/packages/libxext/package.py
+index 9b41f5e..7d1619f 100644
+--- a/var/spack/repos/builtin/packages/libxext/package.py
++++ b/var/spack/repos/builtin/packages/libxext/package.py
+@@ -14,6 +14,10 @@ class Libxext(AutotoolsPackage, XorgPackage):
+ 
+     version('1.3.3', sha256='eb0b88050491fef4716da4b06a4d92b4fc9e76f880d6310b2157df604342cfe5')
+ 
++    cpe = {
++           '1.3.3' :'cpe:2.3:a:x:libxext:1.3.3:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libx11@1.6:')
+ 
+     depends_on('xproto@7.0.13:')
+diff --git a/var/spack/repos/builtin/packages/libxfont/package.py b/var/spack/repos/builtin/packages/libxfont/package.py
+index c271077..b7da5f3 100644
+--- a/var/spack/repos/builtin/packages/libxfont/package.py
++++ b/var/spack/repos/builtin/packages/libxfont/package.py
+@@ -19,6 +19,10 @@ class Libxfont(AutotoolsPackage, XorgPackage):
+ 
+     version('1.5.2', sha256='a7350c75171d03d06ae0d623e42240356d6d3e1ac7dfe606639bf20f0d653c93')
+ 
++    cpe = {
++            '1.5.2':'cpe:2.3:a:x:libxfont:1.5.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libfontenc')
+     depends_on('freetype')
+ 
+diff --git a/var/spack/repos/builtin/packages/libxft/package.py b/var/spack/repos/builtin/packages/libxft/package.py
+index ee401e1..c80ca5b 100644
+--- a/var/spack/repos/builtin/packages/libxft/package.py
++++ b/var/spack/repos/builtin/packages/libxft/package.py
+@@ -18,6 +18,10 @@ class Libxft(AutotoolsPackage, XorgPackage):
+ 
+     version('2.3.2', sha256='26cdddcc70b187833cbe9dc54df1864ba4c03a7175b2ca9276de9f05dce74507')
+ 
++    cpe = {
++            '2.3.2':'cpe:2.3:a:freedesktop:libxft:2.3.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('freetype@2.1.6:')
+     depends_on('fontconfig@2.5.92:')
+     depends_on('libx11')
+diff --git a/var/spack/repos/builtin/packages/libxinerama/package.py b/var/spack/repos/builtin/packages/libxinerama/package.py
+index 9c8546e..530aabe 100644
+--- a/var/spack/repos/builtin/packages/libxinerama/package.py
++++ b/var/spack/repos/builtin/packages/libxinerama/package.py
+@@ -14,6 +14,10 @@ class Libxinerama(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.3', sha256='0ba243222ae5aba4c6a3d7a394c32c8b69220a6872dbb00b7abae8753aca9a44')
+ 
++    cpe = {
++            '1.1.3':'cpe:2.3:a:x:libxinerama:1.1.3:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libx11')
+     depends_on('libxext')
+ 
+diff --git a/var/spack/repos/builtin/packages/libxml2/package.py b/var/spack/repos/builtin/packages/libxml2/package.py
+index 6b95822..dd4ba85 100644
+--- a/var/spack/repos/builtin/packages/libxml2/package.py
++++ b/var/spack/repos/builtin/packages/libxml2/package.py
+@@ -33,6 +33,26 @@ def url_for_version(self, version):
+     version('2.9.2',  sha256='5178c30b151d044aefb1b08bf54c3003a0ac55c59c866763997529d60770d5bc')
+     version('2.7.8',  sha256='cda23bc9ebd26474ca8f3d67e7d1c4a1f1e7106364b690d822e009fdc3c417ec')
+ 
++    cpe = {
++            '2.7.8':'cpe:2.3:a:xmlsoft:libxml2:2.7.8:*:*:*:*:*:*:*',
++            '2.9.8':'cpe:2.3:a:xmlsoft:libxml2:2.9.8:rc1:*:*:*:*:*:*',
++            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:rc1:*:*:*:*:*:*',
++            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:rc2:*:*:*:*:*:*',
++            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:rc1:*:*:*:*:*:*',
++            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:rc2:*:*:*:*:*:*',
++            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:rc1:*:*:*:*:*:*',
++            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:rc2:*:*:*:*:*:*',
++            '2.9.10':'cpe:2.3:a:xmlsoft:libxml2:2.9.10:rc1:*:*:*:*:*:*',
++            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:-:*:*:*:*:*:*',
++            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:-:*:*:*:*:*:*',
++            '2.9.8':'cpe:2.3:a:xmlsoft:libxml2:2.9.8:-:*:*:*:*:*:*',
++            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:-:*:*:*:*:*:*',
++            '2.9.10':'cpe:2.3:a:xmlsoft:libxml2:2.9.10:-:*:*:*:*:*:*',
++            '2.9.11':'cpe:2.3:a:xmlsoft:libxml2:2.9.11:*:*:*:*:*:*:*',
++            '2.9.12':'cpe:2.3:a:xmlsoft:libxml2:2.9.12:*:*:*:*:*:*:*',
++            '2.9.13':'cpe:2.3:a:xmlsoft:libxml2:2.9.13:*:*:*:*:*:*:*'
++          }
++
+     variant('python', default=False, description='Enable Python support')
+ 
+     depends_on('pkgconfig@0.9.0:', type='build')
+diff --git a/var/spack/repos/builtin/packages/libxmu/package.py b/var/spack/repos/builtin/packages/libxmu/package.py
+index f2d6b36..3f4a7f4 100644
+--- a/var/spack/repos/builtin/packages/libxmu/package.py
++++ b/var/spack/repos/builtin/packages/libxmu/package.py
+@@ -17,6 +17,10 @@ class Libxmu(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.2', sha256='e5fd4bacef068f9509b8226017205040e38d3fba8d2de55037200e7176c13dba')
+ 
++    cpe = {
++            '1.1.2':'cpe:2.3:a:freedesktop:libxmu:1.1.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libxt')
+     depends_on('libxext')
+     depends_on('libx11')
+diff --git a/var/spack/repos/builtin/packages/libxpm/package.py b/var/spack/repos/builtin/packages/libxpm/package.py
+index cb87778..c43ff24 100644
+--- a/var/spack/repos/builtin/packages/libxpm/package.py
++++ b/var/spack/repos/builtin/packages/libxpm/package.py
+@@ -19,6 +19,15 @@ class Libxpm(AutotoolsPackage, XorgPackage):
+     version('3.5.8', sha256='06472c7fdd175ea54c84162a428be19c154e7dda03d8bf91beee7f1d104669a6')
+     version('3.5.7', sha256='422fbb311c4fe6ef337e937eb3adc8617a4320bd3e00fce06850d4360829b3ae')
+ 
++    cpe = {
++            '3.5.7':'cpe:2.3:a:libxpm_project:libxpm:3.5.7:*:*:*:*:*:*:*',
++            '3.5.8':'cpe:2.3:a:libxpm_project:libxpm:3.5.8:*:*:*:*:*:*:*',
++            '3.5.9':'cpe:2.3:a:libxpm_project:libxpm:3.5.9:*:*:*:*:*:*:*',
++            '3.5.10':'cpe:2.3:a:libxpm_project:libxpm:3.5.10:*:*:*:*:*:*:*',
++            '3.5.11':'cpe:2.3:a:libxpm_project:libxpm:3.5.11:*:*:*:*:*:*:*',
++            '3.5.12':'cpe:2.3:a:libxpm_project:libxpm:3.5.12:*:*:*:*:*:*:*'
++          }
++
+     depends_on('gettext')
+     depends_on('libx11')
+ 
+diff --git a/var/spack/repos/builtin/packages/libxrender/package.py b/var/spack/repos/builtin/packages/libxrender/package.py
+index 87dd19b..4b25020 100644
+--- a/var/spack/repos/builtin/packages/libxrender/package.py
++++ b/var/spack/repos/builtin/packages/libxrender/package.py
+@@ -15,6 +15,11 @@ class Libxrender(AutotoolsPackage, XorgPackage):
+     version('0.9.10', sha256='770527cce42500790433df84ec3521e8bf095dfe5079454a92236494ab296adf')
+     version('0.9.9',  sha256='beeac64ff8d225f775019eb7c688782dee9f4cc7b412a65538f8dde7be4e90fe')
+ 
++    cpe = {
++            '0.9.9':'cpe:2.3:a:x.org:libxrender:0.9.9:*:*:*:*:*:*:*',
++            '0.9.10':'cpe:2.3:a:x.org:libxrender:0.9.10:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libx11@1.6:')
+ 
+     depends_on('renderproto@0.9:')
+diff --git a/var/spack/repos/builtin/packages/libxt/package.py b/var/spack/repos/builtin/packages/libxt/package.py
+index aeecf6c..21f46cf 100644
+--- a/var/spack/repos/builtin/packages/libxt/package.py
++++ b/var/spack/repos/builtin/packages/libxt/package.py
+@@ -14,6 +14,10 @@ class Libxt(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.5', sha256='b59bee38a9935565fa49dc1bfe84cb30173e2e07e1dcdf801430d4b54eb0caa3')
+ 
++    cpe = {
++            '1.1.5':'cpe:2.3:a:x:libxt:1.1.5:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libsm')
+     depends_on('libice')
+     depends_on('libx11')
+diff --git a/var/spack/repos/builtin/packages/m4/package.py b/var/spack/repos/builtin/packages/m4/package.py
+index cb0091e..bafc70d 100644
+--- a/var/spack/repos/builtin/packages/m4/package.py
++++ b/var/spack/repos/builtin/packages/m4/package.py
+@@ -19,6 +19,12 @@ class M4(AutotoolsPackage, GNUMirrorPackage):
+     version('1.4.18', sha256='ab2633921a5cd38e48797bf5521ad259bdc4b979078034a3b790d7fec5493fab')
+     version('1.4.17', sha256='3ce725133ee552b8b4baca7837fb772940b25e81b2a9dc92537aeaf733538c9e')
+ 
++    cpe = {
++            '1.4.19':'cpe:2.3:a:gnu:m4:1.4.19',
++            '1.4.18':'cpe:2.3:a:gnu:m4:1.4.18',
++            '1.4.17':'cpe:2.3:a:gnu:m4:1.4.17'
++          }
++
+     patch('gnulib-pgi.patch', when='@1.4.18')
+     patch('pgi.patch', when='@1.4.17')
+     # The NVIDIA compilers do not currently support some GNU builtins.
+diff --git a/var/spack/repos/builtin/packages/mariadb/package.py b/var/spack/repos/builtin/packages/mariadb/package.py
+index 9b98458..84f7ed7 100644
+--- a/var/spack/repos/builtin/packages/mariadb/package.py
++++ b/var/spack/repos/builtin/packages/mariadb/package.py
+@@ -31,6 +31,18 @@ class Mariadb(CMakePackage):
+     version('10.1.14', sha256='18e71974a059a268a3f28281599607344d548714ade823d575576121f76ada13')
+     version('5.5.49', sha256='2c82f2af71b88a7940d5ff647498ed78922c92e88004942caa213131e20f4706')
+ 
++    cpe = { 
++            '5.5.49':'cpe:2.3:a:mariadb:mariadb:5.5.49:*:*:*:*:*:*:*',
++            '5.5.56':'cpe:2.3:a:mariadb:mariadb:5.5.56:*:*:*:*:*:*:*',
++            '10.1.14':'cpe:2.3:a:mariadb:mariadb:10.1.14:*:*:*:*:*:*:*',
++            '10.1.23':'cpe:2.3:a:mariadb:mariadb:10.1.23:*:*:*:*:*:*:*',
++            '10.2.8':'cpe:2.3:a:mariadb:mariadb:10.2.8:*:*:*:*:*:*:*',
++            '10.4.7':'cpe:2.3:a:mariadb:mariadb:10.4.7:*:*:*:*:*:*:*',
++            '10.4.8':'cpe:2.3:a:mariadb:mariadb:10.4.8:*:*:*:*:*:*:*',
++            '10.4.12':'cpe:2.3:a:mariadb:mariadb:10.4.12:*:*:*:*:*:*:*',
++            '10.8.2':'cpe:2.3:a:mariadb:mariadb:10.8.2:*:*:*:*:*:*:*'
++          }
++
+     variant('nonblocking', default=True, description='Allow non blocking '
+             'operations in the mariadb client library.')
+ 
+diff --git a/var/spack/repos/builtin/packages/maven/package.py b/var/spack/repos/builtin/packages/maven/package.py
+index f683ee5..228af56 100644
+--- a/var/spack/repos/builtin/packages/maven/package.py
++++ b/var/spack/repos/builtin/packages/maven/package.py
+@@ -14,6 +14,7 @@ class Maven(Package):
+     homepage = "https://maven.apache.org/index.html"
+     url = "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.3.9/apache-maven-3.3.9-bin.tar.gz"
+ 
++    version('3.8.5', sha512='89ab8ece99292476447ef6a6800d9842bbb60787b9b8a45c103aa61d2f205a971d8c3ddfb8b03e514455b4173602bd015e82958c0b3ddc1728a57126f773c743')
+     version('3.8.4', sha256='2cdc9c519427bb20fdc25bef5a9063b790e4abd930e7b14b4e9f4863d6f9f13c')
+     version('3.6.3', sha256='26ad91d751b3a9a53087aefa743f4e16a17741d3915b219cf74112bf87a438c5')
+     version('3.6.2', sha256='3fbc92d1961482d6fbd57fbf3dd6d27a4de70778528ee3fb44aa7d27eb32dfdc')
+@@ -23,6 +24,30 @@ class Maven(Package):
+     version('3.3.9', sha256='6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82')
+     version('3.0.4', sha256='d35a876034c08cb7e20ea2fbcf168bcad4dff5801abad82d48055517513faa2f')
+ 
++    cpe = {
++            '3.0.4':'cpe:2.3:a:apache:maven:3.0.4:*:*:*:*:*:*:*',
++            '3.0.4':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.0.4:*:*:*:*:jenkins:*:*',
++            '3.5.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.5.0:-:*:*:*:jenkins:*:*',
++            '3.5.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.5.0:beta1:*:*:*:jenkins:*:*',
++            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:-:*:*:*:jenkins:*:*',
++            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:beta1:*:*:*:jenkins:*:*',
++            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:beta2:*:*:*:jenkins:*:*',
++            '3.6.1':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.1:*:*:*:*:jenkins:*:*',
++            '3.6.2':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.2:*:*:*:*:jenkins:*:*',
++            '3.6.3':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.3:*:*:*:*:jenkins:*:*',
++            '3.6.3':'cpe:2.3:a:apache:maven:3.6.3:*:*:*:*:*:*:*',
++            '3.6.2':'cpe:2.3:a:apache:maven:3.6.2:*:*:*:*:*:*:*',
++            '3.6.1':'cpe:2.3:a:apache:maven:3.6.1:*:*:*:*:*:*:*',
++            '3.6.0':'cpe:2.3:a:apache:maven:3.6.0:*:*:*:*:*:*:*',
++            '3.3.9':'cpe:2.3:a:apache:maven:3.3.9:*:*:*:*:*:*:*',
++            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:-:*:*:*:*:*:*',
++            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:alpha1:*:*:*:*:*:*',
++            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:beta1:*:*:*:*:*:*',
++            '3.8.5':'cpe:2.3:a:apache:maven:3.8.5:*:*:*:*:*:*',
++            '3.3.9':'cpe:2.3:a:apache:maven:3.3.9:*:*:*:*:*:*',
++            '3.8.4':'cpe:2.3:a:apache:maven:3.8.4:*:*:*:*:*:*'
++          }
++
+     depends_on('java', type='run')
+ 
+     executables = ['^mvn$']
+diff --git a/var/spack/repos/builtin/packages/mkfontdir/package.py b/var/spack/repos/builtin/packages/mkfontdir/package.py
+index 411f108..11d4a35 100644
+--- a/var/spack/repos/builtin/packages/mkfontdir/package.py
++++ b/var/spack/repos/builtin/packages/mkfontdir/package.py
+@@ -16,6 +16,10 @@ class Mkfontdir(AutotoolsPackage, XorgPackage):
+ 
+     version('1.0.7', sha256='bccc5fb7af1b614eabe4a22766758c87bfc36d66191d08c19d2fa97674b7b5b7')
+ 
++    cpe = {
++            '1.0.7':'cpe:2.3:a:freedesktop:mkfontdir:1.0.7:*:*:*:*:*:*:*'
++          }
++
+     depends_on('mkfontscale', type='run')
+ 
+     depends_on('pkgconfig', type='build')
+diff --git a/var/spack/repos/builtin/packages/mkfontscale/package.py b/var/spack/repos/builtin/packages/mkfontscale/package.py
+index da3f324..b3cb9e6 100644
+--- a/var/spack/repos/builtin/packages/mkfontscale/package.py
++++ b/var/spack/repos/builtin/packages/mkfontscale/package.py
+@@ -15,6 +15,10 @@ class Mkfontscale(AutotoolsPackage, XorgPackage):
+ 
+     version('1.1.2', sha256='8bba59e60fbc4cb082092cf6b67e810b47b4fe64fbc77dbea1d7e7d55312b2e4')
+ 
++    cpe = {
++            '1.1.2':'cpe:2.3:a:freedesktop:mkfontscale:1.1.2:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libfontenc')
+     depends_on('freetype')
+ 
+diff --git a/var/spack/repos/builtin/packages/mysql/package.py b/var/spack/repos/builtin/packages/mysql/package.py
+index f040ff7..b7e8aa7 100644
+--- a/var/spack/repos/builtin/packages/mysql/package.py
++++ b/var/spack/repos/builtin/packages/mysql/package.py
+@@ -48,6 +48,40 @@ class Mysql(CMakePackage):
+     version('5.6.43', sha256='1c95800bf0e1b7a19a37d37fbc5023af85c6bc0b41532433b3a886263a1673ef')
+     version('5.5.62', sha256='b1e7853bc1f04aabf6771e0ad947f35ac8d237f4b35d0706d1095c9526ff99d7')
+ 
++    cpe = {
++            '5.5.62':'cpe:2.3:a:oracle:mysql:5.5.62:*:*:*:*:*:*:*',
++            '5.6.43':'cpe:2.3:a:oracle:mysql:5.6.43:*:*:*:*:*:*:*',
++            '5.6.44':'cpe:2.3:a:oracle:mysql:5.6.44:*:*:*:*:*:*:*',
++            '5.7.9':'cpe:2.3:a:oracle:mysql:5.7.9:*:*:*:*:*:*:*',
++            '5.7.10':'cpe:2.3:a:oracle:mysql:5.7.10:*:*:*:*:*:*:*',
++            '5.7.11':'cpe:2.3:a:oracle:mysql:5.7.11:*:*:*:*:*:*:*',
++            '5.7.12':'cpe:2.3:a:oracle:mysql:5.7.12:*:*:*:*:*:*:*',
++            '5.7.13':'cpe:2.3:a:oracle:mysql:5.7.13:*:*:*:*:*:*:*',
++            '5.7.14':'cpe:2.3:a:oracle:mysql:5.7.14:*:*:*:*:*:*:*',
++            '5.7.15':'cpe:2.3:a:oracle:mysql:5.7.15:*:*:*:*:*:*:*',
++            '5.7.16':'cpe:2.3:a:oracle:mysql:5.7.16:*:*:*:*:*:*:*',
++            '5.7.17':'cpe:2.3:a:oracle:mysql:5.7.17:*:*:*:*:*:*:*',
++            '5.7.18':'cpe:2.3:a:oracle:mysql:5.7.18:*:*:*:*:*:*:*',
++            '5.7.19':'cpe:2.3:a:oracle:mysql:5.7.19:*:*:*:*:*:*:*',
++            '5.7.20':'cpe:2.3:a:oracle:mysql:5.7.20:*:*:*:*:*:*:*',
++            '5.7.21':'cpe:2.3:a:oracle:mysql:5.7.21:*:*:*:*:*:*:*',
++            '5.7.22':'cpe:2.3:a:oracle:mysql:5.7.22:*:*:*:*:*:*:*',
++            '5.7.23':'cpe:2.3:a:oracle:mysql:5.7.23:*:*:*:*:*:*:*',
++            '5.7.24':'cpe:2.3:a:oracle:mysql:5.7.24:*:*:*:*:*:*:*',
++            '5.7.25':'cpe:2.3:a:oracle:mysql:5.7.25:*:*:*:*:*:*:*',
++            '5.7.26':'cpe:2.3:a:oracle:mysql:5.7.26:*:*:*:*:*:*:*',
++            '5.7.27':'cpe:2.3:a:oracle:mysql:5.7.27:*:*:*:*:*:*:*',
++            '8.0.11':'cpe:2.3:a:oracle:mysql:8.0.11:*:*:*:*:*:*:*',
++            '8.0.12':'cpe:2.3:a:oracle:mysql:8.0.12:*:*:*:*:*:*:*',
++            '8.0.13':'cpe:2.3:a:oracle:mysql:8.0.13:*:*:*:*:*:*:*',
++            '8.0.14':'cpe:2.3:a:oracle:mysql:8.0.14:*:*:*:*:*:*:*',
++            '8.0.15':'cpe:2.3:a:oracle:mysql:8.0.15:*:*:*:*:*:*:*',
++            '8.0.16':'cpe:2.3:a:oracle:mysql:8.0.16:*:*:*:*:*:*:*',
++            '8.0.17':'cpe:2.3:a:oracle:mysql:8.0.17:*:*:*:*:*:*:*',
++            '8.0.18':'cpe:2.3:a:oracle:mysql:8.0.18:*:*:*:*:*:*:*',
++            '8.0.19':'cpe:2.3:a:oracle:mysql:8.0.19:*:*:*:*:*:*:*',
++          }
++
+     variant('client_only', default=False,
+             description='Build and install client only.')
+     variant('cxxstd',
+diff --git a/var/spack/repos/builtin/packages/ncurses/package.py b/var/spack/repos/builtin/packages/ncurses/package.py
+index 3133ea1..954e511 100644
+--- a/var/spack/repos/builtin/packages/ncurses/package.py
++++ b/var/spack/repos/builtin/packages/ncurses/package.py
+@@ -22,11 +22,21 @@ class Ncurses(AutotoolsPackage, GNUMirrorPackage):
+ 
+     executables = [r'^ncursesw?(?:\d+(?:\.\d+)*)?-config$']
+ 
++    version('6.3', sha256='97fc51ac2b085d4cde31ef4d2c3122c21abc217e9090a43a30fc5ec21684e059')
+     version('6.2', sha256='30306e0c76e0f9f1f0de987cf1c82a5c21e1ce6568b9227f7da5b71cbea86c9d')
+     version('6.1', sha256='aa057eeeb4a14d470101eff4597d5833dcef5965331be3528c08d99cebaa0d17')
+     version('6.0', sha256='f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260')
+     version('5.9', sha256='9046298fb440324c9d4135ecea7879ffed8546dd1b58e59430ea07a4633f563b')
+ 
++    cpe = {
++            '5.9':'cpe:2.3:a:gnu:ncurses:5.9:*:*:*:*:*:*:*',
++            '6.0':'cpe:2.3:a:gnu:ncurses:6.0:*:*:*:*:*:*:*',
++            '6.1':'cpe:2.3:a:gnu:ncurses:6.1:*:*:*:*:*:*:*',
++            '6.2':'cpe:2.3:a:gnu:ncurses:6.2:*:*:*:*:*:*:*',
++            '6.3':'cpe:2.3:a:gnu:ncurses:6.3:*:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:pancurses_project:pancurses:-:*:*:*:*:rust:*:*'
++          }
++
+     variant('symlinks', default=False,
+             description='Enables symlinks. Needed on AFS filesystem.')
+     variant('termlib', default=True,
+diff --git a/var/spack/repos/builtin/packages/nghttp2/package.py b/var/spack/repos/builtin/packages/nghttp2/package.py
+index 9c3d021..fbc1ad9 100644
+--- a/var/spack/repos/builtin/packages/nghttp2/package.py
++++ b/var/spack/repos/builtin/packages/nghttp2/package.py
+@@ -16,6 +16,11 @@ class Nghttp2(AutotoolsPackage):
+     version('1.44.0', sha256='3e4824d02ae27eca931e0bb9788df00a26e5fd8eb672cf52cbb89c1463ba16e9')
+     version('1.26.0', sha256='daf7c0ca363efa25b2cbb1e4bd925ac4287b664c3d1465f6a390359daa3f0cf1')
+ 
++    cpe = {
++            '1.44.0':'cpe:2.3:a:nghttp2:nghttp2:1.44.0:*:*:*:*:*:*:*',
++            '1.26.0':'cpe:2.3:a:nghttp2:nghttp2:1.26.0:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+ 
+     def configure_args(self):
+diff --git a/var/spack/repos/builtin/packages/octave/package.py b/var/spack/repos/builtin/packages/octave/package.py
+index 03b4873..6b3bc42 100644
+--- a/var/spack/repos/builtin/packages/octave/package.py
++++ b/var/spack/repos/builtin/packages/octave/package.py
+@@ -43,6 +43,23 @@ class Octave(AutotoolsPackage, GNUMirrorPackage):
+     version('4.0.2', sha256='39cd8fd36c218fc00adace28d74a6c7c9c6faab7113a5ba3c4372324c755bdc1')
+     version('4.0.0', sha256='4c7ee0957f5dd877e3feb9dfe07ad5f39b311f9373932f0d2a289dc97cca3280')
+ 
++    cpe = {
++            '7.1.0':'cpe:2.3:a:gnu:octave:7.1.0:*:*:*:*:*:*:*',
++            '6.4.0':'cpe:2.3:a:gnu:octave:6.4.0:*:*:*:*:*:*:*',
++            '6.3.0':'cpe:2.3:a:gnu:octave:6.3.0:*:*:*:*:*:*:*',
++            '6.2.0':'cpe:2.3:a:gnu:octave:6.2.0:*:*:*:*:*:*:*',
++            '6.1.0':'cpe:2.3:a:gnu:octave:6.1.0:*:*:*:*:*:*:*',
++            '5.2.0':'cpe:2.3:a:gnu:octave:5.2.0:*:*:*:*:*:*:*',
++            '5.1.0':'cpe:2.3:a:gnu:octave:5.1.0:*:*:*:*:*:*:*',
++            '4.4.1':'cpe:2.3:a:gnu:octave:4.4.1:*:*:*:*:*:*:*',
++            '4.4.0':'cpe:2.3:a:gnu:octave:4.4.0:*:*:*:*:*:*:*',
++            '4.2.2':'cpe:2.3:a:gnu:octave:4.2.2:*:*:*:*:*:*:*',
++            '4.2.1':'cpe:2.3:a:gnu:octave:4.2.1:*:*:*:*:*:*:*',
++            '4.2.0':'cpe:2.3:a:gnu:octave:4.2.0:*:*:*:*:*:*:*',
++            '4.0.2':'cpe:2.3:a:gnu:octave:4.0.2:*:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:gnu:octave:4.0.0:*:*:*:*:*:*:*'
++          }
++
+     # patches
+     # see https://savannah.gnu.org/bugs/?50234
+     patch('patch_4.2.1_inline.diff', when='@4.2.1')
+diff --git a/var/spack/repos/builtin/packages/openblas/package.py b/var/spack/repos/builtin/packages/openblas/package.py
+index ed18dea..9d02723 100644
+--- a/var/spack/repos/builtin/packages/openblas/package.py
++++ b/var/spack/repos/builtin/packages/openblas/package.py
+@@ -48,6 +48,36 @@ class Openblas(MakefilePackage):
+     version('0.2.16', sha256='766f350d0a4be614812d535cead8c816fc3ad3b9afcd93167ea5e4df9d61869b')
+     version('0.2.15', sha256='73c40ace5978282224e5e122a41c8388c5a19e65a6f2329c2b7c0b61bacc9044')
+ 
++    cpe = {
++            '0.2.15':'cpe:2.3:a:openblas_project:openblas:0.2.15:*:*:*:*:*:*:*',
++            '0.3.20':'cpe:2.3:a:openblas_project:openblas:0.3.20:*:*:*:*:*:*:*',
++            '0.3.19':'cpe:2.3:a:openblas_project:openblas:0.3.19:*:*:*:*:*:*:*',
++            '0.3.18':'cpe:2.3:a:openblas_project:openblas:0.3.18:*:*:*:*:*:*:*',
++            '0.3.17':'cpe:2.3:a:openblas_project:openblas:0.3.17:*:*:*:*:*:*:*',
++            '0.3.16':'cpe:2.3:a:openblas_project:openblas:0.3.16:*:*:*:*:*:*:*',
++            '0.3.15':'cpe:2.3:a:openblas_project:openblas:0.3.15:*:*:*:*:*:*:*',
++            '0.3.14':'cpe:2.3:a:openblas_project:openblas:0.3.14:*:*:*:*:*:*:*',
++            '0.3.13':'cpe:2.3:a:openblas_project:openblas:0.3.13:*:*:*:*:*:*:*',
++            '0.3.12':'cpe:2.3:a:openblas_project:openblas:0.3.12:*:*:*:*:*:*:*',
++            '0.3.11':'cpe:2.3:a:openblas_project:openblas:0.3.11:*:*:*:*:*:*:*',
++            '0.3.10':'cpe:2.3:a:openblas_project:openblas:0.3.10:*:*:*:*:*:*:*',
++            '0.3.9':'cpe:2.3:a:openblas_project:openblas:0.3.9:*:*:*:*:*:*:*',
++            '0.3.8':'cpe:2.3:a:openblas_project:openblas:0.3.8:*:*:*:*:*:*:*',
++            '0.3.7':'cpe:2.3:a:openblas_project:openblas:0.3.7:*:*:*:*:*:*:*',
++            '0.3.6':'cpe:2.3:a:openblas_project:openblas:0.3.6:*:*:*:*:*:*:*',
++            '0.3.5':'cpe:2.3:a:openblas_project:openblas:0.3.5:*:*:*:*:*:*:*',
++            '0.3.4':'cpe:2.3:a:openblas_project:openblas:0.3.4:*:*:*:*:*:*:*',
++            '0.3.3':'cpe:2.3:a:openblas_project:openblas:0.3.3:*:*:*:*:*:*:*',
++            '0.3.2':'cpe:2.3:a:openblas_project:openblas:0.3.2:*:*:*:*:*:*:*',
++            '0.3.1':'cpe:2.3:a:openblas_project:openblas:0.3.1:*:*:*:*:*:*:*',
++            '0.3.0':'cpe:2.3:a:openblas_project:openblas:0.3.0:*:*:*:*:*:*:*',
++            '0.2.20':'cpe:2.3:a:openblas_project:openblas:0.2.20:*:*:*:*:*:*:*',
++            '0.2.19':'cpe:2.3:a:openblas_project:openblas:0.2.19:*:*:*:*:*:*:*',
++            '0.2.18':'cpe:2.3:a:openblas_project:openblas:0.2.18:*:*:*:*:*:*:*',
++            '0.2.17':'cpe:2.3:a:openblas_project:openblas:0.2.17:*:*:*:*:*:*:*',
++            '0.2.16':'cpe:2.3:a:openblas_project:openblas:0.2.16:-:*:*:*:*:*:*'
++          }
++
+     variant('ilp64', default=False, description='Force 64-bit Fortran native integers')
+     variant('pic', default=True, description='Build position independent code')
+     variant('shared', default=True, description='Build shared libraries')
+diff --git a/var/spack/repos/builtin/packages/opencv/package.py b/var/spack/repos/builtin/packages/opencv/package.py
+index decb46c..a30ffcc 100644
+--- a/var/spack/repos/builtin/packages/opencv/package.py
++++ b/var/spack/repos/builtin/packages/opencv/package.py
+@@ -127,6 +127,28 @@ class Opencv(CMakePackage, CudaPackage):
+             when="@{0}".format(cv),
+         )
+ 
++    cpe = {
++            '-':'cpe:2.3:a:opencv.js_project:opencv.js:-:*:*:*:*:node.js:*:*',
++            '3.3.1':'cpe:2.3:a:opencv:opencv:3.3.1:*:*:*:*:*:*:*',
++            '3.3.0':'cpe:2.3:a:opencv:opencv:3.3.0:-:*:*:*:*:*:*',
++            '3.3.0':'cpe:2.3:a:opencv:opencv:3.3.0:rc:*:*:*:*:*:*',
++            '3.4.0':'cpe:2.3:a:opencv:opencv:3.4.0:-:*:*:*:*:*:*',
++            '3.4.0':'cpe:2.3:a:opencv:opencv:3.4.0:rc:*:*:*:*:*:*',
++            '3.4.1':'cpe:2.3:a:opencv:opencv:3.4.1:*:*:*:*:*:*:*',
++            '3.4.3':'cpe:2.3:a:opencv:opencv:3.4.3:*:*:*:*:*:*:*',
++            '3.4.4':'cpe:2.3:a:opencv:opencv:3.4.4:*:*:*:*:*:*:*',
++            '3.4.5':'cpe:2.3:a:opencv:opencv:3.4.5:*:*:*:*:*:*:*',
++            '3.4.6':'cpe:2.3:a:opencv:opencv:3.4.6:*:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:-:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:alpha:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:beta:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:rc:*:*:*:*:*:*',
++            '4.0.1':'cpe:2.3:a:opencv:opencv:4.0.1:*:*:*:*:*:*:*',
++            '4.1.0':'cpe:2.3:a:opencv:opencv:4.1.0:*:*:*:*:*:*:*',
++            '4.1.1':'cpe:2.3:a:opencv:opencv:4.1.1:*:*:*:*:*:*:*',
++            '4.0.0':'cpe:2.3:a:node-opencv_project:node-opencv:4.0.0:*:*:*:*:node.js:*:*'
++          }
++
+     # Patch to fix conflict between CUDA and OpenCV (reproduced with 3.3.0
+     # and 3.4.1) header file that have the same name. Problem is fixed in
+     # the current development branch of OpenCV. See #8461 for more information.
+diff --git a/var/spack/repos/builtin/packages/openjdk/package.py b/var/spack/repos/builtin/packages/openjdk/package.py
+index 7be8df6..9d1bd5d 100644
+--- a/var/spack/repos/builtin/packages/openjdk/package.py
++++ b/var/spack/repos/builtin/packages/openjdk/package.py
+@@ -88,7 +88,6 @@
+         'Linux-x86_64': ('79e96dce03a14271040023231a7d0ae374b755d48adf68bbdaec30294e4e2b88', 'https://download.java.net/openjdk/jdk8u40/ri/jdk_ri-8u40-b25-linux-x64-10_feb_2015.tar.gz')},
+ }
+ 
+-
+ class Openjdk(Package):
+     """The free and opensource java implementation"""
+ 
+@@ -115,6 +114,27 @@ class Openjdk(Package):
+ 
+     conflicts('target=ppc64:', msg='openjdk is not available for ppc64 (big endian)')
+ 
++    
++    cpe = {
++            '17.0.3_7':'cpe:2.3:a:oracle:openjdk:17.0.3_7:*:*:*:*:*:*:*',
++            '17.0.2_8':'cpe:2.3:a:oracle:openjdk:17.0.2_8:*:*:*:*:*:*:*',
++            '17.0.0_35':'cpe:2.3:a:oracle:openjdk:17.0.0_35:*:*:*:*:*:*:*',
++            '16.0.2':'cpe:2.3:a:oracle:openjdk:16.0.2:*:*:*:*:*:*:*',
++            '11.0.15_10':'cpe:2.3:a:oracle:openjdk:11.0.15_10:*:*:*:*:*:*:*',
++            '11.0.14.1_1':'cpe:2.3:a:oracle:openjdk:11.0.14.1_1:*:*:*:*:*:*:*',
++            '11.0.12_7':'cpe:2.3:a:oracle:openjdk:11.0.12_7:*:*:*:*:*:*:*',
++            '11.0.9.1_1':'cpe:2.3:a:oracle:openjdk:11.0.9.1_1:*:*:*:*:*:*:*',
++            '11.0.8_10':'cpe:2.3:a:oracle:openjdk:11.0.8_10:*:*:*:*:*:*:*',
++            '11.0.0-2020-01-01':'cpe:2.3:a:oracle:openjdk:11.0.0-2020-01-01:*:*:*:*:*:*:*',
++            '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
++            '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
++            '1.8.0_265-b01':'cpe:2.3:a:oracle:openjdk:1.8.0_265-b01:*:*:*:*:*:*:*',
++            '1.8.0_191-b12':'cpe:2.3:a:oracle:openjdk:1.8.0_191-b12:*:*:*:*:*:*:*',
++            '1.8.0_222-b10':'cpe:2.3:a:oracle:openjdk:1.8.0_222-b10:*:*:*:*:*:*:*',
++            '1.8.0_202-b08':'cpe:2.3:a:oracle:openjdk:1.8.0_202-b08:*:*:*:*:*:*:*',
++            '1.8.0_40-b25':'cpe:2.3:a:oracle:openjdk:1.8.0_40-b25:*:*:*:*:*:*:*'
++          }
++
+     # FIXME:
+     # 1. `extends('java')` doesn't work, you need to use `extends('openjdk')`
+     # 2. Packages cannot extend multiple packages, see #987
+diff --git a/var/spack/repos/builtin/packages/openssh/package.py b/var/spack/repos/builtin/packages/openssh/package.py
+index 77dba88..eaa4459 100644
+--- a/var/spack/repos/builtin/packages/openssh/package.py
++++ b/var/spack/repos/builtin/packages/openssh/package.py
+@@ -45,6 +45,29 @@ class Openssh(AutotoolsPackage):
+     version('6.7p1', sha256='b2f8394eae858dabbdef7dac10b99aec00c95462753e80342e530bbb6f725507')
+     version('6.6p1', sha256='48c1f0664b4534875038004cc4f3555b8329c2a81c1df48db5c517800de203bb')
+ 
++    cpe = {
++            '6.6p1':'cpe:2.3:a:openbsd:openssh:6.6:p1:*:*:*:*:*:*',
++            '6.7p1':'cpe:2.3:a:openbsd:openssh:6.7:p1:*:*:*:*:*:*',
++            '6.8p1':'cpe:2.3:a:openbsd:openssh:6.8:p1:*:*:*:*:*:*',
++            '6.9p1':'cpe:2.3:a:openbsd:openssh:6.9:p1:*:*:*:*:*:*',
++            '7.0p1':'cpe:2.3:a:openbsd:openssh:7.0:p1:*:*:*:*:*:*',
++            '7.1p2':'cpe:2.3:a:openbsd:openssh:7.1:p2:*:*:*:*:*:*',
++            '7.2p2':'cpe:2.3:a:openbsd:openssh:7.2:p2:*:*:*:*:*:*',
++            '7.3p1':'cpe:2.3:a:openbsd:openssh:7.3:p1:*:*:*:*:*:*',
++            '7.4p1':'cpe:2.3:a:openbsd:openssh:7.4:p1:*:*:*:*:*:*',
++            '7.5p1':'cpe:2.3:a:openbsd:openssh:7.5:p1:*:*:*:*:*:*',
++            '7.6p1':'cpe:2.3:a:openbsd:openssh:7.6:p1:*:*:*:*:*:*',
++            '7.9p1':'cpe:2.3:a:openbsd:openssh:7.9:p1:*:*:*:*:*:*',
++            '8.1p1':'cpe:2.3:a:openbsd:openssh:8.1:p1:*:*:*:*:*:*',
++            '8.3p1':'cpe:2.3:a:openbsd:openssh:8.3:p1:*:*:*:*:*:*',
++            '8.4p1':'cpe:2.3:a:openbsd:openssh:8.4:p1:*:*:*:*:*:*',
++            '8.6p1':'cpe:2.3:a:openbsd:openssh:8.6:p1:*:*:*:*:*:*',
++            '8.7p1':'cpe:2.3:a:openbsd:openssh:8.7:p1:*:*:*:*:*:*',
++            '8.8p1':'cpe:2.3:a:openbsd:openssh:8.8:p1:*:*:*:*:*:*',
++            '8.9p1':'cpe:2.3:a:openbsd:openssh:8.9:p1:*:*:*:*:*:*',
++            '9.0p1':'cpe:2.3:a:openbsd:openssh:9.0:p1:*:*:*:*:*:*'
++          }
++
+     variant('gssapi', default=True, description='Enable authentication via Kerberos through GSSAPI')
+ 
+     depends_on('krb5', when='+gssapi')
+diff --git a/var/spack/repos/builtin/packages/openssl/package.py b/var/spack/repos/builtin/packages/openssl/package.py
+index 330ed05..84e31d1 100644
+--- a/var/spack/repos/builtin/packages/openssl/package.py
++++ b/var/spack/repos/builtin/packages/openssl/package.py
+@@ -19,7 +19,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
+     homepage = "https://www.openssl.org"
+ 
+     # URL must remain http:// so Spack can bootstrap curl
+-    url = "https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
++    url = "https://www.openssl.org/source/openssl-3.0.5.tar.gz"
+     list_url = "https://www.openssl.org/source/old/"
+     list_depth = 1
+ 
+@@ -27,12 +27,20 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
+ 
+     executables = ['openssl']
+ 
++    # The latest stable version is the 3.0 series supported until 7th September 2026. 
++    # This is also a Long Term Support (LTS) version. 
++
++    version('3.0.5', sha256='aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a')
++    version('3.0.4', sha256='2831843e9a668a0ab478e7020ad63d2d65e51f72977472dc73efcefbafc0c00f')
++    version('3.0.3', sha256='ee0078adcef1de5f003c62c80cc96527721609c6f3bb42b7795df31f8b558c0b')
+     version('3.0.2', sha256='98e91ccead4d4756ae3c9cde5e09191a8e586d9f4d50838e7ec09d6411dfdb63')
+     version('3.0.1', sha256='c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1', deprecated=True)
+     version('3.0.0', sha256='59eedfcb46c25214c9bd37ed6078297b4df01d012267fe9e9eee31f61bc70536', deprecated=True)
+ 
+     # The latest stable version is the 1.1.1 series. This is also our Long Term
+     # Support (LTS) version, supported until 11th September 2023.
++    version('1.1.1q', sha256='d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca')
++    version('1.1.1p', sha256='bf61b62aaa66c7c7639942a94de4c9ae8280c08f17d4eac2e44644d9fc8ace6f', deprecated=True)
+     version('1.1.1o', sha256='9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f', preferred=True)
+     version('1.1.1n', sha256='40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a', deprecated=True)
+     version('1.1.1m', sha256='f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96', deprecated=True)
+@@ -85,6 +93,88 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
+     version('1.0.1h', sha256='9d1c8a9836aa63e2c6adb684186cbd4371c9e9dcc01d6e3bb447abf2d4d3d093', deprecated=True)
+     version('1.0.1e', sha256='f74f15e8c8ff11aa3d5bb5f276d202ec18d7246e95f961db76054199c69c1ae3', deprecated=True)
+ 
++    cpe = {
++            '-':'cpe:2.3:a:openssl:openssl:-:*:*:*:*:*:*:*',
++            '1.0.2d':'cpe:2.3:a:openssl:openssl:1.0.2d:*:*:*:*:*:*:*',
++            '1.0.1r':'cpe:2.3:a:openssl:openssl:1.0.1r:*:*:*:*:*:*:*',
++            '1.0.2f':'cpe:2.3:a:openssl:openssl:1.0.2f:*:*:*:*:*:*:*',
++            '1.0.2e':'cpe:2.3:a:openssl:openssl:1.0.2e:*:*:*:*:*:*:*',
++            '1.0.2h':'cpe:2.3:a:openssl:openssl:1.0.2h:*:*:*:*:*:*:*',
++            '1.0.1t':'cpe:2.3:a:openssl:openssl:1.0.1t:*:*:*:*:*:*:*',
++            '1.0.2j':'cpe:2.3:a:openssl:openssl:1.0.2j:*:*:*:*:*:*:*',
++            '1.1.0d':'cpe:2.3:a:openssl:openssl:1.1.0d:*:*:*:*:*:*:*',
++            '1.1.0c':'cpe:2.3:a:openssl:openssl:1.1.0c:*:*:*:*:*:*:*',
++            '1.0.2.g':'cpe:2.3:a:openssl:openssl:1.0.2g:*:*:*:*:*:*:*',
++            '1.1.0e':'cpe:2.3:a:openssl:openssl:1.1.0e:*:*:*:*:*:*:*',
++            '1.0.1u':'cpe:2.3:a:openssl:openssl:1.0.1u:*:*:*:*:*:*:*',
++            '1.0.2k':'cpe:2.3:a:openssl:openssl:1.0.2k:*:*:*:*:*:*:*',
++            '1.0.2m':'cpe:2.3:a:openssl:openssl:1.0.2m:*:*:*:*:*:*:*',
++            '1.1.0g':'cpe:2.3:a:openssl:openssl:1.1.0g:*:*:*:*:*:*:*',
++            '1.0.2n':'cpe:2.3:a:openssl:openssl:1.0.2n:*:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:openssl.js_project:openssl.js:-:*:*:*:*:node.js:*:*',
++            '-':'cpe:2.3:a:node-openssl_project:node-openssl:-:*:*:*:*:node.js:*:*',
++            '1.0.2o':'cpe:2.3:a:openssl:openssl:1.0.2o:*:*:*:*:*:*:*',
++            '1.0.2p':'cpe:2.3:a:openssl:openssl:1.0.2p:*:*:*:*:*:*:*',
++            '1.1.1a':'cpe:2.3:a:openssl:openssl:1.1.1a:*:*:*:*:*:*:*',
++            '1.1.0i':'cpe:2.3:a:openssl:openssl:1.1.0i:*:*:*:*:*:*:*',
++            '1.1.0j':'cpe:2.3:a:openssl:openssl:1.1.0j:*:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre1:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre2:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre3:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre4:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre5:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre6:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre7:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre8:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:pre9:*:*:*:*:*:*',
++            '1.1.1b':'cpe:2.3:a:openssl:openssl:1.1.1b:*:*:*:*:*:*:*',
++            '1.0.2r':'cpe:2.3:a:openssl:openssl:1.0.2r:*:*:*:*:*:*:*',
++            '1.0.2s':'cpe:2.3:a:openssl:openssl:1.0.2s:*:*:*:*:*:*:*',
++            '1.1.0k':'cpe:2.3:a:openssl:openssl:1.1.0k:*:*:*:*:*:*:*',
++            '1.1.1c':'cpe:2.3:a:openssl:openssl:1.1.1c:*:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:ruby-lang:openssl:-:*:*:*:*:ruby:*:*',
++            '1.0.2t':'cpe:2.3:a:openssl:openssl:1.0.2t:*:*:*:*:*:*:*',
++            '1.1.0l':'cpe:2.3:a:openssl:openssl:1.1.0l:*:*:*:*:*:*:*',
++            '1.1.1d':'cpe:2.3:a:openssl:openssl:1.1.1d:*:*:*:*:*:*:*',
++            '1.1.1e':'cpe:2.3:a:openssl:openssl:1.1.1e:*:*:*:*:*:*:*',
++            '1.1.1f':'cpe:2.3:a:openssl:openssl:1.1.1f:*:*:*:*:*:*:*',
++            '1.1.1g':'cpe:2.3:a:openssl:openssl:1.1.1g:*:*:*:*:*:*:*',
++            '1.0.2u':'cpe:2.3:a:openssl:openssl:1.0.2u:*:*:*:*:*:*:*',
++            '1.1.1h':'cpe:2.3:a:openssl:openssl:1.1.1h:*:*:*:*:*:*:*',
++            '1.1.1i':'cpe:2.3:a:openssl:openssl:1.1.1i:*:*:*:*:*:*:*',
++            '1.1.1j':'cpe:2.3:a:openssl:openssl:1.1.1j:*:*:*:*:*:*:*',
++            '1.1.1k':'cpe:2.3:a:openssl:openssl:1.1.1k:*:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:redhat:wildfly_openssl:-:*:*:*:*:*:*:*',
++            '1.1.1l':'cpe:2.3:a:openssl:openssl:1.1.1l:*:*:*:*:*:*:*',
++            '1.1.1m':'cpe:2.3:a:openssl:openssl:1.1.1m:*:*:*:*:*:*:*',
++            '1.1.1':'cpe:2.3:a:openssl:openssl:1.1.1:-:*:*:*:*:*:*',
++            '1.1.1n':'cpe:2.3:a:openssl:openssl:1.1.1n:*:*:*:*:*:*:*',
++            '1.1.1o':'cpe:2.3:a:openssl:openssl:1.1.1o:*:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:beta2:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:beta1:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha9:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha8:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha7:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha6:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha5:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha4:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha3:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha2:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha17:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha16:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha15:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha14:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha13:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha12:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha11:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha10:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:alpha1:*:*:*:*:*:*',
++            '3.0.1':'cpe:2.3:a:openssl:openssl:3.0.1:*:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:openssl:openssl:3.0.0:-:*:*:*:*:*:*',
++            '3.0.2':'cpe:2.3:a:openssl:openssl:3.0.2:*:*:*:*:*:*:*',
++            '3.0.3':'cpe:2.3:a:openssl:openssl:3.0.3:*:*:*:*:*:*:*'
++          }
++
+     variant('certs', default='system',
+             values=('mozilla', 'system', 'none'), multi=False,
+             description=('Use certificates from the ca-certificates-mozilla '
+diff --git a/var/spack/repos/builtin/packages/patchelf/package.py b/var/spack/repos/builtin/packages/patchelf/package.py
+index 83f2b8d..3430e71 100644
+--- a/var/spack/repos/builtin/packages/patchelf/package.py
++++ b/var/spack/repos/builtin/packages/patchelf/package.py
+@@ -31,6 +31,8 @@ class Patchelf(AutotoolsPackage):
+     version('0.9',    sha256='f2aa40a6148cb3b0ca807a1bf836b081793e55ec9e5540a5356d800132be7e0a')
+     version('0.8',    sha256='14af06a2da688d577d64ff8dac065bb8903bbffbe01d30c62df7af9bf4ce72fe')
+ 
++    cpe = {}
++
+     conflicts('%gcc@:4.6', when='@0.10:', msg="Requires C++11 support")
+     conflicts('%gcc@:6', when='@0.14:', msg="Requires C++17 support")
+     conflicts('%clang@:3', when='@0.14:', msg="Requires C++17 support")
+diff --git a/var/spack/repos/builtin/packages/pcre/package.py b/var/spack/repos/builtin/packages/pcre/package.py
+index 9f231cc..9faf9a3 100644
+--- a/var/spack/repos/builtin/packages/pcre/package.py
++++ b/var/spack/repos/builtin/packages/pcre/package.py
+@@ -23,6 +23,17 @@ class Pcre(AutotoolsPackage):
+     version('8.39', sha256='b858099f82483031ee02092711689e7245586ada49e534a06e678b8ea9549e8b')
+     version('8.38', sha256='b9e02d36e23024d6c02a2e5b25204b3a4fa6ade43e0a5f869f254f49535079df')
+ 
++    cpe = {
++            '8.45':'cpe:2.3:a:pcre:pcre:8.45',
++            '8.44':'cpe:2.3:a:pcre:pcre:8.44',
++            '8.43':'cpe:2.3:a:pcre:pcre:8.43',
++            '8.42':'cpe:2.3:a:pcre:pcre:8.42',
++            '8.41':'cpe:2.3:a:pcre:pcre:8.41',
++            '8.40':'cpe:2.3:a:pcre:pcre:8.40',
++            '8.39':'cpe:2.3:a:pcre:pcre:8.39',
++            '8.38':'cpe:2.3:a:pcre:pcre:8.38'
++          }
++
+     maintainers = ['drkennetz']
+     patch('intel.patch', when='@8.38')
+ 
+diff --git a/var/spack/repos/builtin/packages/perl/package.py b/var/spack/repos/builtin/packages/perl/package.py
+index 711ad20..09e6503 100644
+--- a/var/spack/repos/builtin/packages/perl/package.py
++++ b/var/spack/repos/builtin/packages/perl/package.py
+@@ -68,6 +68,32 @@ class Perl(Package):  # Perl doesn't use Autotools, it should subclass Package
+     version('5.18.4', sha256='01a4e11a9a34616396c4a77b3cef51f76a297e1a2c2c490ae6138bf0351eb29f')
+     version('5.16.3', sha256='69cf08dca0565cec2c5c6c2f24b87f986220462556376275e5431cc2204dedb6')
+ 
++    cpe = {
++            '5.35.0':'cpe:2.3:a:perl:perl:5.35.0:-:*:*:*:*:*:*',
++            '5.33.3':'cpe:2.3:a:perl:perl:5.33.3:-:*:*:*:*:*:*',
++            '5.31.7':'cpe:2.3:a:perl:perl:5.31.7:-:*:*:*:*:*:*',
++            '5.31.4':'cpe:2.3:a:perl:perl:5.31.4:-:*:*:*:*:*:*',
++            '5.34.1':'cpe:2.3:a:perl:perl:5.34.1:-:*:*:*:*:*:*',
++            '5.34.0':'cpe:2.3:a:perl:perl:5.34.0:-:*:*:*:*:*:*',
++            '5.32.1':'cpe:2.3:a:perl:perl:5.32.1:-:*:*:*:*:*:*',
++            '5.32.0':'cpe:2.3:a:perl:perl:5.32.0:-:*:*:*:*:*:*',
++            '5.30.3':'cpe:2.3:a:perl:perl:5.30.3:-:*:*:*:*:*:*',
++            '5.30.2':'cpe:2.3:a:perl:perl:5.30.2:-:*:*:*:*:*:*',
++            '5.30.1':'cpe:2.3:a:perl:perl:5.30.1:-:*:*:*:*:*:*',
++            '5.30.0':'cpe:2.3:a:perl:perl:5.30.0:-:*:*:*:*:*:*',
++            '5.28.0':'cpe:2.3:a:perl:perl:5.28.0:-:*:*:*:*:*:*',
++            '5.26.2':'cpe:2.3:a:perl:perl:5.26.2:-:*:*:*:*:*:*',
++            '5.24.1':'cpe:2.3:a:perl:perl:5.24.1:-:*:*:*:*:*:*',
++            '5.22.4':'cpe:2.3:a:perl:perl:5.22.4:-:*:*:*:*:*:*',
++            '5.22.3':'cpe:2.3:a:perl:perl:5.22.3:-:*:*:*:*:*:*',
++            '5.22.2':'cpe:2.3:a:perl:perl:5.22.2:-:*:*:*:*:*:*',
++            '5.22.1':'cpe:2.3:a:perl:perl:5.22.1:-:*:*:*:*:*:*',
++            '5.22.0':'cpe:2.3:a:perl:perl:5.22.0:-:*:*:*:*:*:*',
++            '5.20.3':'cpe:2.3:a:perl:perl:5.20.3:-:*:*:*:*:*:*',
++            '5.18.4':'cpe:2.3:a:perl:perl:5.18.4:-:*:*:*:*:*:*',
++            '5.16.3':'cpe:2.3:a:perl:perl:5.16.3:-:*:*:*:*:*:*'
++          }
++
+     extendable = True
+ 
+     if not is_windows:
+diff --git a/var/spack/repos/builtin/packages/pigz/package.py b/var/spack/repos/builtin/packages/pigz/package.py
+index ed2eecc..a80bb2d 100644
+--- a/var/spack/repos/builtin/packages/pigz/package.py
++++ b/var/spack/repos/builtin/packages/pigz/package.py
+@@ -18,6 +18,13 @@ class Pigz(MakefilePackage):
+     version('2.4', sha256='e228e7d18b34c4ece8d596eb6eee97bde533c6beedbb728d07d3abe90b4b1b52')
+     version('2.3.4', sha256='763f2fdb203aa0b7b640e63385e38e5dd4e5aaa041bc8e42aa96f2ef156b06e8')
+ 
++    cpe = {
++            '2.3.4':'cpe:2.3:a:zlib:pigz:2.3.4:*:*:*:*:*:*:*',
++            '2.4':'cpe:2.3:a:zlib:pigz:2.4:*:*:*:*:*:*:*',
++            '2.6':'cpe:2.3:a:zlib:pigz:2.6:*:*:*:*:*:*:*',
++            '2.7':'cpe:2.3:a:zlib:pigz:2.7:*:*:*:*:*:*:*'
++          }
++
+     depends_on('zlib')
+ 
+     def build(self, spec, prefix):
+diff --git a/var/spack/repos/builtin/packages/pkgconf/package.py b/var/spack/repos/builtin/packages/pkgconf/package.py
+index 1745c94..ee69347 100644
+--- a/var/spack/repos/builtin/packages/pkgconf/package.py
++++ b/var/spack/repos/builtin/packages/pkgconf/package.py
+@@ -16,7 +16,7 @@ class Pkgconf(AutotoolsPackage):
+     # URL must remain http:// so Spack can bootstrap curl
+     url      = "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.6.3.tar.xz"
+ 
+-    version('1.8.0', sha256='ef9c7e61822b7cb8356e6e9e1dca58d9556f3200d78acab35e4347e9d4c2bbaf')
++    version('1.8.0',  sha256='ef9c7e61822b7cb8356e6e9e1dca58d9556f3200d78acab35e4347e9d4c2bbaf')
+     version('1.7.4',  sha256='d73f32c248a4591139a6b17777c80d4deab6b414ec2b3d21d0a24be348c476ab')
+     version('1.7.3',  sha256='b846aea51cf696c3392a0ae58bef93e2e72f8e7073ca6ad1ed8b01c85871f9c0')
+     version('1.6.3',  sha256='61f0b31b0d5ea0e862b454a80c170f57bad47879c0c42bd8de89200ff62ea210')
+@@ -28,6 +28,18 @@ class Pkgconf(AutotoolsPackage):
+     version('1.3.10', sha256='62577d265fa9415a57a77a59dede5526b7ece3ef59a750434b281b262f0c1da9')
+     version('1.3.8',  sha256='fc06f058e6905435481f649865ca51000192c91808f307b1053ca5e859cb1488')
+ 
++    cpe = {
++            '1.8.0':'cpe:2.3:a:pkgconf:pkgconf:1.8.0:*:*:*:*:*:*:*',
++            '1.6.3':'cpe:2.3:a:pkgconf:pkgconf:1.6.3:*:*:*:*:*:*:*',
++            '1.6.1':'cpe:2.3:a:pkgconf:pkgconf:1.6.1:*:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:pkgconf:pkgconf:1.6.0:*:*:*:*:*:*:*',
++            '1.5.4':'cpe:2.3:a:pkgconf:pkgconf:1.5.4:*:*:*:*:*:*:*',
++            '1.4.2':'cpe:2.3:a:pkgconf:pkgconf:1.4.2:*:*:*:*:*:*:*',
++            '1.4.0':'cpe:2.3:a:pkgconf:pkgconf:1.4.0:*:*:*:*:*:*:*',
++            '1.3.10':'cpe:2.3:a:pkgconf:pkgconf:1.3.10:*:*:*:*:*:*:*',
++            '1.3.8':'cpe:2.3:a:pkgconf:pkgconf:1.3.8:*:*:*:*:*:*:*'
++           }
++
+     provides('pkgconfig')
+ 
+     # https://github.com/spack/spack/issues/11704
+diff --git a/var/spack/repos/builtin/packages/postgresql/package.py b/var/spack/repos/builtin/packages/postgresql/package.py
+index 096d045..7167ea9 100644
+--- a/var/spack/repos/builtin/packages/postgresql/package.py
++++ b/var/spack/repos/builtin/packages/postgresql/package.py
+@@ -37,6 +37,26 @@ class Postgresql(AutotoolsPackage):
+     version('9.5.3', sha256='7385c01dc58acba8d7ac4e6ad42782bd7c0b59272862a3a3d5fe378d4503a0b4')
+     version('9.3.4', sha256='9ee819574dfc8798a448dc23a99510d2d8924c2f8b49f8228cd77e4efc8a6621')
+ 
++    cpe = {
++            '14.0':'cpe:2.3:a:postgresql:postgresql:14.0:*:*:*:*:*:*:*',
++            '12.2':'cpe:2.3:a:postgresql:postgresql:12.2:*:*:*:*:*:*:*',  
++            '11.2':'cpe:2.3:a:postgresql:postgresql:11.2:*:*:*:*:*:*:*',
++            '11.1':'cpe:2.3:a:postgresql:postgresql:11.1:*:*:*:*:*:*:*',  
++            '11.0':'cpe:2.3:a:postgresql:postgresql:11.0:*:*:*:*:*:*:*',
++            '10.7':'cpe:2.3:a:postgresql:postgresql:10.7:*:*:*:*:*:*:*',  
++            '10.6':'cpe:2.3:a:postgresql:postgresql:10.6:*:*:*:*:*:*:*',
++            '10.5':'cpe:2.3:a:postgresql:postgresql:10.5:*:*:*:*:*:*:*',  
++            '10.4':'cpe:2.3:a:postgresql:postgresql:10.4:*:*:*:*:*:*:*',
++            '10.3':'cpe:2.3:a:postgresql:postgresql:10.3:*:*:*:*:*:*:*',
++            '10.2':'cpe:2.3:a:postgresql:postgresql:10.2:*:*:*:*:*:*:*', 
++            '10.1':'cpe:2.3:a:postgresql:postgresql:10.1:*:*:*:*:*:*:*',  
++            '10.0':'cpe:2.3:a:postgresql:postgresql:10.0:*:*:*:*:*:*:*',  
++            '9.6.12':'cpe:2.3:a:postgresql:postgresql:9.6.12:*:*:*:*:*:*:*',
++            '9.6.11':'cpe:2.3:a:postgresql:postgresql:9.6.11:*:*:*:*:*:*:*',
++            '9.5.3':'cpe:2.3:a:postgresql:postgresql:9.5.3:*:*:*:*:*:*:*', 
++            '9.3.4':'cpe:2.3:a:postgresql:postgresql:9.3.4:*:*:*:*:*:*:*' 
++          }
++
+     variant('client_only', default=False,
+             description='Build and install client only.')
+     variant('threadsafe', default=False, description='Build with thread safe.')
+diff --git a/var/spack/repos/builtin/packages/py-tensorflow/package.py b/var/spack/repos/builtin/packages/py-tensorflow/package.py
+index d84e000..53cfea8 100644
+--- a/var/spack/repos/builtin/packages/py-tensorflow/package.py
++++ b/var/spack/repos/builtin/packages/py-tensorflow/package.py
+@@ -19,6 +19,11 @@ class PyTensorflow(Package, CudaPackage):
+     maintainers = ['adamjstewart', 'aweits']
+     import_modules = ['tensorflow']
+ 
++    version('2.9.1',  sha256='6eaf86ead73e23988fe192da1db68f4d3828bcdd0f3a9dc195935e339c95dbdc')
++    version('2.9.0',  sha256='8087cb0c529f04a4bfe480e49925cd64a904ad16d8ec66b98e2aacdfd53c80ff')
++    version('2.8.2',  sha256='b3f860c02c22a30e9787e2548ca252ab289a76b7778af6e9fa763d4aafd904c7')
++    version('2.8.1',  sha256='4b487a63d6f0c1ca46a2ac37ba4687eabdc3a260c222616fa414f6df73228cec')
++    version('2.8.0',  sha256='66b953ae7fba61fd78969a2e24e350b26ec116cf2e6a7eb93d02c63939c6f9f7')
+     version('2.7.0',  sha256='bb124905c7fdacd81e7c842b287c169bbf377d29c74c9dacc04f96c9793747bb')
+     version('2.6.2',  sha256='e68c1d346fc3d529653530ca346b2c62f5b31bd4fcca7ffc9c65bb39ab2f6ed3')
+     version('2.6.1',  sha256='8e457f617bc2eb43de2a51900e7922b60a8107e2524b2576438f1acccee1d043')
+@@ -82,6 +87,423 @@ class PyTensorflow(Package, CudaPackage):
+     version('0.7.0',  sha256='43dd3051f947aa66e6fc09dac2f86a2efe2e019736bbd091c138544b86d717ce')
+     version('0.6.0',  sha256='f86ace45e99053b09749cd55ab79c57274d8c7460ae763c5e808d81ffbc3b657')
+ 
++    cpe = {
++            '0.6.0':'cpe:2.3:a:google:tensorflow:0.6.0:*:*:*:*:*:*:*',
++            '0.7.0':'cpe:2.3:a:google:tensorflow:0.7.0:*:*:*:*:*:*:*',
++            '0.7.1':'cpe:2.3:a:google:tensorflow:0.7.1:*:*:*:*:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:-:*:*:*:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:rc0:*:*:*:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:-:*:*:*:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:rc0:*:*:*:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:-:*:*:*:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:rc0:*:*:*:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:-:*:*:*:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc0:*:*:*:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc1:*:*:*:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc2:*:*:*:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:-:*:*:*:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:rc0:*:*:*:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:rc1:*:*:*:*:*:*',
++            '0.12.1':'cpe:2.3:a:google:tensorflow:0.12.1:*:*:*:*:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:-:*:*:*:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:alpha:*:*:*:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc0:*:*:*:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc1:*:*:*:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc2:*:*:*:*:*:*',
++            '1.0.1':'cpe:2.3:a:google:tensorflow:1.0.1:*:*:*:*:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:-:*:*:*:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc0:*:*:*:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc1:*:*:*:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc2:*:*:*:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:-:*:*:*:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc0:*:*:*:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc1:*:*:*:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc2:*:*:*:*:*:*',
++            '1.2.1':'cpe:2.3:a:google:tensorflow:1.2.1:*:*:*:*:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:-:*:*:*:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc0:*:*:*:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc1:*:*:*:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc2:*:*:*:*:*:*',
++            '1.3.1':'cpe:2.3:a:google:tensorflow:1.3.1:*:*:*:*:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:-:*:*:*:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc0:*:*:*:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc1:*:*:*:*:*:*',
++            '1.4.1':'cpe:2.3:a:google:tensorflow:1.4.1:*:*:*:*:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:-:*:*:*:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc0:*:*:*:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc1:*:*:*:*:*:*',
++            '1.5.1':'cpe:2.3:a:google:tensorflow:1.5.1:*:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:-:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc0:*:*:*:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc1:*:*:*:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:-:*:*:*:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc0:*:*:*:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc1:*:*:*:*:*:*',
++            '1.7.1':'cpe:2.3:a:google:tensorflow:1.7.1:*:*:*:*:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:-:*:*:*:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc0:*:*:*:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc1:*:*:*:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:-:*:*:*:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc0:*:*:*:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc1:*:*:*:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc2:*:*:*:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:-:*:*:*:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc0:*:*:*:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc1:*:*:*:*:*:*',
++            '1.10.1':'cpe:2.3:a:google:tensorflow:1.10.1:*:*:*:*:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:-:*:*:*:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc0:*:*:*:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc1:*:*:*:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc2:*:*:*:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:-:*:*:*:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc0:*:*:*:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc1:*:*:*:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc2:*:*:*:*:*:*',
++            '1.12.1':'cpe:2.3:a:google:tensorflow:1.12.1:*:*:*:*:*:*:*',
++            '1.12.2':'cpe:2.3:a:google:tensorflow:1.12.2:*:*:*:*:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc0:*:*:*:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc1:*:*:*:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc2:*:*:*:*:*:*',
++            '1.13.1':'cpe:2.3:a:google:tensorflow:1.13.1:*:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:alpha0:*:*:*:*:*:*',
++            '1.12.3':'cpe:2.3:a:google:tensorflow:1.12.3:*:*:*:*:*:*:*',
++            '1.13.2':'cpe:2.3:a:google:tensorflow:1.13.2:*:*:*:*:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:-:*:*:*:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc0:*:*:*:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc1:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:-:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc0:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc1:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc2:*:*:*:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc3:*:*:*:*:*:*',
++            '1.15.2':'cpe:2.3:a:google:tensorflow:1.15.2:*:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:-:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta0:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta1:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc0:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc1:*:*:*:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc2:*:*:*:*:*:*',
++            '2.0.1':'cpe:2.3:a:google:tensorflow:2.0.1:*:*:*:*:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:-:*:*:*:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc0:*:*:*:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc1:*:*:*:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc2:*:*:*:*:*:*',
++            '1.15.3':'cpe:2.3:a:google:tensorflow:1.15.3:*:*:*:*:*:*:*',
++            '1.15.4':'cpe:2.3:a:google:tensorflow:1.15.4:*:*:*:*:*:*:*',
++            '2.0.2':'cpe:2.3:a:google:tensorflow:2.0.2:*:*:*:*:*:*:*',
++            '2.0.3':'cpe:2.3:a:google:tensorflow:2.0.3:*:*:*:*:*:*:*',
++            '2.1.1':'cpe:2.3:a:google:tensorflow:2.1.1:*:*:*:*:*:*:*',
++            '2.1.2':'cpe:2.3:a:google:tensorflow:2.1.2:*:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:-:*:*:*:*:*:*',
++            '2.2.1':'cpe:2.3:a:google:tensorflow:2.2.1:*:*:*:*:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:-:*:*:*:*:*:*',
++            '2.3.1':'cpe:2.3:a:google:tensorflow:2.3.1:*:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:-:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc0:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc1:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc2:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc3:*:*:*:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc4:*:*:*:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc0:*:*:*:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc1:*:*:*:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc2:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc0:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc1:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc2:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc3:*:*:*:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc4:*:*:*:*:*:*',
++            '-':'cpe:2.3:a:google:tensorflow:-:*:*:*:-:*:*:*',
++            '-':'cpe:2.3:a:google:tensorflow:-:*:*:*:lite:*:*:*',
++            '0.6.0':'cpe:2.3:a:google:tensorflow:0.6.0:*:*:*:-:*:*:*',
++            '0.6.0':'cpe:2.3:a:google:tensorflow:0.6.0:*:*:*:lite:*:*:*',
++            '0.7.0':'cpe:2.3:a:google:tensorflow:0.7.0:*:*:*:-:*:*:*',
++            '0.7.0':'cpe:2.3:a:google:tensorflow:0.7.0:*:*:*:lite:*:*:*',
++            '0.7.1':'cpe:2.3:a:google:tensorflow:0.7.1:*:*:*:-:*:*:*',
++            '0.7.1':'cpe:2.3:a:google:tensorflow:0.7.1:*:*:*:lite:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:-:*:*:-:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:-:*:*:lite:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:rc0:*:*:-:*:*:*',
++            '0.8.0':'cpe:2.3:a:google:tensorflow:0.8.0:rc0:*:*:lite:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:-:*:*:-:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:-:*:*:lite:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:rc0:*:*:-:*:*:*',
++            '0.9.0':'cpe:2.3:a:google:tensorflow:0.9.0:rc0:*:*:lite:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:-:*:*:-:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:-:*:*:lite:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:rc0:*:*:-:*:*:*',
++            '0.10.0':'cpe:2.3:a:google:tensorflow:0.10.0:rc0:*:*:lite:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:-:*:*:-:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:-:*:*:lite:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc0:*:*:-:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc0:*:*:lite:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc1:*:*:-:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc1:*:*:lite:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc2:*:*:-:*:*:*',
++            '0.11.0':'cpe:2.3:a:google:tensorflow:0.11.0:rc2:*:*:lite:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:*:*:*:lite:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:-:*:*:-:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:rc0:*:*:-:*:*:*',
++            '0.12.0':'cpe:2.3:a:google:tensorflow:0.12.0:rc1:*:*:-:*:*:*',
++            '0.12.1':'cpe:2.3:a:google:tensorflow:0.12.1:*:*:*:-:*:*:*',
++            '0.12.1':'cpe:2.3:a:google:tensorflow:0.12.1:*:*:*:lite:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:-:*:*:-:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:-:*:*:lite:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:alpha:*:*:-:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:alpha:*:*:lite:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc0:*:*:-:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc0:*:*:lite:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc1:*:*:-:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc1:*:*:lite:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc2:*:*:-:*:*:*',
++            '1.0.0':'cpe:2.3:a:google:tensorflow:1.0.0:rc2:*:*:lite:*:*:*',
++            '1.0.1':'cpe:2.3:a:google:tensorflow:1.0.1:*:*:*:-:*:*:*',
++            '1.0.1':'cpe:2.3:a:google:tensorflow:1.0.1:*:*:*:lite:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:-:*:*:-:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:-:*:*:lite:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc0:*:*:-:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc0:*:*:lite:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc1:*:*:-:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc1:*:*:lite:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc2:*:*:-:*:*:*',
++            '1.1.0':'cpe:2.3:a:google:tensorflow:1.1.0:rc2:*:*:lite:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:-:*:*:-:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:-:*:*:lite:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc0:*:*:-:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc0:*:*:lite:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc1:*:*:-:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc1:*:*:lite:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc2:*:*:-:*:*:*',
++            '1.2.0':'cpe:2.3:a:google:tensorflow:1.2.0:rc2:*:*:lite:*:*:*',
++            '1.2.1':'cpe:2.3:a:google:tensorflow:1.2.1:*:*:*:-:*:*:*',
++            '1.2.1':'cpe:2.3:a:google:tensorflow:1.2.1:*:*:*:lite:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:-:*:*:-:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:-:*:*:lite:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc0:*:*:-:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc0:*:*:lite:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc1:*:*:-:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc1:*:*:lite:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc2:*:*:-:*:*:*',
++            '1.3.0':'cpe:2.3:a:google:tensorflow:1.3.0:rc2:*:*:lite:*:*:*',
++            '1.3.1':'cpe:2.3:a:google:tensorflow:1.3.1:*:*:*:-:*:*:*',
++            '1.3.1':'cpe:2.3:a:google:tensorflow:1.3.1:*:*:*:lite:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:-:*:*:-:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:-:*:*:lite:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc0:*:*:-:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc0:*:*:lite:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc1:*:*:-:*:*:*',
++            '1.4.0':'cpe:2.3:a:google:tensorflow:1.4.0:rc1:*:*:lite:*:*:*',
++            '1.4.1':'cpe:2.3:a:google:tensorflow:1.4.1:*:*:*:-:*:*:*',
++            '1.4.1':'cpe:2.3:a:google:tensorflow:1.4.1:*:*:*:lite:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:-:*:*:-:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:-:*:*:lite:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc0:*:*:-:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc0:*:*:lite:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc1:*:*:-:*:*:*',
++            '1.5.0':'cpe:2.3:a:google:tensorflow:1.5.0:rc1:*:*:lite:*:*:*',
++            '1.5.1':'cpe:2.3:a:google:tensorflow:1.5.1:*:*:*:-:*:*:*',
++            '1.5.1':'cpe:2.3:a:google:tensorflow:1.5.1:*:*:*:lite:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:-:*:*:-:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:-:*:*:lite:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc0:*:*:-:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc0:*:*:lite:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc1:*:*:-:*:*:*',
++            '1.6.0':'cpe:2.3:a:google:tensorflow:1.6.0:rc1:*:*:lite:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:-:*:*:-:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:-:*:*:lite:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc0:*:*:-:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc0:*:*:lite:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc1:*:*:-:*:*:*',
++            '1.7.0':'cpe:2.3:a:google:tensorflow:1.7.0:rc1:*:*:lite:*:*:*',
++            '1.7.1':'cpe:2.3:a:google:tensorflow:1.7.1:*:*:*:-:*:*:*',
++            '1.7.1':'cpe:2.3:a:google:tensorflow:1.7.1:*:*:*:lite:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:-:*:*:-:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:-:*:*:lite:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc0:*:*:-:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc0:*:*:lite:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc1:*:*:-:*:*:*',
++            '1.8.0':'cpe:2.3:a:google:tensorflow:1.8.0:rc1:*:*:lite:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:-:*:*:-:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:-:*:*:lite:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc0:*:*:-:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc0:*:*:lite:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc1:*:*:-:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc1:*:*:lite:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc2:*:*:-:*:*:*',
++            '1.9.0':'cpe:2.3:a:google:tensorflow:1.9.0:rc2:*:*:lite:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:-:*:*:-:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:-:*:*:lite:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc0:*:*:-:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc0:*:*:lite:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc1:*:*:-:*:*:*',
++            '1.10.0':'cpe:2.3:a:google:tensorflow:1.10.0:rc1:*:*:lite:*:*:*',
++            '1.10.1':'cpe:2.3:a:google:tensorflow:1.10.1:*:*:*:-:*:*:*',
++            '1.10.1':'cpe:2.3:a:google:tensorflow:1.10.1:*:*:*:lite:*:*:*',
++            '1.15.5':'cpe:2.3:a:google:tensorflow:1.15.5:*:*:*:*:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:-:*:*:-:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:-:*:*:lite:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc0:*:*:-:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc0:*:*:lite:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc1:*:*:-:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc1:*:*:lite:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc2:*:*:-:*:*:*',
++            '1.11.0':'cpe:2.3:a:google:tensorflow:1.11.0:rc2:*:*:lite:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:-:*:*:-:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:-:*:*:lite:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc0:*:*:-:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc0:*:*:lite:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc1:*:*:-:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc1:*:*:lite:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc2:*:*:-:*:*:*',
++            '1.12.0':'cpe:2.3:a:google:tensorflow:1.12.0:rc2:*:*:lite:*:*:*',
++            '1.12.1':'cpe:2.3:a:google:tensorflow:1.12.1:*:*:*:-:*:*:*',
++            '1.12.1':'cpe:2.3:a:google:tensorflow:1.12.1:*:*:*:lite:*:*:*',
++            '1.12.2':'cpe:2.3:a:google:tensorflow:1.12.2:*:*:*:-:*:*:*',
++            '1.12.2':'cpe:2.3:a:google:tensorflow:1.12.2:*:*:*:lite:*:*:*',
++            '1.12.3':'cpe:2.3:a:google:tensorflow:1.12.3:-:*:*:-:*:*:*',
++            '1.12.3':'cpe:2.3:a:google:tensorflow:1.12.3:-:*:*:lite:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc0:*:*:-:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc0:*:*:lite:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc1:*:*:-:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc1:*:*:lite:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc2:*:*:-:*:*:*',
++            '1.13.0':'cpe:2.3:a:google:tensorflow:1.13.0:rc2:*:*:lite:*:*:*',
++            '1.13.1':'cpe:2.3:a:google:tensorflow:1.13.1:*:*:*:-:*:*:*',
++            '1.13.1':'cpe:2.3:a:google:tensorflow:1.13.1:*:*:*:lite:*:*:*',
++            '1.13.2':'cpe:2.3:a:google:tensorflow:1.13.2:*:*:*:-:*:*:*',
++            '1.13.2':'cpe:2.3:a:google:tensorflow:1.13.2:*:*:*:lite:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:-:*:*:-:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:-:*:*:lite:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc0:*:*:-:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc0:*:*:lite:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc1:*:*:-:*:*:*',
++            '1.14.0':'cpe:2.3:a:google:tensorflow:1.14.0:rc1:*:*:lite:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:-:*:*:-:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:-:*:*:lite:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc0:*:*:-:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc0:*:*:lite:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc1:*:*:-:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc1:*:*:lite:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc2:*:*:-:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc2:*:*:lite:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc3:*:*:-:*:*:*',
++            '1.15.0':'cpe:2.3:a:google:tensorflow:1.15.0:rc3:*:*:lite:*:*:*',
++            '1.15.2':'cpe:2.3:a:google:tensorflow:1.15.2:*:*:*:-:*:*:*',
++            '1.15.2':'cpe:2.3:a:google:tensorflow:1.15.2:*:*:*:lite:*:*:*',
++            '1.15.3':'cpe:2.3:a:google:tensorflow:1.15.3:*:*:*:-:*:*:*',
++            '1.15.3':'cpe:2.3:a:google:tensorflow:1.15.3:*:*:*:lite:*:*:*',
++            '1.15.4':'cpe:2.3:a:google:tensorflow:1.15.4:*:*:*:-:*:*:*',
++            '1.15.4':'cpe:2.3:a:google:tensorflow:1.15.4:*:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:-:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:-:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:alpha0:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:alpha0:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta0:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta0:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta1:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:beta1:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc0:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc0:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc1:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc1:*:*:lite:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc2:*:*:-:*:*:*',
++            '2.0.0':'cpe:2.3:a:google:tensorflow:2.0.0:rc2:*:*:lite:*:*:*',
++            '2.0.1':'cpe:2.3:a:google:tensorflow:2.0.1:*:*:*:-:*:*:*',
++            '2.0.1':'cpe:2.3:a:google:tensorflow:2.0.1:*:*:*:lite:*:*:*',
++            '2.0.2':'cpe:2.3:a:google:tensorflow:2.0.2:*:*:*:-:*:*:*',
++            '2.0.2':'cpe:2.3:a:google:tensorflow:2.0.2:*:*:*:lite:*:*:*',
++            '2.0.3':'cpe:2.3:a:google:tensorflow:2.0.3:*:*:*:-:*:*:*',
++            '2.0.3':'cpe:2.3:a:google:tensorflow:2.0.3:*:*:*:lite:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:-:*:*:-:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:-:*:*:lite:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc0:*:*:-:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc0:*:*:lite:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc1:*:*:-:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc1:*:*:lite:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc2:*:*:-:*:*:*',
++            '2.1.0':'cpe:2.3:a:google:tensorflow:2.1.0:rc2:*:*:lite:*:*:*',
++            '2.1.1':'cpe:2.3:a:google:tensorflow:2.1.1:*:*:*:-:*:*:*',
++            '2.1.1':'cpe:2.3:a:google:tensorflow:2.1.1:*:*:*:lite:*:*:*',
++            '2.1.2':'cpe:2.3:a:google:tensorflow:2.1.2:*:*:*:-:*:*:*',
++            '2.1.2':'cpe:2.3:a:google:tensorflow:2.1.2:*:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:-:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:-:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc0:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc0:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc1:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc1:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc2:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc2:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc3:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc3:*:*:lite:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc4:*:*:-:*:*:*',
++            '2.2.0':'cpe:2.3:a:google:tensorflow:2.2.0:rc4:*:*:lite:*:*:*',
++            '2.2.1':'cpe:2.3:a:google:tensorflow:2.2.1:*:*:*:-:*:*:*',
++            '2.2.1':'cpe:2.3:a:google:tensorflow:2.2.1:*:*:*:lite:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:-:*:*:-:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:-:*:*:lite:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc0:*:*:-:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc0:*:*:lite:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc1:*:*:-:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc1:*:*:lite:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc2:*:*:-:*:*:*',
++            '2.3.0':'cpe:2.3:a:google:tensorflow:2.3.0:rc2:*:*:lite:*:*:*',
++            '2.3.1':'cpe:2.3:a:google:tensorflow:2.3.1:*:*:*:-:*:*:*',
++            '2.3.1':'cpe:2.3:a:google:tensorflow:2.3.1:*:*:*:lite:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:-:*:*:-:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc0:*:*:-:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc0:*:*:lite:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc1:*:*:-:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc1:*:*:lite:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc2:*:*:-:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc2:*:*:lite:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc3:*:*:-:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc3:*:*:lite:*:*:*',
++            '2.4.0':'cpe:2.3:a:google:tensorflow:2.4.0:rc4:*:*:-:*:*:*',
++            '2.4.2':'cpe:2.3:a:google:tensorflow:2.4.2:*:*:*:*:*:*:*',
++            '2.6.0':'cpe:2.3:a:google:tensorflow:2.6.0:rc0:*:*:*:*:*:*',
++            '2.6.0':'cpe:2.3:a:google:tensorflow:2.6.0:rc1:*:*:*:*:*:*',
++            '2.6.0':'cpe:2.3:a:google:tensorflow:2.6.0:rc2:*:*:*:*:*:*',
++            '2.0.4':'cpe:2.3:a:google:tensorflow:2.0.4:*:*:*:*:*:*:*',
++            '2.1.3':'cpe:2.3:a:google:tensorflow:2.1.3:*:*:*:*:*:*:*',
++            '2.2.2':'cpe:2.3:a:google:tensorflow:2.2.2:*:*:*:*:*:*:*',
++            '2.3.2':'cpe:2.3:a:google:tensorflow:2.3.2:*:*:*:*:*:*:*',
++            '2.4.1':'cpe:2.3:a:google:tensorflow:2.4.1:*:*:*:*:*:*:*',
++            '2.5.0':'cpe:2.3:a:google:tensorflow:2.5.0:-:*:*:*:*:*:*',
++            '2.5.0':'cpe:2.3:a:google:tensorflow:2.5.0:rc0:*:*:*:*:*:*',
++            '2.5.0':'cpe:2.3:a:google:tensorflow:2.5.0:rc1:*:*:*:*:*:*',
++            '2.5.0':'cpe:2.3:a:google:tensorflow:2.5.0:rc2:*:*:*:*:*:*',
++            '2.5.0':'cpe:2.3:a:google:tensorflow:2.5.0:rc3:*:*:*:*:*:*',
++            '2.6.0':'cpe:2.3:a:google:tensorflow:2.6.0:-:*:*:*:*:*:*',
++            '2.1.4':'cpe:2.3:a:google:tensorflow:2.1.4:*:*:*:*:*:*:*',
++            '2.2.3':'cpe:2.3:a:google:tensorflow:2.2.3:*:*:*:*:*:*:*',
++            '2.3.3':'cpe:2.3:a:google:tensorflow:2.3.3:*:*:*:*:*:*:*',
++            '2.5.1':'cpe:2.3:a:google:tensorflow:2.5.1:*:*:*:*:*:*:*',
++            '2.3.4':'cpe:2.3:a:google:tensorflow:2.3.4:*:*:*:*:*:*:*',
++            '2.4.3':'cpe:2.3:a:google:tensorflow:2.4.3:*:*:*:*:*:*:*',
++            '2.5.2':'cpe:2.3:a:google:tensorflow:2.5.2:*:*:*:*:*:*:*',
++            '2.6.1':'cpe:2.3:a:google:tensorflow:2.6.1:*:*:*:*:*:*:*',
++            '2.7.1':'cpe:2.3:a:google:tensorflow:2.7.1:*:*:*:*:*:*:*',
++            '2.6.3':'cpe:2.3:a:google:tensorflow:2.6.3:*:*:*:*:*:*:*',
++            '2.6.2':'cpe:2.3:a:google:tensorflow:2.6.2:*:*:*:*:*:*:*',
++            '2.8.0':'cpe:2.3:a:google:tensorflow:2.8.0:rc0:*:*:*:*:*:*',
++            '2.8.0':'cpe:2.3:a:google:tensorflow:2.8.0:rc1:*:*:*:*:*:*',
++            '2.7.0':'cpe:2.3:a:google:tensorflow:2.7.0:rc0:*:*:*:*:*:*',
++            '2.7.0':'cpe:2.3:a:google:tensorflow:2.7.0:rc1:*:*:*:*:*:*',
++            '2.9.0':'cpe:2.3:a:google:tensorflow:2.9.0:rc0:*:*:*:*:*:*',
++            '2.9.0':'cpe:2.3:a:google:tensorflow:2.9.0:rc1:*:*:*:*:*:*',
++            '2.9.0':'cpe:2.3:a:google:tensorflow:2.9.0:rc2:*:*:*:*:*:*',
++            '2.9.0':'cpe:2.3:a:google:tensorflow:2.9.0:-:*:*:*:*:*:*',
++            '2.7.2':'cpe:2.3:a:google:tensorflow:2.7.2:*:*:*:*:*:*:*',
++            '2.8.1':'cpe:2.3:a:google:tensorflow:2.8.1:*:*:*:*:*:*:*',
++            '2.6.4':'cpe:2.3:a:google:tensorflow:2.6.4:*:*:*:*:*:*:*',
++            '2.7.3':'cpe:2.3:a:google:tensorflow:2.7.3:*:*:*:*:*:*:*',
++            '2.6.5':'cpe:2.3:a:google:tensorflow:2.6.5:*:*:*:*:*:*:*',
++            '2.8.2':'cpe:2.3:a:google:tensorflow:2.8.2:*:*:*:*:*:*:*',
++            '2.9.1':'cpe:2.3:a:google:tensorflow:2.9.1:*:*:*:*:*:*:*',
++            '2.8.0':'cpe:2.3:a:google:tensorflow:2.8.0:-:*:*:*:*:*:*',
++            '2.7.0':'cpe:2.3:a:google:tensorflow:2.7.0:-:*:*:*:*:*:*'
++          }
++
+     variant('mkl', default=False, description='Build with MKL support')
+     variant('jemalloc', default=False, description='Build with jemalloc as malloc support')
+     variant('gcp', default=False, description='Build with Google Cloud Platform support')
+diff --git a/var/spack/repos/builtin/packages/readline/package.py b/var/spack/repos/builtin/packages/readline/package.py
+index e105ae2..120d27e 100644
+--- a/var/spack/repos/builtin/packages/readline/package.py
++++ b/var/spack/repos/builtin/packages/readline/package.py
+@@ -23,6 +23,13 @@ class Readline(AutotoolsPackage, GNUMirrorPackage):
+     version('7.0', sha256='750d437185286f40a369e1e4f4764eda932b9459b5ec9a731628393dd3d32334')
+     version('6.3', sha256='56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43')
+ 
++    cpe = {
++            '6.3':'cpe:2.3:a:gnu:readline:6.3:*:*:*:*:*:*:*',
++            '7.0':'cpe:2.3:a:gnu:readline:7.0:*:*:*:*:*:*:*',
++            '8.0':'cpe:2.3:a:gnu:readline:8.0:*:*:*:*:*:*:*',
++            '8.1':'cpe:2.3:a:gnu:readline:8.1:*:*:*:*:*:*:*'
++          }
++
+     depends_on('ncurses')
+     # from url=https://www.linuxfromscratch.org/patches/downloads/readline/readline-6.3-upstream_fixes-1.patch
+     # this fixes a bug that could lead to seg faults in ipython
+diff --git a/var/spack/repos/builtin/packages/renderproto/package.py b/var/spack/repos/builtin/packages/renderproto/package.py
+index 0481d42..4e4a7cf 100644
+--- a/var/spack/repos/builtin/packages/renderproto/package.py
++++ b/var/spack/repos/builtin/packages/renderproto/package.py
+@@ -17,5 +17,9 @@ class Renderproto(AutotoolsPackage, XorgPackage):
+ 
+     version('0.11.1', sha256='a0a4be3cad9381ae28279ba5582e679491fc2bec9aab8a65993108bf8dbce5fe')
+ 
++    cpe = {
++            '0.11.1':'cpe:2.3:a:freedesktop:renderproto:0.11.1:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/sqlite/package.py b/var/spack/repos/builtin/packages/sqlite/package.py
+index 93c582b..ea6d08f 100644
+--- a/var/spack/repos/builtin/packages/sqlite/package.py
++++ b/var/spack/repos/builtin/packages/sqlite/package.py
+@@ -40,6 +40,30 @@ class Sqlite(AutotoolsPackage):
+     # All versions prior to 3.26.0 are vulnerable to Magellan when FTS
+     # is enabled, see https://blade.tencent.com/magellan/index_en.html
+ 
++    cpe = {
++                '3.38.5':'cpe:2.3:a:sqlite:sqlite:3.38.5:*:*:*:*:*:*:*',
++                '3.38.3':'cpe:2.3:a:sqlite:sqlite:3.38.3:*:*:*:*:*:*:*',
++                '3.37.2':'cpe:2.3:a:sqlite:sqlite:3.37.2:*:*:*:*:*:*:*',
++                '3.37.1':'cpe:2.3:a:sqlite:sqlite:3.37.1:*:*:*:*:*:*:*',
++                '3.37.0':'cpe:2.3:a:sqlite:sqlite:3.37.0:*:*:*:*:*:*:*',
++                '3.36.0':'cpe:2.3:a:sqlite:sqlite:3.36.0:*:*:*:*:*:*:*',
++                '3.35.5':'cpe:2.3:a:sqlite:sqlite:3.35.5:*:*:*:*:*:*:*',
++                '3.35.4':'cpe:2.3:a:sqlite:sqlite:3.35.4:*:*:*:*:*:*:*',
++                '3.35.3':'cpe:2.3:a:sqlite:sqlite:3.35.3:*:*:*:*:*:*:*',
++                '3.34.0':'cpe:2.3:a:sqlite:sqlite:3.34.0:*:*:*:*:*:*:*',
++                '3.33.0':'cpe:2.3:a:sqlite:sqlite:3.33.0:*:*:*:*:*:*:*',
++                '3.32.3':'cpe:2.3:a:sqlite:sqlite:3.32.3:*:*:*:*:*:*:*',
++                '3.31.1':'cpe:2.3:a:sqlite:sqlite:3.31.1:*:*:*:*:*:*:*',
++                '3.30.1':'cpe:2.3:a:sqlite:sqlite:3.30.1:*:*:*:*:*:*:*',
++                '3.30.0':'cpe:2.3:a:sqlite:sqlite:3.30.0:*:*:*:*:*:*:*',
++                '3.29.0':'cpe:2.3:a:sqlite:sqlite:3.29.0:*:*:*:*:*:*:*',
++                '3.28.0':'cpe:2.3:a:sqlite:sqlite:3.28.0:*:*:*:*:*:*:*',
++                '3.27.2':'cpe:2.3:a:sqlite:sqlite:3.27.2:*:*:*:*:*:*:*',
++                '3.27.1':'cpe:2.3:a:sqlite:sqlite:3.27.1:*:*:*:*:*:*:*',
++                '3.27.0':'cpe:2.3:a:sqlite:sqlite:3.27.0:*:*:*:*:*:*:*',
++                '3.26.0':'cpe:2.3:a:sqlite:sqlite:3.26.0:*:*:*:*:*:*:*'
++           }
++
+     variant('functions', default=False, when='+dynamic_extensions',
+             description='Provide mathematical and string extension functions for SQL '
+                         'queries using the loadable extensions mechanism')
+diff --git a/var/spack/repos/builtin/packages/stream/package.py b/var/spack/repos/builtin/packages/stream/package.py
+index 3d55ac3..d588a67 100644
+--- a/var/spack/repos/builtin/packages/stream/package.py
++++ b/var/spack/repos/builtin/packages/stream/package.py
+@@ -16,6 +16,10 @@ class Stream(MakefilePackage):
+ 
+     version('5.10')
+ 
++    cpe = {
++
++          }
++
+     variant('openmp', default=False, description='Build with OpenMP support')
+ 
+     def edit(self, spec, prefix):
+diff --git a/var/spack/repos/builtin/packages/tar/package.py b/var/spack/repos/builtin/packages/tar/package.py
+index c1c1007..210ae72 100644
+--- a/var/spack/repos/builtin/packages/tar/package.py
++++ b/var/spack/repos/builtin/packages/tar/package.py
+@@ -26,6 +26,26 @@ class Tar(AutotoolsPackage, GNUMirrorPackage):
+     version('1.29', sha256='cae466e6e58c7292355e7080248f244db3a4cf755f33f4fa25ca7f9a7ed09af0')
+     version('1.28', sha256='6a6b65bac00a127a508533c604d5bf1a3d40f82707d56f20cefd38a05e8237de')
+ 
++    cpe = {
++            '1.28':'cpe:2.3:a:emeric_vernat:javamelody:1.28:*:*:*:*:*:*:*',
++            '1.28':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.28:*:*:*:*:perl:*:*',
++            '1.28':'cpe:2.3:a:gnu:tar:1.28:*:*:*:*:*:*:*',
++            '1.29':'cpe:2.3:a:emeric_vernat:javamelody:1.29:*:*:*:*:*:*:*',
++            '1.29':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.29:*:*:*:*:perl:*:*',
++            '1.29':'cpe:2.3:a:gnu:tar:1.29:*:*:*:*:*:*:*',
++            '1.30':'cpe:2.3:a:emeric_vernat:javamelody:1.30:*:*:*:*:*:*:*',
++            '1.30':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.30:*:*:*:*:perl:*:*',
++            '1.30':'cpe:2.3:a:gnu:tar:1.30:*:*:*:*:*:*:*',
++            '1.31':'cpe:2.3:a:emeric_vernat:javamelody:1.31:*:*:*:*:*:*:*',
++            '1.31':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.31:*:*:*:*:perl:*:*',
++            '1.31':'cpe:2.3:a:gnu:tar:1.31:*:*:*:*:*:*:*',
++            '1.32':'cpe:2.3:a:emeric_vernat:javamelody:1.32:*:*:*:*:*:*:*',
++            '1.32':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.32:*:*:*:*:perl:*:*',
++            '1.32':'cpe:2.3:a:gnu:tar:1.32:*:*:*:*:*:*:*',
++            '1.34':'cpe:2.3:a:emeric_vernat:javamelody:1.34:*:*:*:*:*:*:*',
++            '1.34':'cpe:2.3:a:archive\:\:tar_project:archive\:\:tar:1.34:*:*:*:*:perl:*:*'
++          }
++
+     # A saner default than gzip?
+     variant('zip', default='pigz', values=('gzip', 'pigz'), description='Default compression program for tar -z')
+ 
+diff --git a/var/spack/repos/builtin/packages/termcap/package.py b/var/spack/repos/builtin/packages/termcap/package.py
+index 1443b43..0554ea8 100644
+--- a/var/spack/repos/builtin/packages/termcap/package.py
++++ b/var/spack/repos/builtin/packages/termcap/package.py
+@@ -16,3 +16,8 @@ class Termcap(AutotoolsPackage):
+ 
+     version('1.3.1', sha256='91a0e22e5387ca4467b5bcb18edf1c51b930262fd466d5fda396dd9d26719100')
+     version('1.3',   sha256='3eb4b98ae08408ca65dd9275f3c8e56e2feac1261fae914a9b21273db51cf000')
++
++    cpe = {
++            '1.3':'cpe:2.3:a:gnu:termcap:1.3:*:*:*:*:*:*:*',
++            '1.3.1':'cpe:2.3:a:gnu:termcap:1.3.1:*:*:*:*:*:*:*'
++          }
+diff --git a/var/spack/repos/builtin/packages/texinfo/package.py b/var/spack/repos/builtin/packages/texinfo/package.py
+index cd6a198..254f619 100644
+--- a/var/spack/repos/builtin/packages/texinfo/package.py
++++ b/var/spack/repos/builtin/packages/texinfo/package.py
+@@ -30,6 +30,16 @@ class Texinfo(AutotoolsPackage, GNUMirrorPackage):
+     version('5.1', sha256='50e8067f9758bb2bf175b69600082ac4a27c464cb4bcd48a578edd3127216600')
+     version('5.0', sha256='2c579345a39a2a0bb4b8c28533f0b61356504a202da6a25d17d4d866af7f5803')
+ 
++    cpe = {
++            '-':'cpe:2.3:a:gnu:texinfo:-:*:*:*:*:*:*:*',
++            '6.5':'cpe:2.3:a:gnu:texinfo:6.5:*:*:*:*:*:*:*',
++            '6.3':'cpe:2.3:a:gnu:texinfo:6.3:*:*:*:*:*:*:*',
++            '6.0':'cpe:2.3:a:gnu:texinfo:6.0:*:*:*:*:*:*:*',
++            '5.2':'cpe:2.3:a:gnu:texinfo:5.2:*:*:*:*:*:*:*',
++            '5.1':'cpe:2.3:a:gnu:texinfo:5.1:*:*:*:*:*:*:*',
++            '5.0':'cpe:2.3:a:gnu:texinfo:5.0:*:*:*:*:*:*:*'
++          }
++
+     depends_on('perl')
+ 
+     # Fix unescaped braces in regexps.
+diff --git a/var/spack/repos/builtin/packages/tmux/package.py b/var/spack/repos/builtin/packages/tmux/package.py
+index c41ca22..5379844 100644
+--- a/var/spack/repos/builtin/packages/tmux/package.py
++++ b/var/spack/repos/builtin/packages/tmux/package.py
+@@ -15,30 +15,56 @@ class Tmux(AutotoolsPackage):
+     """
+ 
+     homepage = "https://tmux.github.io"
+-    url = "https://github.com/tmux/tmux/releases/download/2.6/tmux-2.6.tar.gz"
++    url = "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
+     git = 'https://github.com/tmux/tmux.git'
+ 
++    version('3.3a', sha256='e4fd347843bd0772c4f48d6dde625b0b109b7a380ff15db21e97c11a4dcdf93f')
++    version('3.3',  sha256='b2382ac391f6a1c5b93293016cdc9488337d9a04b9d611ae05eac164740351dc')
+     version('3.2a', sha256='551553a4f82beaa8dadc9256800bcc284d7c000081e47aa6ecbb6ff36eacd05f')
+-    version('3.2', sha256='664d345338c11cbe429d7ff939b92a5191e231a7c1ef42f381cebacb1e08a399')
++    version('3.2',  sha256='664d345338c11cbe429d7ff939b92a5191e231a7c1ef42f381cebacb1e08a399')
+     version('3.1c', sha256='918f7220447bef33a1902d4faff05317afd9db4ae1c9971bef5c787ac6c88386')
+     version('3.1b', sha256='d93f351d50af05a75fe6681085670c786d9504a5da2608e481c47cf5e1486db9')
+     version('3.1a', sha256='10687cbb02082b8b9e076cf122f1b783acc2157be73021b4bedb47e958f4e484')
+-    version('3.1', sha256='979bf38db2c36193de49149aaea5c540d18e01ccc27cf76e2aff5606bd186722')
++    version('3.1',  sha256='979bf38db2c36193de49149aaea5c540d18e01ccc27cf76e2aff5606bd186722')
+     version('3.0a', sha256='4ad1df28b4afa969e59c08061b45082fdc49ff512f30fc8e43217d7b0e5f8db9')
+-    version('3.0', sha256='9edcd78df80962ee2e6471a8f647602be5ded62bb41c574172bb3dc3d0b9b4b4')
++    version('3.0',  sha256='9edcd78df80962ee2e6471a8f647602be5ded62bb41c574172bb3dc3d0b9b4b4')
+     version('2.9a', sha256='839d167a4517a6bffa6b6074e89a9a8630547b2dea2086f1fad15af12ab23b25')
+-    version('2.9', sha256='34901232f486fd99f3a39e864575e658b5d49f43289ccc6ee57c365f2e2c2980')
+-    version('2.8', sha256='7f6bf335634fafecff878d78de389562ea7f73a7367f268b66d37ea13617a2ba')
+-    version('2.7', sha256='9ded7d100313f6bc5a87404a4048b3745d61f2332f99ec1400a7c4ed9485d452')
+-    version('2.6', sha256='b17cd170a94d7b58c0698752e1f4f263ab6dc47425230df7e53a6435cc7cd7e8')
+-    version('2.5', sha256='ae135ec37c1bf6b7750a84e3a35e93d91033a806943e034521c8af51b12d95df')
+-    version('2.4', sha256='757d6b13231d0d9dd48404968fc114ac09e005d475705ad0cd4b7166f799b349')
+-    version('2.3', sha256='55313e132f0f42de7e020bf6323a1939ee02ab79c48634aa07475db41573852b')
+-    version('2.2', sha256='bc28541b64f99929fe8e3ae7a02291263f3c97730781201824c0f05d7c8e19e4')
+-    version('2.1', sha256='31564e7bf4bcef2defb3cb34b9e596bd43a3937cad9e5438701a81a5a9af6176')
++    version('2.9',  sha256='34901232f486fd99f3a39e864575e658b5d49f43289ccc6ee57c365f2e2c2980')
++    version('2.8',  sha256='7f6bf335634fafecff878d78de389562ea7f73a7367f268b66d37ea13617a2ba')
++    version('2.7',  sha256='9ded7d100313f6bc5a87404a4048b3745d61f2332f99ec1400a7c4ed9485d452')
++    version('2.6',  sha256='b17cd170a94d7b58c0698752e1f4f263ab6dc47425230df7e53a6435cc7cd7e8')
++    version('2.5',  sha256='ae135ec37c1bf6b7750a84e3a35e93d91033a806943e034521c8af51b12d95df')
++    version('2.4',  sha256='757d6b13231d0d9dd48404968fc114ac09e005d475705ad0cd4b7166f799b349')
++    version('2.3',  sha256='55313e132f0f42de7e020bf6323a1939ee02ab79c48634aa07475db41573852b')
++    version('2.2',  sha256='bc28541b64f99929fe8e3ae7a02291263f3c97730781201824c0f05d7c8e19e4')
++    version('2.1',  sha256='31564e7bf4bcef2defb3cb34b9e596bd43a3937cad9e5438701a81a5a9af6176')
+     version('1.9a', sha256='c5e3b22b901cf109b20dab54a4a651f0471abd1f79f6039d79b250d21c2733f5')
+     version('master', branch='master')
+ 
++    cpe = {
++            '3.3a':'cpe:2.3:a:tmux_project:tmux:3.3a:*:*:*:*:*:*:*',
++            '3.3':'cpe:2.3:a:tmux_project:tmux:3.3:*:*:*:*:*:*:*',
++            '3.2a':'cpe:2.3:a:tmux_project:tmux:3.2a:*:*:*:*:*:*:*',
++            '1.9a':'cpe:2.3:a:tmux_project:tmux:1.9a:*:*:*:*:*:*:*',
++            '2.1':'cpe:2.3:a:tmux_project:tmux:2.1:*:*:*:*:*:*:*',
++            '2.2':'cpe:2.3:a:tmux_project:tmux:2.2:*:*:*:*:*:*:*',
++            '2.3':'cpe:2.3:a:tmux_project:tmux:2.3:*:*:*:*:*:*:*',
++            '2.4':'cpe:2.3:a:tmux_project:tmux:2.4:*:*:*:*:*:*:*',
++            '2.5':'cpe:2.3:a:tmux_project:tmux:2.5:*:*:*:*:*:*:*',
++            '2.6':'cpe:2.3:a:tmux_project:tmux:2.6:*:*:*:*:*:*:*',
++            '2.7':'cpe:2.3:a:tmux_project:tmux:2.7:*:*:*:*:*:*:*',
++            '2.8':'cpe:2.3:a:tmux_project:tmux:2.8:*:*:*:*:*:*:*',
++            '2.9':'cpe:2.3:a:tmux_project:tmux:2.9:*:*:*:*:*:*:*',
++            '2.9a':'cpe:2.3:a:tmux_project:tmux:2.9a:*:*:*:*:*:*:*',
++            '3.0':'cpe:2.3:a:tmux_project:tmux:3.0:*:*:*:*:*:*:*',
++            '3.0a':'cpe:2.3:a:tmux_project:tmux:3.0a:*:*:*:*:*:*:*',
++            '3.1':'cpe:2.3:a:tmux_project:tmux:3.1:*:*:*:*:*:*:*',
++            '3.1a':'cpe:2.3:a:tmux_project:tmux:3.1a:*:*:*:*:*:*:*',
++            '3.1b':'cpe:2.3:a:tmux_project:tmux:3.1b:*:*:*:*:*:*:*',
++            '3.1c':'cpe:2.3:a:tmux_project:tmux:3.1c:*:*:*:*:*:*:*',
++            '3.2':'cpe:2.3:a:tmux_project:tmux:3.2:*:*:*:*:*:*:*'
++          }
++
+     variant('utf8proc', default=False, description='Build with UTF-8 support from utf8proc library')
+     variant('static', default=False, description='Create a static build')
+ 
+@@ -54,6 +80,7 @@ class Tmux(AutotoolsPackage):
+ 
+     conflicts('+static', when='platform=darwin', msg='Static build not supported on MacOS')
+ 
++
+     @run_before('autoreconf')
+     def autogen(self):
+         if self.spec.satisfies('@master'):
+diff --git a/var/spack/repos/builtin/packages/tomcat/package.py b/var/spack/repos/builtin/packages/tomcat/package.py
+index 49ed980..17822ca 100644
+--- a/var/spack/repos/builtin/packages/tomcat/package.py
++++ b/var/spack/repos/builtin/packages/tomcat/package.py
+@@ -22,6 +22,14 @@ class Tomcat(Package):
+     version('9.0.26', sha256='b5430890d3b986d6b7ec6a6ef611f9451cbfa933b0a1a3dd48e2cd1f46a63381')
+     version('9.0.24', sha256='22064138e25f7ab899802804775259a156c06770535b8ce93856beba13dfcf6d')
+ 
++    cpe = {
++            '9.0.24':'cpe:2.3:a:apache:tomcat:9.0.24:*:*:*:*:*:*:*',
++            '9.0.26':'cpe:2.3:a:apache:tomcat:9.0.26:*:*:*:*:*:*:*',
++            '9.0.27':'cpe:2.3:a:apache:tomcat:9.0.27:*:*:*:*:*:*:*',
++            '9.0.29':'cpe:2.3:a:apache:tomcat:9.0.29:*:*:*:*:*:*:*',
++            '9.0.30':'cpe:2.3:a:apache:tomcat:9.0.30:*:*:*:*:*:*:*'
++          }
++
+     def url_for_version(self, version):
+         url = "https://archive.apache.org/dist/tomcat/tomcat-9/v{0}/bin/apache-tomcat-{0}.tar.gz"
+         return url.format(version)
+diff --git a/var/spack/repos/builtin/packages/torque/package.py b/var/spack/repos/builtin/packages/torque/package.py
+index 416f4a2..c5e4058 100644
+--- a/var/spack/repos/builtin/packages/torque/package.py
++++ b/var/spack/repos/builtin/packages/torque/package.py
+@@ -16,11 +16,75 @@ class Torque(Package):
+ 
+     maintainers = ['sethrj']
+ 
++    version('6.0.0')
++    version('5.1.2')
++    version('5.1.1.2')
++    version('5.1.1')
++    version('5.0.2')
++    version('5.0.1.h2')
++    version('5.0.1')
++    version('5.0.0')
++    version('4.5.0')
++    version('4.2.9')
++    version('4.2.8')
++    version('4.2.7')
++    version('4.2.6.1.h1')
++    version('4.2.6.1')
++    version('4.2.6')
++    version('4.2.5')
++    version('4.2.4')
++    version('4.2.3')
++    version('4.2.2')
++    version('4.2.1')
++    version('4.2.0')
++    version('4.1.6')
++    version('4.1.5')
++    version('4.1.4')
++    version('4.1.3')
++    version('4.1.2')
++    version('4.1.1')
++    version('4.1.0')
++    version('4.0.3')
++    version('4.0.2')
++    version('4.0.1')
++    version('4.0.0')
++    version('3.0.5')
+     version('3.0.4')
++    version('3.0.3')
+     version('3.0.2')
+-
+     provides('pbs')
+ 
++    cpe = {
++            '4.0.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.0.0:*:*:*:*:*:*:*',
++            '4.0.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.0.2:*:*:*:*:*:*:*',
++            '3.0.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.6:*:*:*:*:*:*:*',
++            '3.0.5':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.5:*:*:*:*:*:*:*',
++            '3.0.4':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.4:*:*:*:*:*:*:*',
++            '3.0.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.3:*:*:*:*:*:*:*',
++            '3.0.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.2:*:*:*:*:*:*:*',
++            '3.0.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.1:*:*:*:*:*:*:*',
++            '3.0.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.0:*:*:*:*:*:*:*',
++            '4.1.7':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.7:*:*:*:*:*:*:*',
++            '4.1.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.6:*:*:*:*:*:*:*',
++            '4.1.5.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.5.1:*:*:*:*:*:*:*',
++            '4.1.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.3:*:*:*:*:*:*:*',
++            '4.1.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.2:*:*:*:*:*:*:*',
++            '4.1.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.1:*:*:*:*:*:*:*',
++            '4.1.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.0:*:*:*:*:*:*:*',
++            '4.2.5':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.5:*:*:*:*:*:*:*',
++            '4.2.4.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.4.1:*:*:*:*:*:*:*',
++            '4.2.3.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.3.1:*:*:*:*:*:*:*',
++            '4.2.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.3:*:*:*:*:*:*:*',
++            '4.2.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.2:*:*:*:*:*:*:*',
++            '5.0.0-1_43d8f09a':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:5.0.0-1_43d8f09a:*:*:*:*:*:*:*',
++            '4.2.9':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.9:*:*:*:*:*:*:*',
++            '4.2.8':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.8:*:*:*:*:*:*:*',
++            '4.2.7':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.7:*:*:*:*:*:*:*',
++            '4.2.6.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.6.1:*:*:*:*:*:*:*',
++            '4.2.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.6:*:*:*:*:*:*:*',
++            '4.2.4':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.4:*:*:*:*:*:*:*'
++           }
++
+     # TORQUE needs to be added as an external package to SPACK. For this, the
+     # config file packages.yaml needs to be adjusted:
+     #
+diff --git a/var/spack/repos/builtin/packages/unzip/package.py b/var/spack/repos/builtin/packages/unzip/package.py
+index bc4d769..420778c 100644
+--- a/var/spack/repos/builtin/packages/unzip/package.py
++++ b/var/spack/repos/builtin/packages/unzip/package.py
+@@ -14,6 +14,10 @@ class Unzip(MakefilePackage):
+ 
+     version('6.0', sha256='036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37')
+ 
++    cpe = {
++            '6.0':'cpe:2.3:a:unzip_project:unzip:6.0:*:*:*:*:*:*:*'
++          }
++
+     # The Cray cc wrapper doesn't handle the '-s' flag (strip) cleanly.
+     @when('platform=cray')
+     def patch(self):
+diff --git a/var/spack/repos/builtin/packages/util-linux-uuid/package.py b/var/spack/repos/builtin/packages/util-linux-uuid/package.py
+index fef7347..fd0a324 100644
+--- a/var/spack/repos/builtin/packages/util-linux-uuid/package.py
++++ b/var/spack/repos/builtin/packages/util-linux-uuid/package.py
+@@ -18,6 +18,12 @@ class UtilLinuxUuid(AutotoolsPackage):
+     version('2.36.2', sha256='f5dbe79057e7d68e1a46fc04083fc558b26a49499b1b3f50e4f4893150970463')
+     version('2.36',   sha256='82942cd877a989f6d12d4ce2c757fb67ec53d8c5cd9af0537141ec5f84a2eea3')
+ 
++    cpe = {
++            '2.37.4':'cpe:2.3:a:kernel:util-linux:2.37.4:*:*:*:*:*:*:*',
++            '2.36.2':'cpe:2.3:a:kernel:util-linux:2.36.2:*:*:*:*:*:*:*',
++            '2.36':'cpe:2.3:a:kernel:util-linux:2.36:*:*:*:*:*:*:*'
++          }
++
+     conflicts('%gcc@:4', when='@2.37:')
+ 
+     depends_on('pkgconfig', type='build')
+diff --git a/var/spack/repos/builtin/packages/util-macros/package.py b/var/spack/repos/builtin/packages/util-macros/package.py
+index 13d4af8..22edbfb 100644
+--- a/var/spack/repos/builtin/packages/util-macros/package.py
++++ b/var/spack/repos/builtin/packages/util-macros/package.py
+@@ -21,6 +21,14 @@ class UtilMacros(AutotoolsPackage, XorgPackage):
+     version('1.19.1', sha256='18d459400558f4ea99527bc9786c033965a3db45bf4c6a32eefdc07aa9e306a6')
+     version('1.19.0', sha256='2835b11829ee634e19fa56517b4cfc52ef39acea0cd82e15f68096e27cbed0ba')
+ 
++    cpe = { 
++            '1.19.0':'cpe:2.3:a:freedesktop:util-macros:1.19.0:*:*:*:*:*:*:*',
++            '1.19.1':'cpe:2.3:a:freedesktop:util-macros:1.19.1:*:*:*:*:*:*:*',
++            '1.19.2':'cpe:2.3:a:freedesktop:util-macros:1.19.2:*:*:*:*:*:*:*',
++            '1.19.3':'cpe:2.3:a:freedesktop:util-macros:1.19.3:*:*:*:*:*:*:*'
++          }
++
++
+     def setup_dependent_build_environment(self, env, dependent_spec):
+         """Adds the ACLOCAL path for autotools."""
+         env.append_path('ACLOCAL_PATH', self.prefix.share.aclocal)
+diff --git a/var/spack/repos/builtin/packages/wireshark/package.py b/var/spack/repos/builtin/packages/wireshark/package.py
+index 182fa36..3b6e9b8 100644
+--- a/var/spack/repos/builtin/packages/wireshark/package.py
++++ b/var/spack/repos/builtin/packages/wireshark/package.py
+@@ -19,6 +19,14 @@ class Wireshark(CMakePackage):
+     version('3.0.8', sha256='b4bd8189934d82330a053c5b10398f2b625b1e1c8818831ab61739b2d7aa7561')
+     version('2.6.0', sha256='711c7f01d27a8817d58277a5487cef3e3c7bab1c8caaf8f4c92aa21015b9117f')
+ 
++    cpe = {
++            '3.2.1':'cpe:2.3:a:wireshark:wireshark:3.2.1:*:*:*:*:*:*:*', 
++            '3.2.0':'cpe:2.3:a:wireshark:wireshark:3.2.0:*:*:*:*:*:*:*',
++            '3.1.0':'cpe:2.3:a:wireshark:wireshark:3.1.0:*:*:*:*:*:*:*', 
++            '3.0.8':'cpe:2.3:a:wireshark:wireshark:3.0.8:*:*:*:*:*:*:*',
++            '2.6.0':'cpe:2.3:a:wireshark:wireshark:2.6.0:*:*:*:*:*:*:*'
++          }
++
+     variant('libssh',   default=False, description='Build with libssh')
+     variant('nghttp2',  default=False, description='Build with nghttp2')
+     variant('qt',       default=False, description='Build with qt')
+diff --git a/var/spack/repos/builtin/packages/xcb-proto/package.py b/var/spack/repos/builtin/packages/xcb-proto/package.py
+index 11d80f7..4c13891 100644
+--- a/var/spack/repos/builtin/packages/xcb-proto/package.py
++++ b/var/spack/repos/builtin/packages/xcb-proto/package.py
+@@ -19,6 +19,15 @@ class XcbProto(AutotoolsPackage):
+     version('1.12', sha256='cfa49e65dd390233d560ce4476575e4b76e505a0e0bacdfb5ba6f8d0af53fd59')
+     version('1.11', sha256='d12152193bd71aabbdbb97b029717ae6d5d0477ab239614e3d6193cc0385d906')
+ 
++    cpe = { 
++            '1.11':'cpe:2.3:a:freedesktop:xcb-proto:1.11:*:*:*:*:*:*:*',
++            '1.12':'cpe:2.3:a:freedesktop:xcb-proto:1.12:*:*:*:*:*:*:*',
++            '1.13':'cpe:2.3:a:freedesktop:xcb-proto:1.13:*:*:*:*:*:*:*',
++            '1.14':'cpe:2.3:a:freedesktop:xcb-proto:1.14:*:*:*:*:*:*:*',
++            '1.14.1':'cpe:2.3:a:freedesktop:xcb-proto:1.14.1:*:*:*:*:*:*:*'
++          }
++
++
+     # TODO: uncomment once build deps can be resolved separately
+     # See #7646, #4145, #4063, and #2548 for details
+     # extends('python')
+diff --git a/var/spack/repos/builtin/packages/xextproto/package.py b/var/spack/repos/builtin/packages/xextproto/package.py
+index 28d4be0..5d3cf72 100644
+--- a/var/spack/repos/builtin/packages/xextproto/package.py
++++ b/var/spack/repos/builtin/packages/xextproto/package.py
+@@ -14,6 +14,10 @@ class Xextproto(AutotoolsPackage, XorgPackage):
+ 
+     version('7.3.0', sha256='1b1bcdf91221e78c6c33738667a57bd9aaa63d5953174ad8ed9929296741c9f5')
+ 
++    cpe = {
++            '7.3.0':'cpe:2.3:a:freedesktop:xextproto:7.3.0:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+ 
+diff --git a/var/spack/repos/builtin/packages/xineramaproto/package.py b/var/spack/repos/builtin/packages/xineramaproto/package.py
+index b7b016f..d1509f0 100644
+--- a/var/spack/repos/builtin/packages/xineramaproto/package.py
++++ b/var/spack/repos/builtin/packages/xineramaproto/package.py
+@@ -17,5 +17,9 @@ class Xineramaproto(AutotoolsPackage, XorgPackage):
+ 
+     version('1.2.1', sha256='d99e121edf7b310008d7371ac5dbe3aa2810996d476b754dc78477cc26e5e7c1')
+ 
++    cpe = {
++            '1.2.1':'cpe:2.3:a:freedesktop:xineramaproto:1.2.1:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/xproto/package.py b/var/spack/repos/builtin/packages/xproto/package.py
+index 8b3a317..94a30e7 100644
+--- a/var/spack/repos/builtin/packages/xproto/package.py
++++ b/var/spack/repos/builtin/packages/xproto/package.py
+@@ -22,6 +22,11 @@ class Xproto(AutotoolsPackage, XorgPackage):
+     version('7.0.31', sha256='6d755eaae27b45c5cc75529a12855fed5de5969b367ed05003944cf901ed43c7')
+     version('7.0.29', sha256='628243b3a0fa9b65eda804810ab7238cb88af92fe89efdbc858f25ee5e93a324')
+ 
++    cpe = {
++            '7.0.29':'cpe:2.3:a:freedesktop:xproto:7.0.29:*:*:*:*:*:*:*',
++            '7.0.31':'cpe:2.3:a:freedesktop:xproto:7.0.31:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+ 
+diff --git a/var/spack/repos/builtin/packages/xterm/package.py b/var/spack/repos/builtin/packages/xterm/package.py
+index 8e6bfa9..4fa9e14 100644
+--- a/var/spack/repos/builtin/packages/xterm/package.py
++++ b/var/spack/repos/builtin/packages/xterm/package.py
+@@ -20,6 +20,14 @@ class Xterm(AutotoolsPackage):
+     version('330', sha256='7aeef9f29f6b95e09f481173c8c3053357bf5ffe162585647f690fd1707556df')
+     version('327', sha256='66fb2f6c35b342148f549c276b12a3aa3fb408e27ab6360ddec513e14376150b')
+ 
++    cpe = {
++            '327':'cpe:2.3:a:invisible-island:xterm:327:*:*:*:*:*:*:*',
++            '330':'cpe:2.3:a:invisible-island:xterm:330:*:*:*:*:*:*:*',
++            '340':'cpe:2.3:a:invisible-island:xterm:340:*:*:*:*:*:*:*',
++            '350':'cpe:2.3:a:invisible-island:xterm:350:*:*:*:*:*:*:*',
++            '353':'cpe:2.3:a:invisible-island:xterm:353:*:*:*:*:*:*:*'
++          }
++
+     depends_on('libxft')
+     depends_on('fontconfig')
+     depends_on('libxaw')
+diff --git a/var/spack/repos/builtin/packages/xtrans/package.py b/var/spack/repos/builtin/packages/xtrans/package.py
+index f2173eb..a581287 100644
+--- a/var/spack/repos/builtin/packages/xtrans/package.py
++++ b/var/spack/repos/builtin/packages/xtrans/package.py
+@@ -17,5 +17,9 @@ class Xtrans(AutotoolsPackage, XorgPackage):
+ 
+     version('1.3.5', sha256='b7a577c1b6c75030145e53b4793db9c88f9359ac49e7d771d4385d21b3e5945d')
+ 
++    cpe = {
++            '1.3.5':'cpe:2.3:a:freedesktop:xtrans:1.3.5:*:*:*:*:*:*:*'
++          }
++
+     depends_on('pkgconfig', type='build')
+     depends_on('util-macros', type='build')
+diff --git a/var/spack/repos/builtin/packages/xz/package.py b/var/spack/repos/builtin/packages/xz/package.py
+index dc46615..939d31a 100644
+--- a/var/spack/repos/builtin/packages/xz/package.py
++++ b/var/spack/repos/builtin/packages/xz/package.py
+@@ -26,6 +26,14 @@ class Xz(AutotoolsPackage, SourceforgePackage):
+     version('5.2.2', sha256='6ff5f57a4b9167155e35e6da8b529de69270efb2b4cf3fbabf41a4ee793840b5')
+     version('5.2.0', sha256='f7357d7455a1670229b3cca021da71dd5d13b789db62743c20624bdffc9cc4a5')
+ 
++    cpe = {
++            '5.2.0':'cpe:2.3:a:tukaani:xz:5.2.0:*:*:*:*:*:*:*',
++            '5.2.2':'cpe:2.3:a:tukaani:xz:5.2.2:*:*:*:*:*:*:*',
++            '5.2.3':'cpe:2.3:a:tukaani:xz:5.2.3:*:*:*:*:*:*:*',
++            '5.2.4':'cpe:2.3:a:tukaani:xz:5.2.4:*:*:*:*:*:*:*',
++            '5.2.5':'cpe:2.3:a:tukaani:xz:5.2.5:*:*:*:*:*:*:*'
++          }
++
+     variant('pic', default=False,
+             description='Compile with position independent code.')
+ 
+diff --git a/var/spack/repos/builtin/packages/zlib/package.py b/var/spack/repos/builtin/packages/zlib/package.py
+index 4561140..7cf4d57 100644
+--- a/var/spack/repos/builtin/packages/zlib/package.py
++++ b/var/spack/repos/builtin/packages/zlib/package.py
+@@ -26,6 +26,13 @@ class Zlib(Package):
+     version('1.2.8', sha256='36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d', deprecated=True)
+     version('1.2.3', sha256='1795c7d067a43174113fdf03447532f373e1c6c57c08d61d9e4e9be5e244b05e', deprecated=True)
+ 
++    cpe = {
++            '1.2.3':'cpe:2.3:a:zlib:zlib:1.2.3:*:*:*:*:*:*:*',
++            '1.2.8':'cpe:2.3:a:zlib:zlib:1.2.8:*:*:*:*:*:*:*',
++            '1.2.11':'cpe:2.3:a:zlib:zlib:1.2.11:*:*:*:*:*:*:*',
++            '1.2.12':'cpe:2.3:a:zlib:zlib:1.2.12:*:*:*:*:*:*:*'
++          }
++
+     variant('pic', default=True,
+             description='Produce position-independent code (for shared libs)')
+     variant('shared', default=True,
+diff --git a/var/spack/repos/builtin/packages/zstd/package.py b/var/spack/repos/builtin/packages/zstd/package.py
+index d7baca0..bc2ec7d 100644
+--- a/var/spack/repos/builtin/packages/zstd/package.py
++++ b/var/spack/repos/builtin/packages/zstd/package.py
+@@ -32,6 +32,22 @@ class Zstd(MakefilePackage):
+     version('1.3.0', sha256='0fdba643b438b7cbce700dcc0e7b3e3da6d829088c63757a5984930e2f70b348')
+     version('1.1.2', sha256='980b8febb0118e22f6ed70d23b5b3e600995dbf7489c1f6d6122c1411cdda8d8')
+ 
++    cpe = {
++            '1.1.2':'cpe:2.3:a:facebook:zstandard:1.1.2:*:*:*:*:*:*:*',
++            '1.3.0':'cpe:2.3:a:facebook:zstandard:1.3.0:*:*:*:*:*:*:*',
++            '1.3.8':'cpe:2.3:a:facebook:zstandard:1.3.8:*:*:*:*:*:*:*',
++            '1.4.0':'cpe:2.3:a:facebook:zstandard:1.4.0:*:*:*:*:*:*:*',
++            '1.4.2':'cpe:2.3:a:facebook:zstandard:1.4.2:*:*:*:*:*:*:*',
++            '1.4.3':'cpe:2.3:a:facebook:zstandard:1.4.3:*:*:*:*:*:*:*',
++            '1.4.4':'cpe:2.3:a:facebook:zstandard:1.4.4:*:*:*:*:*:*:*',
++            '1.4.5':'cpe:2.3:a:facebook:zstandard:1.4.5:*:*:*:*:*:*:*',
++            '1.4.7':'cpe:2.3:a:facebook:zstandard:1.4.7:*:*:*:*:*:*:*',
++            '1.4.8':'cpe:2.3:a:facebook:zstandard:1.4.8:*:*:*:*:*:*:*',
++            '1.4.9':'cpe:2.3:a:facebook:zstandard:1.4.9:*:*:*:*:*:*:*',
++            '1.5.0':'cpe:2.3:a:facebook:zstandard:1.5.0:*:*:*:*:*:*:*',
++            '1.5.2':'cpe:2.3:a:facebook:zstandard:1.5.2:*:*:*:*:*:*:*'
++          }
++
+     variant('programs', default=False, description='Build executables')
+     variant('libs', default='shared,static', values=('shared', 'static'),
+             multi=True, description='Build shared libs, static libs or both')
