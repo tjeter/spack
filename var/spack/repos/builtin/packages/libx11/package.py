@@ -9,6 +9,9 @@ from spack.package import *
 class Libx11(AutotoolsPackage, XorgPackage):
     """libX11 - Core X11 protocol client library."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.x.org/"
     xorg_mirror_path = "lib/libX11-1.6.7.tar.gz"
 
@@ -19,14 +22,7 @@ class Libx11(AutotoolsPackage, XorgPackage):
     version('1.6.5', sha256='3abce972ba62620611fab5b404dafb852da3da54e7c287831c30863011d28fb3')
     version('1.6.3', sha256='0b03b9d22f4c9e59b4ba498f294e297f013cae27050dfa0f3496640200db5376')
 
-    cpe = {
-            '1.6.3':'cpe:2.3:a:x.org:libx11:1.6.3:*:*:*:*:*:*:*',
-            '1.6.5':'cpe:2.3:a:x.org:libx11:1.6.5:*:*:*:*:*:*:*',
-            '1.6.7':'cpe:2.3:a:x.org:libx11:1.6.7:*:*:*:*:*:*:*',
-            '1.7.0':'cpe:2.3:a:x.org:libx11:1.7.0:*:*:*:*:*:*:*',
-            '1.7.3':'cpe:2.3:a:x.org:libx11:1.7.3:*:*:*:*:*:*:*',
-            '1.8':'cpe:2.3:a:x.org:libx11:1.8:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('libxcb@1.1.92:')
 

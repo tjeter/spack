@@ -14,14 +14,15 @@ class Libxfont(AutotoolsPackage, XorgPackage):
     but should not be used by normal X11 clients.  X11 clients access fonts
     via either the new API's in libXft, or the legacy API's in libX11."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXfont"
     xorg_mirror_path = "lib/libXfont-1.5.2.tar.gz"
 
     version('1.5.2', sha256='a7350c75171d03d06ae0d623e42240356d6d3e1ac7dfe606639bf20f0d653c93')
 
-    cpe = {
-            '1.5.2':'cpe:2.3:a:x:libxfont:1.5.2:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('libfontenc')
     depends_on('freetype')

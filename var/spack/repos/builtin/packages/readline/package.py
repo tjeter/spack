@@ -14,6 +14,9 @@ class Readline(AutotoolsPackage, GNUMirrorPackage):
     command lines, to recall and perhaps reedit those lines, and perform
     csh-like history expansion on previous commands."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://tiswww.case.edu/php/chet/readline/rltop.html"
     # URL must remain http:// so Spack can bootstrap curl
     gnu_mirror_path = "readline/readline-8.0.tar.gz"
@@ -23,12 +26,7 @@ class Readline(AutotoolsPackage, GNUMirrorPackage):
     version('7.0', sha256='750d437185286f40a369e1e4f4764eda932b9459b5ec9a731628393dd3d32334')
     version('6.3', sha256='56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43')
 
-    cpe = {
-            '6.3':'cpe:2.3:a:gnu:readline:6.3:*:*:*:*:*:*:*',
-            '7.0':'cpe:2.3:a:gnu:readline:7.0:*:*:*:*:*:*:*',
-            '8.0':'cpe:2.3:a:gnu:readline:8.0:*:*:*:*:*:*:*',
-            '8.1':'cpe:2.3:a:gnu:readline:8.1:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('ncurses')
     # from url=https://www.linuxfromscratch.org/patches/downloads/readline/readline-6.3-upstream_fixes-1.patch

@@ -11,6 +11,9 @@ class Zstd(MakefilePackage):
     algorithm, targeting real-time compression scenarios at zlib-level and
     better compression ratios."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://facebook.github.io/zstd/"
     url      = "https://github.com/facebook/zstd/archive/v1.4.3.tar.gz"
     git      = "https://github.com/facebook/zstd.git"
@@ -32,21 +35,7 @@ class Zstd(MakefilePackage):
     version('1.3.0', sha256='0fdba643b438b7cbce700dcc0e7b3e3da6d829088c63757a5984930e2f70b348')
     version('1.1.2', sha256='980b8febb0118e22f6ed70d23b5b3e600995dbf7489c1f6d6122c1411cdda8d8')
 
-    cpe = {
-            '1.1.2':'cpe:2.3:a:facebook:zstandard:1.1.2:*:*:*:*:*:*:*',
-            '1.3.0':'cpe:2.3:a:facebook:zstandard:1.3.0:*:*:*:*:*:*:*',
-            '1.3.8':'cpe:2.3:a:facebook:zstandard:1.3.8:*:*:*:*:*:*:*',
-            '1.4.0':'cpe:2.3:a:facebook:zstandard:1.4.0:*:*:*:*:*:*:*',
-            '1.4.2':'cpe:2.3:a:facebook:zstandard:1.4.2:*:*:*:*:*:*:*',
-            '1.4.3':'cpe:2.3:a:facebook:zstandard:1.4.3:*:*:*:*:*:*:*',
-            '1.4.4':'cpe:2.3:a:facebook:zstandard:1.4.4:*:*:*:*:*:*:*',
-            '1.4.5':'cpe:2.3:a:facebook:zstandard:1.4.5:*:*:*:*:*:*:*',
-            '1.4.7':'cpe:2.3:a:facebook:zstandard:1.4.7:*:*:*:*:*:*:*',
-            '1.4.8':'cpe:2.3:a:facebook:zstandard:1.4.8:*:*:*:*:*:*:*',
-            '1.4.9':'cpe:2.3:a:facebook:zstandard:1.4.9:*:*:*:*:*:*:*',
-            '1.5.0':'cpe:2.3:a:facebook:zstandard:1.5.0:*:*:*:*:*:*:*',
-            '1.5.2':'cpe:2.3:a:facebook:zstandard:1.5.2:*:*:*:*:*:*:*'
-          }
+    
 
     variant('programs', default=False, description='Build executables')
     variant('libs', default='shared,static', values=('shared', 'static'),

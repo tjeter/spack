@@ -13,6 +13,9 @@ class Tomcat(Package):
     WebSocket technologies.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://tomcat.apache.org/"
     url      = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.30/bin/apache-tomcat-9.0.30.tar.gz"
 
@@ -22,13 +25,7 @@ class Tomcat(Package):
     version('9.0.26', sha256='b5430890d3b986d6b7ec6a6ef611f9451cbfa933b0a1a3dd48e2cd1f46a63381')
     version('9.0.24', sha256='22064138e25f7ab899802804775259a156c06770535b8ce93856beba13dfcf6d')
 
-    cpe = {
-            '9.0.24':'cpe:2.3:a:apache:tomcat:9.0.24:*:*:*:*:*:*:*',
-            '9.0.26':'cpe:2.3:a:apache:tomcat:9.0.26:*:*:*:*:*:*:*',
-            '9.0.27':'cpe:2.3:a:apache:tomcat:9.0.27:*:*:*:*:*:*:*',
-            '9.0.29':'cpe:2.3:a:apache:tomcat:9.0.29:*:*:*:*:*:*:*',
-            '9.0.30':'cpe:2.3:a:apache:tomcat:9.0.30:*:*:*:*:*:*:*'
-          }
+    
 
     def url_for_version(self, version):
         url = "https://archive.apache.org/dist/tomcat/tomcat-9/v{0}/bin/apache-tomcat-{0}.tar.gz"

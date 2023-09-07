@@ -10,6 +10,9 @@ class XcbProto(AutotoolsPackage):
     """xcb-proto provides the XML-XCB protocol descriptions that libxcb uses to
     generate the majority of its code and API."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://xcb.freedesktop.org/"
     url      = "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.14.1.tar.xz"
 
@@ -19,13 +22,7 @@ class XcbProto(AutotoolsPackage):
     version('1.12', sha256='cfa49e65dd390233d560ce4476575e4b76e505a0e0bacdfb5ba6f8d0af53fd59')
     version('1.11', sha256='d12152193bd71aabbdbb97b029717ae6d5d0477ab239614e3d6193cc0385d906')
 
-    cpe = { 
-            '1.11':'cpe:2.3:a:freedesktop:xcb-proto:1.11:*:*:*:*:*:*:*',
-            '1.12':'cpe:2.3:a:freedesktop:xcb-proto:1.12:*:*:*:*:*:*:*',
-            '1.13':'cpe:2.3:a:freedesktop:xcb-proto:1.13:*:*:*:*:*:*:*',
-            '1.14':'cpe:2.3:a:freedesktop:xcb-proto:1.14:*:*:*:*:*:*:*',
-            '1.14.1':'cpe:2.3:a:freedesktop:xcb-proto:1.14.1:*:*:*:*:*:*:*'
-          }
+    
 
 
     # TODO: uncomment once build deps can be resolved separately

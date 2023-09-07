@@ -14,6 +14,9 @@ class Sqlite(AutotoolsPackage):
     """SQLite is a C-language library that implements a small, fast,
     self-contained, high-reliability, full-featured, SQL database engine.
     """
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.sqlite.org"
 
     version('3.38.5', sha256='5af07de982ba658fd91a03170c945f99c971f6955bc79df3266544373e39869c')
@@ -40,29 +43,7 @@ class Sqlite(AutotoolsPackage):
     # All versions prior to 3.26.0 are vulnerable to Magellan when FTS
     # is enabled, see https://blade.tencent.com/magellan/index_en.html
 
-    cpe = {
-                '3.38.5':'cpe:2.3:a:sqlite:sqlite:3.38.5:*:*:*:*:*:*:*',
-                '3.38.3':'cpe:2.3:a:sqlite:sqlite:3.38.3:*:*:*:*:*:*:*',
-                '3.37.2':'cpe:2.3:a:sqlite:sqlite:3.37.2:*:*:*:*:*:*:*',
-                '3.37.1':'cpe:2.3:a:sqlite:sqlite:3.37.1:*:*:*:*:*:*:*',
-                '3.37.0':'cpe:2.3:a:sqlite:sqlite:3.37.0:*:*:*:*:*:*:*',
-                '3.36.0':'cpe:2.3:a:sqlite:sqlite:3.36.0:*:*:*:*:*:*:*',
-                '3.35.5':'cpe:2.3:a:sqlite:sqlite:3.35.5:*:*:*:*:*:*:*',
-                '3.35.4':'cpe:2.3:a:sqlite:sqlite:3.35.4:*:*:*:*:*:*:*',
-                '3.35.3':'cpe:2.3:a:sqlite:sqlite:3.35.3:*:*:*:*:*:*:*',
-                '3.34.0':'cpe:2.3:a:sqlite:sqlite:3.34.0:*:*:*:*:*:*:*',
-                '3.33.0':'cpe:2.3:a:sqlite:sqlite:3.33.0:*:*:*:*:*:*:*',
-                '3.32.3':'cpe:2.3:a:sqlite:sqlite:3.32.3:*:*:*:*:*:*:*',
-                '3.31.1':'cpe:2.3:a:sqlite:sqlite:3.31.1:*:*:*:*:*:*:*',
-                '3.30.1':'cpe:2.3:a:sqlite:sqlite:3.30.1:*:*:*:*:*:*:*',
-                '3.30.0':'cpe:2.3:a:sqlite:sqlite:3.30.0:*:*:*:*:*:*:*',
-                '3.29.0':'cpe:2.3:a:sqlite:sqlite:3.29.0:*:*:*:*:*:*:*',
-                '3.28.0':'cpe:2.3:a:sqlite:sqlite:3.28.0:*:*:*:*:*:*:*',
-                '3.27.2':'cpe:2.3:a:sqlite:sqlite:3.27.2:*:*:*:*:*:*:*',
-                '3.27.1':'cpe:2.3:a:sqlite:sqlite:3.27.1:*:*:*:*:*:*:*',
-                '3.27.0':'cpe:2.3:a:sqlite:sqlite:3.27.0:*:*:*:*:*:*:*',
-                '3.26.0':'cpe:2.3:a:sqlite:sqlite:3.26.0:*:*:*:*:*:*:*'
-           }
+    
 
     variant('functions', default=False, when='+dynamic_extensions',
             description='Provide mathematical and string extension functions for SQL '

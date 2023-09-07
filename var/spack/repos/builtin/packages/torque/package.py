@@ -11,6 +11,9 @@ class Torque(Package):
     source project based on the original PBS resource manager developed by NASA,
     LLNL, and MRJ."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://github.com/abarbu/torque"
     has_code = False
 
@@ -54,36 +57,7 @@ class Torque(Package):
     version('3.0.2')
     provides('pbs')
 
-    cpe = {
-            '4.0.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.0.0:*:*:*:*:*:*:*',
-            '4.0.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.0.2:*:*:*:*:*:*:*',
-            '3.0.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.6:*:*:*:*:*:*:*',
-            '3.0.5':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.5:*:*:*:*:*:*:*',
-            '3.0.4':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.4:*:*:*:*:*:*:*',
-            '3.0.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.3:*:*:*:*:*:*:*',
-            '3.0.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.2:*:*:*:*:*:*:*',
-            '3.0.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.1:*:*:*:*:*:*:*',
-            '3.0.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:3.0.0:*:*:*:*:*:*:*',
-            '4.1.7':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.7:*:*:*:*:*:*:*',
-            '4.1.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.6:*:*:*:*:*:*:*',
-            '4.1.5.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.5.1:*:*:*:*:*:*:*',
-            '4.1.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.3:*:*:*:*:*:*:*',
-            '4.1.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.2:*:*:*:*:*:*:*',
-            '4.1.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.1:*:*:*:*:*:*:*',
-            '4.1.0':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.1.0:*:*:*:*:*:*:*',
-            '4.2.5':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.5:*:*:*:*:*:*:*',
-            '4.2.4.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.4.1:*:*:*:*:*:*:*',
-            '4.2.3.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.3.1:*:*:*:*:*:*:*',
-            '4.2.3':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.3:*:*:*:*:*:*:*',
-            '4.2.2':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.2:*:*:*:*:*:*:*',
-            '5.0.0-1_43d8f09a':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:5.0.0-1_43d8f09a:*:*:*:*:*:*:*',
-            '4.2.9':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.9:*:*:*:*:*:*:*',
-            '4.2.8':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.8:*:*:*:*:*:*:*',
-            '4.2.7':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.7:*:*:*:*:*:*:*',
-            '4.2.6.1':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.6.1:*:*:*:*:*:*:*',
-            '4.2.6':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.6:*:*:*:*:*:*:*',
-            '4.2.4':'cpe:2.3:a:adaptivecomputing:torque_resource_manager:4.2.4:*:*:*:*:*:*:*'
-           }
+    
 
     # TORQUE needs to be added as an external package to SPACK. For this, the
     # config file packages.yaml needs to be adjusted:

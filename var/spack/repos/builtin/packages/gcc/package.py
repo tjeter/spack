@@ -23,6 +23,9 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     """The GNU Compiler Collection includes front ends for C, C++, Objective-C,
     Fortran, Ada, and Go, as well as libraries for these languages."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = 'https://gcc.gnu.org'
     gnu_mirror_path = 'gcc/gcc-9.2.0/gcc-9.2.0.tar.xz'
     git      = 'git://gcc.gnu.org/git/gcc.git'
@@ -83,26 +86,7 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     version('4.6.4', sha256='35af16afa0b67af9b8eb15cafb76d2bc5f568540552522f5dc2c88dd45d977e8')
     version('4.5.4', sha256='eef3f0456db8c3d992cbb51d5d32558190bc14f3bc19383dd93acc27acc6befc')
 
-    cpe = {
-            '-':'cpe:2.3:a:gnu:gcc:-:*:*:*:*:*:*:*',
-            '4.8.5':'cpe:2.3:a:gnu:libgomp:4.8.5:*:*:*:*:*:*:*',
-            '4.9.4':'cpe:2.3:a:gnu:gcc:4.9.4:*:*:*:*:*:*:*',
-            '4.5.4':'cpe:2.3:a:gnu:gcc:4.5.4:*:*:*:*:*:*:*',
-            '4.6.4':'cpe:2.3:a:gnu:gcc:4.6.4:*:*:*:*:*:*:*',
-            '4.7.4':'cpe:2.3:a:gnu:gcc:4.7.4:*:*:*:*:*:*:*',
-            '4.8.4':'cpe:2.3:a:gnu:gcc:4.8.4:*:*:*:*:*:*:*',
-            '4.8.5':'cpe:2.3:a:gnu:gcc:4.8.5:*:*:*:*:*:*:*',
-            '4.9.1':'cpe:2.3:a:gnu:gcc:4.9.1:*:*:*:*:*:*:*',
-            '4.9.2':'cpe:2.3:a:gnu:gcc:4.9.2:*:*:*:*:*:*:*',
-            '4.9.3':'cpe:2.3:a:gnu:gcc:4.9.3:*:*:*:*:*:*:*',
-            '-':'cpe:2.3:a:gnu:libssp:-:*:*:*:*:*:*:*',
-            '7.5.0':'cpe:2.3:a:gnu:gcc:7.5.0:*:*:*:*:*:*:*',
-            '8.4.0':'cpe:2.3:a:gnu:gcc:8.4.0:*:*:*:*:*:*:*',
-            '9.2.0':'cpe:2.3:a:gnu:gcc:9.2.0:*:*:*:*:*:*:*',
-            '9.3.0':'cpe:2.3:a:gnu:gcc:9.3.0:*:*:*:*:*:*:*',
-            '10.1.0':'cpe:2.3:a:gnu:gcc:10.1.0:*:*:*:*:*:*:*',
-            '10.2.0':'cpe:2.3:a:gnu:gcc:10.2.0:*:*:*:*:*:*:*'
-           }
+    
 
     # We specifically do not add 'all' variant here because:
     # (i) Ada, Go, Jit, and Objective-C++ are not default languages.

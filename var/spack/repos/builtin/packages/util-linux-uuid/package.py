@@ -9,6 +9,9 @@ from spack.package import *
 class UtilLinuxUuid(AutotoolsPackage):
     """Util-linux is a suite of essential utilities for any Linux system."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://github.com/karelzak/util-linux"
     url      = "https://www.kernel.org/pub/linux/utils/util-linux/v2.29/util-linux-2.29.2.tar.gz"
     list_url = "https://www.kernel.org/pub/linux/utils/util-linux"
@@ -18,11 +21,7 @@ class UtilLinuxUuid(AutotoolsPackage):
     version('2.36.2', sha256='f5dbe79057e7d68e1a46fc04083fc558b26a49499b1b3f50e4f4893150970463')
     version('2.36',   sha256='82942cd877a989f6d12d4ce2c757fb67ec53d8c5cd9af0537141ec5f84a2eea3')
 
-    cpe = {
-            '2.37.4':'cpe:2.3:a:kernel:util-linux:2.37.4:*:*:*:*:*:*:*',
-            '2.36.2':'cpe:2.3:a:kernel:util-linux:2.36.2:*:*:*:*:*:*:*',
-            '2.36':'cpe:2.3:a:kernel:util-linux:2.36:*:*:*:*:*:*:*'
-          }
+    
 
     conflicts('%gcc@:4', when='@2.37:')
 

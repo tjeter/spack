@@ -10,6 +10,9 @@ from spack.package import *
 class Automake(AutotoolsPackage, GNUMirrorPackage):
     """Automake -- make file builder part of autotools"""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = 'https://www.gnu.org/software/automake/'
     gnu_mirror_path = 'automake/automake-1.15.tar.gz'
 
@@ -23,17 +26,7 @@ class Automake(AutotoolsPackage, GNUMirrorPackage):
     version('1.13.4', sha256='4c93abc0bff54b296f41f92dd3aa1e73e554265a6f719df465574983ef6f878c')
     version('1.11.6', sha256='53dbf1945401c43f4ce19c1971baecdbf8bc32e0f37fa3f49fe7b6992d0d2030')
 
-    cpe = {
-            '1.16.5':'cpe:2.3:a:gnu:automake:1.16.5:*:*:*:*:*:*:*',
-            '1.16.3':'cpe:2.3:a:gnu:automake:1.16.3:*:*:*:*:*:*:*',
-            '1.16.2':'cpe:2.3:a:gnu:automake:1.16.2:*:*:*:*:*:*:*',
-            '1.16.1':'cpe:2.3:a:gnu:automake:1.16.1:*:*:*:*:*:*:*',
-            '1.15.1':'cpe:2.3:a:gnu:automake:1.15.1:*:*:*:*:*:*:*',
-            '1.15':'cpe:2.3:a:gnu:automake:1.15:*:*:*:*:*:*:*',
-            '1.14.1':'cpe:2.3:a:gnu:automake:1.14.1:*:*:*:*:*:*:*',
-            '1.13.4':'cpe:2.3:a:gnu:automake:1.13.4:*:*:*:*:*:*:*',
-            '1.11.6':'cpe:2.3:a:gnu:automake:1.11.6:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('autoconf', type='build')
     depends_on('perl', type=('build', 'run'))

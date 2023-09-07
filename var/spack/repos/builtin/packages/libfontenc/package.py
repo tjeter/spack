@@ -9,14 +9,15 @@ from spack.package import *
 class Libfontenc(AutotoolsPackage, XorgPackage):
     """libfontenc - font encoding library."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libfontenc"
     xorg_mirror_path = "lib/libfontenc-1.1.3.tar.gz"
 
     version('1.1.3', sha256='6fba26760ca8d5045f2b52ddf641c12cedc19ee30939c6478162b7db8b6220fb')
 
-    cpe = {
-            '1.1.3':'cpe:2.3:a:freedesktop:libfontenc:1.1.3:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('zlib')
 

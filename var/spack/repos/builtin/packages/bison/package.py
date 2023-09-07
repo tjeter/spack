@@ -15,6 +15,9 @@ class Bison(AutotoolsPackage, GNUMirrorPackage):
     an annotated context-free grammar into a deterministic LR or
     generalized LR (GLR) parser employing LALR(1) parser tables."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.gnu.org/software/bison/"
     gnu_mirror_path = "bison/bison-3.6.4.tar.gz"
 
@@ -48,33 +51,7 @@ class Bison(AutotoolsPackage, GNUMirrorPackage):
     version('3.0.4', sha256='b67fd2daae7a64b5ba862c66c07c1addb9e6b1b05c5f2049392cfd8a2172952e')
     version('2.7',   sha256='19bbe7374fd602f7a6654c131c21a15aebdc06cc89493e8ff250cb7f9ed0a831')
 
-    cpe = {
-            '2.7':'cpe:2.3:a:gnu:bison:2.7:*:*:*:*:*:*:*',
-            '3.0.4':'cpe:2.3:a:gnu:bison:3.0.4:*:*:*:*:*:*:*',
-            '3.0.5':'cpe:2.3:a:gnu:bison:3.0.5:*:*:*:*:*:*:*',
-            '3.3.2':'cpe:2.3:a:gnu:bison:3.3.2:*:*:*:*:*:*:*',
-            '3.4.1':'cpe:2.3:a:gnu:bison:3.4.1:*:*:*:*:*:*:*',
-            '3.4.2':'cpe:2.3:a:gnu:bison:3.4.2:*:*:*:*:*:*:*',
-            '3.5':'cpe:2.3:a:gnu:bison:3.5:*:*:*:*:*:*:*',
-            '3.5.1':'cpe:2.3:a:gnu:bison:3.5.1:*:*:*:*:*:*:*',
-            '3.5.2':'cpe:2.3:a:gnu:bison:3.5.2:*:*:*:*:*:*:*',
-            '3.5.3':'cpe:2.3:a:gnu:bison:3.5.3:*:*:*:*:*:*:*',
-            '3.6':'cpe:2.3:a:gnu:bison:3.6:*:*:*:*:*:*:*',
-            '3.6.1':'cpe:2.3:a:gnu:bison:3.6.1:*:*:*:*:*:*:*',
-            '3.6.2':'cpe:2.3:a:gnu:bison:3.6.2:*:*:*:*:*:*:*',
-            '3.6.3':'cpe:2.3:a:gnu:bison:3.6.3:*:*:*:*:*:*:*',
-            '3.6.4':'cpe:2.3:a:gnu:bison:3.6.4:*:*:*:*:*:*:*',
-            '3.7':'cpe:2.3:a:gnu:bison:3.7:*:*:*:*:*:*:*',
-            '3.7.1':'cpe:2.3:a:gnu:bison:3.7.1:*:*:*:*:*:*:*',
-            '3.7.2':'cpe:2.3:a:gnu:bison:3.7.2:*:*:*:*:*:*:*',
-            '3.7.3':'cpe:2.3:a:gnu:bison:3.7.3:*:*:*:*:*:*:*',
-            '3.7.4':'cpe:2.3:a:gnu:bison:3.7.4:*:*:*:*:*:*:*',
-            '3.7.5':'cpe:2.3:a:gnu:bison:3.7.5:*:*:*:*:*:*:*',
-            '3.7.6':'cpe:2.3:a:gnu:bison:3.7.6:*:*:*:*:*:*:*',
-            '3.8':'cpe:2.3:a:gnu:bison:3.8:*:*:*:*:*:*:*',
-            '3.8.1':'cpe:2.3:a:gnu:bison:3.8.1:*:*:*:*:*:*:*',
-            '3.8.2':'cpe:2.3:a:gnu:bison:3.8.2:*:*:*:*:*:*:*'
-          }
+    
 
     # https://lists.gnu.org/archive/html/bug-bison/2019-08/msg00008.html
     patch('parallel.patch', when='@3.4.2')

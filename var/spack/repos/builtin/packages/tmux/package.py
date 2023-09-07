@@ -14,6 +14,9 @@ class Tmux(AutotoolsPackage):
     background) and reattach them to a different terminal. And do a lot more.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://tmux.github.io"
     url = "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
     git = 'https://github.com/tmux/tmux.git'
@@ -41,29 +44,7 @@ class Tmux(AutotoolsPackage):
     version('1.9a', sha256='c5e3b22b901cf109b20dab54a4a651f0471abd1f79f6039d79b250d21c2733f5')
     version('master', branch='master')
 
-    cpe = {
-            '3.3a':'cpe:2.3:a:tmux_project:tmux:3.3a:*:*:*:*:*:*:*',
-            '3.3':'cpe:2.3:a:tmux_project:tmux:3.3:*:*:*:*:*:*:*',
-            '3.2a':'cpe:2.3:a:tmux_project:tmux:3.2a:*:*:*:*:*:*:*',
-            '1.9a':'cpe:2.3:a:tmux_project:tmux:1.9a:*:*:*:*:*:*:*',
-            '2.1':'cpe:2.3:a:tmux_project:tmux:2.1:*:*:*:*:*:*:*',
-            '2.2':'cpe:2.3:a:tmux_project:tmux:2.2:*:*:*:*:*:*:*',
-            '2.3':'cpe:2.3:a:tmux_project:tmux:2.3:*:*:*:*:*:*:*',
-            '2.4':'cpe:2.3:a:tmux_project:tmux:2.4:*:*:*:*:*:*:*',
-            '2.5':'cpe:2.3:a:tmux_project:tmux:2.5:*:*:*:*:*:*:*',
-            '2.6':'cpe:2.3:a:tmux_project:tmux:2.6:*:*:*:*:*:*:*',
-            '2.7':'cpe:2.3:a:tmux_project:tmux:2.7:*:*:*:*:*:*:*',
-            '2.8':'cpe:2.3:a:tmux_project:tmux:2.8:*:*:*:*:*:*:*',
-            '2.9':'cpe:2.3:a:tmux_project:tmux:2.9:*:*:*:*:*:*:*',
-            '2.9a':'cpe:2.3:a:tmux_project:tmux:2.9a:*:*:*:*:*:*:*',
-            '3.0':'cpe:2.3:a:tmux_project:tmux:3.0:*:*:*:*:*:*:*',
-            '3.0a':'cpe:2.3:a:tmux_project:tmux:3.0a:*:*:*:*:*:*:*',
-            '3.1':'cpe:2.3:a:tmux_project:tmux:3.1:*:*:*:*:*:*:*',
-            '3.1a':'cpe:2.3:a:tmux_project:tmux:3.1a:*:*:*:*:*:*:*',
-            '3.1b':'cpe:2.3:a:tmux_project:tmux:3.1b:*:*:*:*:*:*:*',
-            '3.1c':'cpe:2.3:a:tmux_project:tmux:3.1c:*:*:*:*:*:*:*',
-            '3.2':'cpe:2.3:a:tmux_project:tmux:3.2:*:*:*:*:*:*:*'
-          }
+    
 
     variant('utf8proc', default=False, description='Build with UTF-8 support from utf8proc library')
     variant('static', default=False, description='Create a static build')

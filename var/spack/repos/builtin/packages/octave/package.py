@@ -22,6 +22,9 @@ class Octave(AutotoolsPackage, GNUMirrorPackage):
     It may also be used as a batch-oriented language.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.gnu.org/software/octave/"
     gnu_mirror_path = "octave/octave-4.0.0.tar.gz"
     maintainers = ['mtmiller', 'siko1056']
@@ -43,22 +46,7 @@ class Octave(AutotoolsPackage, GNUMirrorPackage):
     version('4.0.2', sha256='39cd8fd36c218fc00adace28d74a6c7c9c6faab7113a5ba3c4372324c755bdc1')
     version('4.0.0', sha256='4c7ee0957f5dd877e3feb9dfe07ad5f39b311f9373932f0d2a289dc97cca3280')
 
-    cpe = {
-            '7.1.0':'cpe:2.3:a:gnu:octave:7.1.0:*:*:*:*:*:*:*',
-            '6.4.0':'cpe:2.3:a:gnu:octave:6.4.0:*:*:*:*:*:*:*',
-            '6.3.0':'cpe:2.3:a:gnu:octave:6.3.0:*:*:*:*:*:*:*',
-            '6.2.0':'cpe:2.3:a:gnu:octave:6.2.0:*:*:*:*:*:*:*',
-            '6.1.0':'cpe:2.3:a:gnu:octave:6.1.0:*:*:*:*:*:*:*',
-            '5.2.0':'cpe:2.3:a:gnu:octave:5.2.0:*:*:*:*:*:*:*',
-            '5.1.0':'cpe:2.3:a:gnu:octave:5.1.0:*:*:*:*:*:*:*',
-            '4.4.1':'cpe:2.3:a:gnu:octave:4.4.1:*:*:*:*:*:*:*',
-            '4.4.0':'cpe:2.3:a:gnu:octave:4.4.0:*:*:*:*:*:*:*',
-            '4.2.2':'cpe:2.3:a:gnu:octave:4.2.2:*:*:*:*:*:*:*',
-            '4.2.1':'cpe:2.3:a:gnu:octave:4.2.1:*:*:*:*:*:*:*',
-            '4.2.0':'cpe:2.3:a:gnu:octave:4.2.0:*:*:*:*:*:*:*',
-            '4.0.2':'cpe:2.3:a:gnu:octave:4.0.2:*:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:gnu:octave:4.0.0:*:*:*:*:*:*:*'
-          }
+    
 
     # patches
     # see https://savannah.gnu.org/bugs/?50234

@@ -11,6 +11,9 @@ from spack.package import *
 class Maven(Package):
     """Apache Maven is a software project management and comprehension tool."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://maven.apache.org/index.html"
     url = "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.3.9/apache-maven-3.3.9-bin.tar.gz"
 
@@ -24,29 +27,7 @@ class Maven(Package):
     version('3.3.9', sha256='6e3e9c949ab4695a204f74038717aa7b2689b1be94875899ac1b3fe42800ff82')
     version('3.0.4', sha256='d35a876034c08cb7e20ea2fbcf168bcad4dff5801abad82d48055517513faa2f')
 
-    cpe = {
-            '3.0.4':'cpe:2.3:a:apache:maven:3.0.4:*:*:*:*:*:*:*',
-            '3.0.4':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.0.4:*:*:*:*:jenkins:*:*',
-            '3.5.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.5.0:-:*:*:*:jenkins:*:*',
-            '3.5.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.5.0:beta1:*:*:*:jenkins:*:*',
-            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:-:*:*:*:jenkins:*:*',
-            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:beta1:*:*:*:jenkins:*:*',
-            '3.6.0':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.0:beta2:*:*:*:jenkins:*:*',
-            '3.6.1':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.1:*:*:*:*:jenkins:*:*',
-            '3.6.2':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.2:*:*:*:*:jenkins:*:*',
-            '3.6.3':'cpe:2.3:a:jenkins:pipeline_maven_integration:3.6.3:*:*:*:*:jenkins:*:*',
-            '3.6.3':'cpe:2.3:a:apache:maven:3.6.3:*:*:*:*:*:*:*',
-            '3.6.2':'cpe:2.3:a:apache:maven:3.6.2:*:*:*:*:*:*:*',
-            '3.6.1':'cpe:2.3:a:apache:maven:3.6.1:*:*:*:*:*:*:*',
-            '3.6.0':'cpe:2.3:a:apache:maven:3.6.0:*:*:*:*:*:*:*',
-            '3.3.9':'cpe:2.3:a:apache:maven:3.3.9:*:*:*:*:*:*:*',
-            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:-:*:*:*:*:*:*',
-            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:alpha1:*:*:*:*:*:*',
-            '3.5.0':'cpe:2.3:a:apache:maven:3.5.0:beta1:*:*:*:*:*:*',
-            '3.8.5':'cpe:2.3:a:apache:maven:3.8.5:*:*:*:*:*:*',
-            '3.3.9':'cpe:2.3:a:apache:maven:3.3.9:*:*:*:*:*:*',
-            '3.8.4':'cpe:2.3:a:apache:maven:3.8.4:*:*:*:*:*:*'
-          }
+    
 
     depends_on('java', type='run')
 

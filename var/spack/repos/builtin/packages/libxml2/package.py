@@ -13,6 +13,9 @@ class Libxml2(AutotoolsPackage):
        project (but usable outside of the Gnome platform), it is free
        software available under the MIT License."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "http://xmlsoft.org"
     url      = 'https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.13.tar.xz'
     list_url = 'https://gitlab.gnome.org/GNOME/libxml2/-/releases'
@@ -33,25 +36,7 @@ class Libxml2(AutotoolsPackage):
     version('2.9.2',  sha256='5178c30b151d044aefb1b08bf54c3003a0ac55c59c866763997529d60770d5bc')
     version('2.7.8',  sha256='cda23bc9ebd26474ca8f3d67e7d1c4a1f1e7106364b690d822e009fdc3c417ec')
 
-    cpe = {
-            '2.7.8':'cpe:2.3:a:xmlsoft:libxml2:2.7.8:*:*:*:*:*:*:*',
-            '2.9.8':'cpe:2.3:a:xmlsoft:libxml2:2.9.8:rc1:*:*:*:*:*:*',
-            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:rc1:*:*:*:*:*:*',
-            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:rc2:*:*:*:*:*:*',
-            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:rc1:*:*:*:*:*:*',
-            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:rc2:*:*:*:*:*:*',
-            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:rc1:*:*:*:*:*:*',
-            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:rc2:*:*:*:*:*:*',
-            '2.9.10':'cpe:2.3:a:xmlsoft:libxml2:2.9.10:rc1:*:*:*:*:*:*',
-            '2.9.2':'cpe:2.3:a:xmlsoft:libxml2:2.9.2:-:*:*:*:*:*:*',
-            '2.9.4':'cpe:2.3:a:xmlsoft:libxml2:2.9.4:-:*:*:*:*:*:*',
-            '2.9.8':'cpe:2.3:a:xmlsoft:libxml2:2.9.8:-:*:*:*:*:*:*',
-            '2.9.9':'cpe:2.3:a:xmlsoft:libxml2:2.9.9:-:*:*:*:*:*:*',
-            '2.9.10':'cpe:2.3:a:xmlsoft:libxml2:2.9.10:-:*:*:*:*:*:*',
-            '2.9.11':'cpe:2.3:a:xmlsoft:libxml2:2.9.11:*:*:*:*:*:*:*',
-            '2.9.12':'cpe:2.3:a:xmlsoft:libxml2:2.9.12:*:*:*:*:*:*:*',
-            '2.9.13':'cpe:2.3:a:xmlsoft:libxml2:2.9.13:*:*:*:*:*:*:*'
-          }
+    
 
     variant('python', default=False, description='Enable Python support')
 

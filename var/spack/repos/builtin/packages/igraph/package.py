@@ -9,13 +9,14 @@ from spack.package import *
 class Igraph(AutotoolsPackage):
     """igraph is a library for creating and manipulating graphs."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://igraph.org/"
     url      = "https://github.com/igraph/igraph/releases/download/0.7.1/igraph-0.7.1.tar.gz"
 
     version('0.7.1', sha256='d978030e27369bf698f3816ab70aa9141e9baf81c56cc4f55efbe5489b46b0df')
 
-    cpe = {
-            '0.7.1':'cpe:2.3:a:igraph:igraph:0.7.1:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('libxml2')

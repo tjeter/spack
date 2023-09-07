@@ -9,14 +9,15 @@ from spack.package import *
 class Libxext(AutotoolsPackage, XorgPackage):
     """libXext - library for common extensions to the X11 protocol."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXext"
     xorg_mirror_path = "lib/libXext-1.3.3.tar.gz"
 
     version('1.3.3', sha256='eb0b88050491fef4716da4b06a4d92b4fc9e76f880d6310b2157df604342cfe5')
 
-    cpe = {
-           '1.3.3' :'cpe:2.3:a:x:libxext:1.3.3:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('libx11@1.6:')
 

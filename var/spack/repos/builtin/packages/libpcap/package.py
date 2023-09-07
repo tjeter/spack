@@ -8,6 +8,9 @@ from spack.package import *
 
 class Libpcap(AutotoolsPackage):
     """libpcap is a portable library in C/C++ for packet capture."""
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.tcpdump.org/"
     list_url = "https://www.tcpdump.org/release/"
     url      = "https://www.tcpdump.org/release/libpcap-1.8.1.tar.gz"
@@ -16,11 +19,7 @@ class Libpcap(AutotoolsPackage):
     version('1.9.1',  sha256='635237637c5b619bcceba91900666b64d56ecb7be63f298f601ec786ce087094')
     version('1.8.1',  sha256='673dbc69fdc3f5a86fb5759ab19899039a8e5e6c631749e48dcd9c6f0c83541e')
 
-    cpe = {
-            '1.10.0':'cpe:2.3:a:tcpdump:libpcap:1.10.0:*:*:*:*:*:*:*',
-            '1.9.1':'cpe:2.3:a:tcpdump:libpcap:1.9.1:*:*:*:*:*:*:*',
-            '1.8.1':'cpe:2.3:a:tcpdump:libpcap:1.8.1:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('flex', type='build')
     depends_on('bison', type='build')

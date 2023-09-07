@@ -9,14 +9,15 @@ from spack.package import *
 class Xextproto(AutotoolsPackage, XorgPackage):
     """X Protocol Extensions."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/xextproto"
     xorg_mirror_path = "proto/xextproto-7.3.0.tar.gz"
 
     version('7.3.0', sha256='1b1bcdf91221e78c6c33738667a57bd9aaa63d5953174ad8ed9929296741c9f5')
 
-    cpe = {
-            '7.3.0':'cpe:2.3:a:freedesktop:xextproto:7.3.0:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('pkgconfig', type='build')
     depends_on('util-macros', type='build')

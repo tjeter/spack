@@ -15,6 +15,9 @@ class Bzip2(Package, SourcewarePackage):
     compressors), whilst being around twice as fast at compression
     and six times faster at decompression."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://sourceware.org/bzip2/"
     sourceware_mirror_path = "bzip2/bzip2-1.0.8.tar.gz"
 
@@ -24,11 +27,7 @@ class Bzip2(Package, SourcewarePackage):
     version('1.0.7', sha256='e768a87c5b1a79511499beb41500bcc4caf203726fff46a6f5f9ad27fe08ab2b')
     version('1.0.6', sha256='a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd')
 
-    cpe = {
-            '1.0.8':'cpe:2.3:a:bzip:bzip2:1.0.8:*:*:*:*:*:*:*',
-            '1.0.7':'cpe:2.3:a:bzip:bzip2:1.0.7:*:*:*:*:*:*:*',
-            '1.0.6':'cpe:2.3:a:bzip:bzip2:1.0.6:*:*:*:*:*:*:*'
-          }
+    
 
     variant('shared', default=True, description='Enables the build of shared libraries.')
     variant('pic', default=False, description='Build static libraries with PIC')

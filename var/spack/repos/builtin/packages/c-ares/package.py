@@ -9,6 +9,9 @@ from spack.package import *
 class CAres(CMakePackage):
     """c-ares: A C library for asynchronous DNS requests"""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://c-ares.haxx.se"
     url      = "https://github.com/c-ares/c-ares/archive/cares-1_15_0.tar.gz"
     git      = "https://github.com/c-ares/c-ares.git"
@@ -17,11 +20,7 @@ class CAres(CMakePackage):
     version('1.15.0', sha256='7deb7872cbd876c29036d5f37e30c4cbc3cc068d59d8b749ef85bb0736649f04')
     version('1.13.0', sha256='7c48c57706a38691041920e705d2a04426ad9c68d40edd600685323f214b2d57')
 
-    cpe = {
-            'master':'cpe:2.3:a:c-ares_project:c-ares:master:*:*:*:*:*:*:*',
-            '1.13.0':'cpe:2.3:a:c-ares_project:c-ares:1.13.0:*:*:*:*:*:*:*',
-            '1.15.0':'cpe:2.3:a:c-ares_project:c-ares:1.15.0:*:*:*:*:*:*:*'
-          }
+    
 
     def url_for_version(self, version):
         url = "https://github.com/c-ares/c-ares/archive/cares-{0}.tar.gz"

@@ -11,6 +11,9 @@ class Libmd(AutotoolsPackage):
        either on their libc (NetBSD, OpenBSD) or libmd (FreeBSD, DragonflyBSD,
        macOS, Solaris) libraries and lacking on others like GNU systems."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.hadrons.org/software/libmd/"
     url      = "https://archive.hadrons.org/software/libmd/libmd-1.0.3.tar.xz"
 
@@ -22,13 +25,7 @@ class Libmd(AutotoolsPackage):
     version('1.0.1', sha256='e14eeb931cf85330f95ff822262d3033125488dfb2f867441e36e2d2c4a34c71')
     version('1.0.0', sha256='f21aea69f6411cb4307cda1f6378c7ed07830202b5f4cb9e64f681fdaf2d64c7')
 
-    cpe = {
-            '1.0.4':'cpe:2.3:a:hadrons:libmd:1.0.4', 
-            '1.0.3':'cpe:2.3:a:hadrons:libmd:1.0.3', 
-            '1.0.2':'cpe:2.3:a:hadrons:libmd:1.0.2', 
-            '1.0.1':'cpe:2.3:a:hadrons:libmd:1.0.1', 
-            '1.0.0':'cpe:2.3:a:hadrons:libmd:1.0.0' 
-          }
+    
 
     # Use wrapper functions instead of __attribute__ __alias__
     patch('nvhpc-aliases.patch', when='%nvhpc')

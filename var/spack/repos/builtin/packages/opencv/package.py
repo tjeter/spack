@@ -12,6 +12,9 @@ class Opencv(CMakePackage, CudaPackage):
     """OpenCV (Open Source Computer Vision Library) is an open source computer
     vision and machine learning software library."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://opencv.org/"
     url = "https://github.com/opencv/opencv/archive/4.5.0.tar.gz"
     git = "https://github.com/opencv/opencv.git"
@@ -127,27 +130,7 @@ class Opencv(CMakePackage, CudaPackage):
             when="@{0}".format(cv),
         )
 
-    cpe = {
-            '-':'cpe:2.3:a:opencv.js_project:opencv.js:-:*:*:*:*:node.js:*:*',
-            '3.3.1':'cpe:2.3:a:opencv:opencv:3.3.1:*:*:*:*:*:*:*',
-            '3.3.0':'cpe:2.3:a:opencv:opencv:3.3.0:-:*:*:*:*:*:*',
-            '3.3.0':'cpe:2.3:a:opencv:opencv:3.3.0:rc:*:*:*:*:*:*',
-            '3.4.0':'cpe:2.3:a:opencv:opencv:3.4.0:-:*:*:*:*:*:*',
-            '3.4.0':'cpe:2.3:a:opencv:opencv:3.4.0:rc:*:*:*:*:*:*',
-            '3.4.1':'cpe:2.3:a:opencv:opencv:3.4.1:*:*:*:*:*:*:*',
-            '3.4.3':'cpe:2.3:a:opencv:opencv:3.4.3:*:*:*:*:*:*:*',
-            '3.4.4':'cpe:2.3:a:opencv:opencv:3.4.4:*:*:*:*:*:*:*',
-            '3.4.5':'cpe:2.3:a:opencv:opencv:3.4.5:*:*:*:*:*:*:*',
-            '3.4.6':'cpe:2.3:a:opencv:opencv:3.4.6:*:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:-:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:alpha:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:beta:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:opencv:opencv:4.0.0:rc:*:*:*:*:*:*',
-            '4.0.1':'cpe:2.3:a:opencv:opencv:4.0.1:*:*:*:*:*:*:*',
-            '4.1.0':'cpe:2.3:a:opencv:opencv:4.1.0:*:*:*:*:*:*:*',
-            '4.1.1':'cpe:2.3:a:opencv:opencv:4.1.1:*:*:*:*:*:*:*',
-            '4.0.0':'cpe:2.3:a:node-opencv_project:node-opencv:4.0.0:*:*:*:*:node.js:*:*'
-          }
+    
 
     # Patch to fix conflict between CUDA and OpenCV (reproduced with 3.3.0
     # and 3.4.1) header file that have the same name. Problem is fixed in

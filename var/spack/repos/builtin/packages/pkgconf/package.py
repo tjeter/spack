@@ -12,6 +12,9 @@ class Pkgconf(AutotoolsPackage):
     freedesktop.org, providing additional functionality while also
     maintaining compatibility."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "http://pkgconf.org/"
     # URL must remain http:// so Spack can bootstrap curl
     url      = "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.6.3.tar.xz"
@@ -28,17 +31,7 @@ class Pkgconf(AutotoolsPackage):
     version('1.3.10', sha256='62577d265fa9415a57a77a59dede5526b7ece3ef59a750434b281b262f0c1da9')
     version('1.3.8',  sha256='fc06f058e6905435481f649865ca51000192c91808f307b1053ca5e859cb1488')
 
-    cpe = {
-            '1.8.0':'cpe:2.3:a:pkgconf:pkgconf:1.8.0:*:*:*:*:*:*:*',
-            '1.6.3':'cpe:2.3:a:pkgconf:pkgconf:1.6.3:*:*:*:*:*:*:*',
-            '1.6.1':'cpe:2.3:a:pkgconf:pkgconf:1.6.1:*:*:*:*:*:*:*',
-            '1.6.0':'cpe:2.3:a:pkgconf:pkgconf:1.6.0:*:*:*:*:*:*:*',
-            '1.5.4':'cpe:2.3:a:pkgconf:pkgconf:1.5.4:*:*:*:*:*:*:*',
-            '1.4.2':'cpe:2.3:a:pkgconf:pkgconf:1.4.2:*:*:*:*:*:*:*',
-            '1.4.0':'cpe:2.3:a:pkgconf:pkgconf:1.4.0:*:*:*:*:*:*:*',
-            '1.3.10':'cpe:2.3:a:pkgconf:pkgconf:1.3.10:*:*:*:*:*:*:*',
-            '1.3.8':'cpe:2.3:a:pkgconf:pkgconf:1.3.8:*:*:*:*:*:*:*'
-           }
+    
 
     provides('pkgconfig')
 

@@ -11,6 +11,9 @@ from spack.package import *
 class Autoconf(AutotoolsPackage, GNUMirrorPackage):
     """Autoconf -- system configuration part of autotools"""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = 'https://www.gnu.org/software/autoconf/'
     gnu_mirror_path = 'autoconf/autoconf-2.69.tar.gz'
 
@@ -21,13 +24,7 @@ class Autoconf(AutotoolsPackage, GNUMirrorPackage):
     version('2.62', sha256='83aa747e6443def0ebd1882509c53f5a2133f502ddefa21b3de141c433914bdd')
     version('2.59', sha256='9cd05c73c5fcb1f5ccae53dd6cac36bb8cb9c7b3e97ffae5a7c05c72594c88d8')
 
-    cpe = {
-            '2.71':'cpe:2.3:a:gnu:autoconf:2.71',
-            '2.70':'cpe:2.3:a:gnu:autoconf:2.70',
-            '2.69':'cpe:2.3:a:gnu:autoconf:2.69',
-            '2.62':'cpe:2.3:a:gnu:autoconf:2.62',
-            '2.59':'cpe:2.3:a:gnu:autoconf:2.59'
-          }
+    
 
     # https://savannah.gnu.org/support/?110396
     patch('https://git.savannah.gnu.org/cgit/autoconf.git/patch/?id=05972f49ee632cd98057a3caf82ebfb9574846da',

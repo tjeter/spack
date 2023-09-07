@@ -10,6 +10,9 @@ class Httpd(AutotoolsPackage):
     """The Apache HTTP Server is a powerful and flexible HTTP/1.1 compliant
     web server."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://httpd.apache.org/"
     url      = "https://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2"
 
@@ -26,12 +29,7 @@ class Httpd(AutotoolsPackage):
     depends_on('apr-util')
     depends_on('pcre')
 
-    cpe = {
-            '2.4.38':'cpe:2.3:a:apache:http_server:2.4.38:*:*:*:*:*:*:*',
-            '2.4.39':'cpe:2.3:a:apache:http_server:2.4.39:*:*:*:*:*:*:*',
-            '2.4.41':'cpe:2.3:a:apache:http_server:2.4.41:*:*:*:*:*:*:*',
-            '2.4.43':'cpe:2.3:a:apache:http_server:2.4.43:*:*:*:*:*:*:*'
-          }
+    
 
     def configure_args(self):
         spec = self.spec

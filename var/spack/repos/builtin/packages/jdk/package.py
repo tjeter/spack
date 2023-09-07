@@ -17,6 +17,9 @@ class Jdk(Package):
     form of a binary product aimed at Java developers. Includes a complete JRE
     plus tools for developing, debugging, and monitoring Java applications."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
     maintainers = ['justintoo']
@@ -28,6 +31,9 @@ class Jdk(Package):
     # http://stackoverflow.com/questions/10268583/how-to-automate-download-and-installation-of-java-jdk-on-linux
     fetch_options = {'cookie': 'oraclelicense=accept-securebackup-cookie'}
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     # To add the latest version, go to the homepage listed above,
     # click "JDK Download", click "Accept License Agreement", right-click the
     # Linux .tar.gz link, and select Copy Link Address. The checksum can be
@@ -61,21 +67,7 @@ class Jdk(Package):
     version('1.8.0_131-b11', sha256='62b215bdfb48bace523723cdbb2157c665e6a25429c73828a32f00e587301236',
             url='https://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz')
 
-    cpe = { 
-            '1.8.0_131':'cpe:2.3:a:oracle:jdk:1.8.0:update131:*:*:*:*:*:*',
-            '1.8.0_141':'cpe:2.3:a:oracle:jdk:1.8.0:update141:*:*:*:*:*:*',
-            '1.8.0_202':'cpe:2.3:a:oracle:jdk:1.8.0:update202:*:*:*:*:*:*',
-            '1.8.0_212':'cpe:2.3:a:oracle:jdk:1.8.0:update212:*:*:*:*:*:*',
-            '1.8.0_231':'cpe:2.3:a:oracle:jdk:1.8.0:update231:*:*:*:*:*:*',
-            '1.8.0_241':'cpe:2.3:a:oracle:jdk:1.8.0:update241:*:*:*:*:*:*',
-            '10.0.1':'cpe:2.3:a:oracle:openjdk:10.0.1:*:*:*:*:*:*:*',
-            '10.0.2':'cpe:2.3:a:oracle:openjdk:10.0.2:*:*:*:*:*:*:*',
-            '11.0.1':'cpe:2.3:a:oracle:openjdk:11.0.1:*:*:*:*:*:*:*',
-            '11.0.2':'cpe:2.3:a:oracle:openjdk:11.0.2:*:*:*:*:*:*:*',
-            '12.0.1':'cpe:2.3:a:oracle:openjdk:12.0.1:*:*:*:*:*:*:*',
-            '12.0.2':'cpe:2.3:a:oracle:openjdk:12.0.2:*:*:*:*:*:*:*',
-            '14.0.2':'cpe:2.3:a:oracle:openjdk:14.0.2:*:*:*:*:*:*:*'
-          } 
+     
 
     provides('java@14', when='@14.0:14')
     provides('java@13', when='@13.0:13')
@@ -179,6 +171,9 @@ and adding entries for each installation:
         - spec: jdk@10.0.1_10
           prefix: /path/to/jdk/Home
         - spec: jdk@1.7.0_45-b18
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
           prefix: /path/to/jdk/Home""".format(self.homepage)
 
             tty.die(msg)

@@ -11,14 +11,15 @@ class Stream(MakefilePackage):
     measures sustainable memory bandwidth (in MB/s) and the corresponding
     computation rate for simple vector kernels."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.cs.virginia.edu/stream/ref.html"
     git      = "https://github.com/jeffhammond/STREAM.git"
 
     version('5.10')
 
-    cpe = {
-
-          }
+    
 
     variant('openmp', default=False, description='Build with OpenMP support')
 

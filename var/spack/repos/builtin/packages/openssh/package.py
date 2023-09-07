@@ -18,6 +18,9 @@ class Openssh(AutotoolsPackage):
        configuration options.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.openssh.com/"
     url      = "https://mirrors.sonic.net/pub/OpenBSD/OpenSSH/portable/openssh-8.7p1.tar.gz"
 
@@ -45,28 +48,7 @@ class Openssh(AutotoolsPackage):
     version('6.7p1', sha256='b2f8394eae858dabbdef7dac10b99aec00c95462753e80342e530bbb6f725507')
     version('6.6p1', sha256='48c1f0664b4534875038004cc4f3555b8329c2a81c1df48db5c517800de203bb')
 
-    cpe = {
-            '6.6p1':'cpe:2.3:a:openbsd:openssh:6.6:p1:*:*:*:*:*:*',
-            '6.7p1':'cpe:2.3:a:openbsd:openssh:6.7:p1:*:*:*:*:*:*',
-            '6.8p1':'cpe:2.3:a:openbsd:openssh:6.8:p1:*:*:*:*:*:*',
-            '6.9p1':'cpe:2.3:a:openbsd:openssh:6.9:p1:*:*:*:*:*:*',
-            '7.0p1':'cpe:2.3:a:openbsd:openssh:7.0:p1:*:*:*:*:*:*',
-            '7.1p2':'cpe:2.3:a:openbsd:openssh:7.1:p2:*:*:*:*:*:*',
-            '7.2p2':'cpe:2.3:a:openbsd:openssh:7.2:p2:*:*:*:*:*:*',
-            '7.3p1':'cpe:2.3:a:openbsd:openssh:7.3:p1:*:*:*:*:*:*',
-            '7.4p1':'cpe:2.3:a:openbsd:openssh:7.4:p1:*:*:*:*:*:*',
-            '7.5p1':'cpe:2.3:a:openbsd:openssh:7.5:p1:*:*:*:*:*:*',
-            '7.6p1':'cpe:2.3:a:openbsd:openssh:7.6:p1:*:*:*:*:*:*',
-            '7.9p1':'cpe:2.3:a:openbsd:openssh:7.9:p1:*:*:*:*:*:*',
-            '8.1p1':'cpe:2.3:a:openbsd:openssh:8.1:p1:*:*:*:*:*:*',
-            '8.3p1':'cpe:2.3:a:openbsd:openssh:8.3:p1:*:*:*:*:*:*',
-            '8.4p1':'cpe:2.3:a:openbsd:openssh:8.4:p1:*:*:*:*:*:*',
-            '8.6p1':'cpe:2.3:a:openbsd:openssh:8.6:p1:*:*:*:*:*:*',
-            '8.7p1':'cpe:2.3:a:openbsd:openssh:8.7:p1:*:*:*:*:*:*',
-            '8.8p1':'cpe:2.3:a:openbsd:openssh:8.8:p1:*:*:*:*:*:*',
-            '8.9p1':'cpe:2.3:a:openbsd:openssh:8.9:p1:*:*:*:*:*:*',
-            '9.0p1':'cpe:2.3:a:openbsd:openssh:9.0:p1:*:*:*:*:*:*'
-          }
+    
 
     variant('gssapi', default=True, description='Enable authentication via Kerberos through GSSAPI')
 

@@ -10,6 +10,9 @@ from spack.package import *
 class Wireshark(CMakePackage):
     """Graphical network analyzer and capture tool"""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.wireshark.org"
     url      = "https://www.wireshark.org/download/src/all-versions/wireshark-2.6.0.tar.xz"
 
@@ -19,13 +22,7 @@ class Wireshark(CMakePackage):
     version('3.0.8', sha256='b4bd8189934d82330a053c5b10398f2b625b1e1c8818831ab61739b2d7aa7561')
     version('2.6.0', sha256='711c7f01d27a8817d58277a5487cef3e3c7bab1c8caaf8f4c92aa21015b9117f')
 
-    cpe = {
-            '3.2.1':'cpe:2.3:a:wireshark:wireshark:3.2.1:*:*:*:*:*:*:*', 
-            '3.2.0':'cpe:2.3:a:wireshark:wireshark:3.2.0:*:*:*:*:*:*:*',
-            '3.1.0':'cpe:2.3:a:wireshark:wireshark:3.1.0:*:*:*:*:*:*:*', 
-            '3.0.8':'cpe:2.3:a:wireshark:wireshark:3.0.8:*:*:*:*:*:*:*',
-            '2.6.0':'cpe:2.3:a:wireshark:wireshark:2.6.0:*:*:*:*:*:*:*'
-          }
+    
 
     variant('libssh',   default=False, description='Build with libssh')
     variant('nghttp2',  default=False, description='Build with nghttp2')

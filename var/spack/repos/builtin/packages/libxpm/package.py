@@ -9,6 +9,9 @@ from spack.package import *
 class Libxpm(AutotoolsPackage, XorgPackage):
     """libXpm - X Pixmap (XPM) image file format library."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXpm"
     xorg_mirror_path = "lib/libXpm-3.5.12.tar.gz"
 
@@ -19,14 +22,7 @@ class Libxpm(AutotoolsPackage, XorgPackage):
     version('3.5.8', sha256='06472c7fdd175ea54c84162a428be19c154e7dda03d8bf91beee7f1d104669a6')
     version('3.5.7', sha256='422fbb311c4fe6ef337e937eb3adc8617a4320bd3e00fce06850d4360829b3ae')
 
-    cpe = {
-            '3.5.7':'cpe:2.3:a:libxpm_project:libxpm:3.5.7:*:*:*:*:*:*:*',
-            '3.5.8':'cpe:2.3:a:libxpm_project:libxpm:3.5.8:*:*:*:*:*:*:*',
-            '3.5.9':'cpe:2.3:a:libxpm_project:libxpm:3.5.9:*:*:*:*:*:*:*',
-            '3.5.10':'cpe:2.3:a:libxpm_project:libxpm:3.5.10:*:*:*:*:*:*:*',
-            '3.5.11':'cpe:2.3:a:libxpm_project:libxpm:3.5.11:*:*:*:*:*:*:*',
-            '3.5.12':'cpe:2.3:a:libxpm_project:libxpm:3.5.12:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('gettext')
     depends_on('libx11')

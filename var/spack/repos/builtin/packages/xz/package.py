@@ -14,6 +14,9 @@ class Xz(AutotoolsPackage, SourceforgePackage):
     but also work on some not-so-POSIX systems. XZ Utils are the successor
     to LZMA Utils."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://tukaani.org/xz/"
     sourceforge_mirror_path = "lzmautils/files/xz-5.2.5.tar.bz2"
     list_url = "https://tukaani.org/xz/old.html"
@@ -26,13 +29,7 @@ class Xz(AutotoolsPackage, SourceforgePackage):
     version('5.2.2', sha256='6ff5f57a4b9167155e35e6da8b529de69270efb2b4cf3fbabf41a4ee793840b5')
     version('5.2.0', sha256='f7357d7455a1670229b3cca021da71dd5d13b789db62743c20624bdffc9cc4a5')
 
-    cpe = {
-            '5.2.0':'cpe:2.3:a:tukaani:xz:5.2.0:*:*:*:*:*:*:*',
-            '5.2.2':'cpe:2.3:a:tukaani:xz:5.2.2:*:*:*:*:*:*:*',
-            '5.2.3':'cpe:2.3:a:tukaani:xz:5.2.3:*:*:*:*:*:*:*',
-            '5.2.4':'cpe:2.3:a:tukaani:xz:5.2.4:*:*:*:*:*:*:*',
-            '5.2.5':'cpe:2.3:a:tukaani:xz:5.2.5:*:*:*:*:*:*:*'
-          }
+    
 
     variant('pic', default=False,
             description='Compile with position independent code.')

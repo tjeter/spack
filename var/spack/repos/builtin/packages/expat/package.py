@@ -11,6 +11,9 @@ from spack.package import *
 class Expat(AutotoolsPackage):
     """Expat is an XML parser library written in C."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://libexpat.github.io/"
     url      = "https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.bz2"
 
@@ -33,23 +36,7 @@ class Expat(AutotoolsPackage):
     version('2.2.2', sha256='4376911fcf81a23ebd821bbabc26fd933f3ac74833f74924342c29aad2c86046', deprecated=True)
     version('2.2.0', sha256='d9e50ff2d19b3538bd2127902a89987474e1a4db8e43a66a4d1a712ab9a504ff', deprecated=True)
 
-    cpe = {
-            '2.4.8':'cpe:2.3:a:libexpat_project:libexpat:2.4.8:*:*:*:*:*:*:*',
-            '2.4.7':'cpe:2.3:a:libexpat_project:libexpat:2.4.7:*:*:*:*:*:*:*',
-            '2.4.6':'cpe:2.3:a:libexpat_project:libexpat:2.4.6:*:*:*:*:*:*:*',
-            '2.4.5':'cpe:2.3:a:libexpat_project:libexpat:2.4.5:*:*:*:*:*:*:*',
-            '2.4.4':'cpe:2.3:a:libexpat_project:libexpat:2.4.4:*:*:*:*:*:*:*',
-            '2.4.3':'cpe:2.3:a:libexpat_project:libexpat:2.4.3:*:*:*:*:*:*:*',
-            '2.4.1':'cpe:2.3:a:libexpat_project:libexpat:2.4.1:*:*:*:*:*:*:*',
-            '2.4.0':'cpe:2.3:a:libexpat_project:libexpat:2.4.0:*:*:*:*:*:*:*',
-            '2.3.0':'cpe:2.3:a:libexpat_project:libexpat:2.3.0:*:*:*:*:*:*:*',
-            '2.2.10':'cpe:2.3:a:libexpat_project:libexpat:2.2.10:*:*:*:*:*:*:*',
-            '2.2.9':'cpe:2.3:a:libexpat_project:libexpat:2.2.9:*:*:*:*:*:*:*',
-            '2.2.6':'cpe:2.3:a:libexpat_project:libexpat:2.2.6:*:*:*:*:*:*:*',
-            '2.2.5':'cpe:2.3:a:libexpat_project:libexpat:2.2.5:*:*:*:*:*:*:*',
-            '2.2.2':'cpe:2.3:a:libexpat_project:libexpat:2.2.2:*:*:*:*:*:*:*',
-            '2.2.0':'cpe:2.3:a:libexpat_project:libexpat:2.2.0:*:*:*:*:*:*:*'
-          }
+    
 
     # Version 2.2.2 introduced a requirement for a high quality
     # entropy source.  "Older" linux systems (aka CentOS 7) do not

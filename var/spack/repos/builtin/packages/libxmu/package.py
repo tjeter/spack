@@ -12,14 +12,15 @@ class Libxmu(AutotoolsPackage, XorgPackage):
     that it may be layered on top of any proprietary implementation of Xlib
     or Xt."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXmu"
     xorg_mirror_path = "lib/libXmu-1.1.2.tar.gz"
 
     version('1.1.2', sha256='e5fd4bacef068f9509b8226017205040e38d3fba8d2de55037200e7176c13dba')
 
-    cpe = {
-            '1.1.2':'cpe:2.3:a:freedesktop:libxmu:1.1.2:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('libxt')
     depends_on('libxext')

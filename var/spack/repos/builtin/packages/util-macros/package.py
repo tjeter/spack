@@ -11,6 +11,9 @@ class UtilMacros(AutotoolsPackage, XorgPackage):
     other Xorg modular packages, and is needed to generate new versions
     of their configure scripts with autoconf."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/util/macros/"
     xorg_mirror_path = "util/util-macros-1.19.1.tar.bz2"
 
@@ -21,12 +24,7 @@ class UtilMacros(AutotoolsPackage, XorgPackage):
     version('1.19.1', sha256='18d459400558f4ea99527bc9786c033965a3db45bf4c6a32eefdc07aa9e306a6')
     version('1.19.0', sha256='2835b11829ee634e19fa56517b4cfc52ef39acea0cd82e15f68096e27cbed0ba')
 
-    cpe = { 
-            '1.19.0':'cpe:2.3:a:freedesktop:util-macros:1.19.0:*:*:*:*:*:*:*',
-            '1.19.1':'cpe:2.3:a:freedesktop:util-macros:1.19.1:*:*:*:*:*:*:*',
-            '1.19.2':'cpe:2.3:a:freedesktop:util-macros:1.19.2:*:*:*:*:*:*:*',
-            '1.19.3':'cpe:2.3:a:freedesktop:util-macros:1.19.3:*:*:*:*:*:*:*'
-          }
+    
 
 
     def setup_dependent_build_environment(self, env, dependent_spec):

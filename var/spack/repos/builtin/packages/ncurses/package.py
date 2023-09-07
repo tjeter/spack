@@ -16,6 +16,9 @@ class Ncurses(AutotoolsPackage, GNUMirrorPackage):
     characters and function-key mapping, and has all the other
     SYSV-curses enhancements over BSD curses."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://invisible-island.net/ncurses/ncurses.html"
     # URL must remain http:// so Spack can bootstrap curl
     gnu_mirror_path = "ncurses/ncurses-6.1.tar.gz"
@@ -28,14 +31,7 @@ class Ncurses(AutotoolsPackage, GNUMirrorPackage):
     version('6.0', sha256='f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260')
     version('5.9', sha256='9046298fb440324c9d4135ecea7879ffed8546dd1b58e59430ea07a4633f563b')
 
-    cpe = {
-            '5.9':'cpe:2.3:a:gnu:ncurses:5.9:*:*:*:*:*:*:*',
-            '6.0':'cpe:2.3:a:gnu:ncurses:6.0:*:*:*:*:*:*:*',
-            '6.1':'cpe:2.3:a:gnu:ncurses:6.1:*:*:*:*:*:*:*',
-            '6.2':'cpe:2.3:a:gnu:ncurses:6.2:*:*:*:*:*:*:*',
-            '6.3':'cpe:2.3:a:gnu:ncurses:6.3:*:*:*:*:*:*:*',
-            '-':'cpe:2.3:a:pancurses_project:pancurses:-:*:*:*:*:rust:*:*'
-          }
+    
 
     variant('symlinks', default=False,
             description='Enables symlinks. Needed on AFS filesystem.')

@@ -9,14 +9,15 @@ from spack.package import *
 class Unzip(MakefilePackage):
     """Unzip is a compression and file packaging/archive utility."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = 'http://www.info-zip.org/Zip.html'
     url      = 'http://downloads.sourceforge.net/infozip/unzip60.tar.gz'
 
     version('6.0', sha256='036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37')
 
-    cpe = {
-            '6.0':'cpe:2.3:a:unzip_project:unzip:6.0:*:*:*:*:*:*:*'
-          }
+    
 
     # The Cray cc wrapper doesn't handle the '-s' flag (strip) cleanly.
     @when('platform=cray')

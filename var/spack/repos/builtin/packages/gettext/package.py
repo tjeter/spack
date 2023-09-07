@@ -11,6 +11,9 @@ from spack.package import *
 class Gettext(AutotoolsPackage, GNUMirrorPackage):
     """GNU internationalization (i18n) and localization (l10n) library."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.gnu.org/software/gettext/"
     gnu_mirror_path = "gettext/gettext-0.20.1.tar.xz"
 
@@ -22,13 +25,7 @@ class Gettext(AutotoolsPackage, GNUMirrorPackage):
     version('0.19.8.1', sha256='105556dbc5c3fbbc2aa0edb46d22d055748b6f5c7cd7a8d99f8e7eb84e938be4')
     version('0.19.7',   sha256='378fa86a091cec3acdece3c961bb8d8c0689906287809a8daa79dc0c6398d934')
 
-    cpe = {
-            '0.19.7':'cpe:2.3:a:gnu:gettext:0.19.7:*:*:*:*:*:*:*',
-            '0.19.8.1':'cpe:2.3:a:gnu:gettext:0.19.8.1:*:*:*:*:*:*:*',
-            '0.20.1':'cpe:2.3:a:gnu:gettext:0.20.1:*:*:*:*:*:*:*',
-            '0.20.2':'cpe:2.3:a:gnu:gettext:0.20.2:*:*:*:*:*:*:*',
-            '0.21':'cpe:2.3:a:gnu:gettext:0.21:*:*:*:*:*:*:*'
-          }
+    
 
     # Recommended variants
     variant('curses',   default=True, description='Use libncurses')

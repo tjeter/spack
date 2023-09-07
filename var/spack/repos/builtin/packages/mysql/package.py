@@ -13,6 +13,9 @@ from spack.pkg.builtin.boost import Boost
 class Mysql(CMakePackage):
     """MySQL is an open source relational database management system."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.mysql.com/"
     url      = "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.15.tar.gz"
 
@@ -48,39 +51,7 @@ class Mysql(CMakePackage):
     version('5.6.43', sha256='1c95800bf0e1b7a19a37d37fbc5023af85c6bc0b41532433b3a886263a1673ef')
     version('5.5.62', sha256='b1e7853bc1f04aabf6771e0ad947f35ac8d237f4b35d0706d1095c9526ff99d7')
 
-    cpe = {
-            '5.5.62':'cpe:2.3:a:oracle:mysql:5.5.62:*:*:*:*:*:*:*',
-            '5.6.43':'cpe:2.3:a:oracle:mysql:5.6.43:*:*:*:*:*:*:*',
-            '5.6.44':'cpe:2.3:a:oracle:mysql:5.6.44:*:*:*:*:*:*:*',
-            '5.7.9':'cpe:2.3:a:oracle:mysql:5.7.9:*:*:*:*:*:*:*',
-            '5.7.10':'cpe:2.3:a:oracle:mysql:5.7.10:*:*:*:*:*:*:*',
-            '5.7.11':'cpe:2.3:a:oracle:mysql:5.7.11:*:*:*:*:*:*:*',
-            '5.7.12':'cpe:2.3:a:oracle:mysql:5.7.12:*:*:*:*:*:*:*',
-            '5.7.13':'cpe:2.3:a:oracle:mysql:5.7.13:*:*:*:*:*:*:*',
-            '5.7.14':'cpe:2.3:a:oracle:mysql:5.7.14:*:*:*:*:*:*:*',
-            '5.7.15':'cpe:2.3:a:oracle:mysql:5.7.15:*:*:*:*:*:*:*',
-            '5.7.16':'cpe:2.3:a:oracle:mysql:5.7.16:*:*:*:*:*:*:*',
-            '5.7.17':'cpe:2.3:a:oracle:mysql:5.7.17:*:*:*:*:*:*:*',
-            '5.7.18':'cpe:2.3:a:oracle:mysql:5.7.18:*:*:*:*:*:*:*',
-            '5.7.19':'cpe:2.3:a:oracle:mysql:5.7.19:*:*:*:*:*:*:*',
-            '5.7.20':'cpe:2.3:a:oracle:mysql:5.7.20:*:*:*:*:*:*:*',
-            '5.7.21':'cpe:2.3:a:oracle:mysql:5.7.21:*:*:*:*:*:*:*',
-            '5.7.22':'cpe:2.3:a:oracle:mysql:5.7.22:*:*:*:*:*:*:*',
-            '5.7.23':'cpe:2.3:a:oracle:mysql:5.7.23:*:*:*:*:*:*:*',
-            '5.7.24':'cpe:2.3:a:oracle:mysql:5.7.24:*:*:*:*:*:*:*',
-            '5.7.25':'cpe:2.3:a:oracle:mysql:5.7.25:*:*:*:*:*:*:*',
-            '5.7.26':'cpe:2.3:a:oracle:mysql:5.7.26:*:*:*:*:*:*:*',
-            '5.7.27':'cpe:2.3:a:oracle:mysql:5.7.27:*:*:*:*:*:*:*',
-            '8.0.11':'cpe:2.3:a:oracle:mysql:8.0.11:*:*:*:*:*:*:*',
-            '8.0.12':'cpe:2.3:a:oracle:mysql:8.0.12:*:*:*:*:*:*:*',
-            '8.0.13':'cpe:2.3:a:oracle:mysql:8.0.13:*:*:*:*:*:*:*',
-            '8.0.14':'cpe:2.3:a:oracle:mysql:8.0.14:*:*:*:*:*:*:*',
-            '8.0.15':'cpe:2.3:a:oracle:mysql:8.0.15:*:*:*:*:*:*:*',
-            '8.0.16':'cpe:2.3:a:oracle:mysql:8.0.16:*:*:*:*:*:*:*',
-            '8.0.17':'cpe:2.3:a:oracle:mysql:8.0.17:*:*:*:*:*:*:*',
-            '8.0.18':'cpe:2.3:a:oracle:mysql:8.0.18:*:*:*:*:*:*:*',
-            '8.0.19':'cpe:2.3:a:oracle:mysql:8.0.19:*:*:*:*:*:*:*',
-          }
+    
 
     variant('client_only', default=False,
             description='Build and install client only.')

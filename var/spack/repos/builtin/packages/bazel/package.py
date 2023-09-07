@@ -15,6 +15,9 @@ class Bazel(Package):
     Bazel supports large codebases across multiple repositories, and large
     numbers of users."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://bazel.build/"
     url      = "https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-dist.zip"
 
@@ -124,13 +127,7 @@ class Bazel(Package):
     version('0.1.4',  sha256='f3c395f5cd78cfef96f4008fe842f327bc8b03b77f46999387bc0ad223b5d970')
     version('0.1.1',  sha256='c6ae19610b936a0aa940b44a3626d6e660fc457a8187d295cdf0b21169453d20')
 
-    cpe = {
-            '0.4.1':'cpe:2.3:a:google:bazel:0.4.1:*:*:*:*:visual_studio:*:*',
-            '-':'cpe:2.3:a:google:bazel:-:*:*:*:*:visual_studio:*:*',
-            '0.2.0':'cpe:2.3:a:google:bazel:0.2.0:*:*:*:*:visual_studio:*:*',
-            '0.3.0':'cpe:2.3:a:google:bazel:0.3.0:*:*:*:*:visual_studio:*:*',
-            '0.4.0':'cpe:2.3:a:google:bazel:0.4.0:*:*:*:*:visual_studio:*:*'
-          }
+    
 
     variant('nodepfail', default=True, description='Disable failing dependency checks due to injected absolute paths - required for most builds using bazel with spack')
 

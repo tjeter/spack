@@ -14,6 +14,9 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     program was doing at the moment it crashed.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.gnu.org/software/gdb"
     gnu_mirror_path = "gdb/gdb-11.2.tar.gz"
 
@@ -37,22 +40,7 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     version('7.11.1', sha256='57e9e9aa3172ee16aa1e9c66fef08b4393b51872cc153e3f1ffdf18a57440586')
     version('7.10.1', sha256='ff14f8050e6484508c73cbfa63731e57901478490ca1672dc0b5e2b03f6af622')
 
-    cpe = {
-            '-':'cpe:2.3:a:gnu:gdb:-:*:*:*:*:*:*:*',
-            '7.11.1':'cpe:2.3:a:gnu:gdb:7.11.1:*:*:*:*:*:*:*',
-            '7.12.1':'cpe:2.3:a:gnu:gdb:7.12.1:*:*:*:*:*:*:*',
-            '8.0':'cpe:2.3:a:gnu:gdb:8.0:*:*:*:*:*:*:*',
-            '8.0.1':'cpe:2.3:a:gnu:gdb:8.0.1:*:*:*:*:*:*:*',
-            '7.10.1':'cpe:2.3:a:gnu:gdb:7.10.1:*:*:*:*:*:*:*',
-            '8.1':'cpe:2.3:a:gnu:gdb:8.1:*:*:*:*:*:*:*',
-            '8.2':'cpe:2.3:a:gnu:gdb:8.2:*:*:*:*:*:*:*',
-            '8.2.1':'cpe:2.3:a:gnu:gdb:8.2.1:*:*:*:*:*:*:*',
-            '8.3':'cpe:2.3:a:gnu:gdb:8.3:*:*:*:*:*:*:*',
-            '8.3.1':'cpe:2.3:a:gnu:gdb:8.3.1:*:*:*:*:*:*:*',
-            '9.1':'cpe:2.3:a:gnu:gdb:9.1:*:*:*:*:*:*:*',
-            '9.2':'cpe:2.3:a:gnu:gdb:9.2:*:*:*:*:*:*:*',
-            '10.1':'cpe:2.3:a:gnu:gdb:10.1:*:*:*:*:*:*:*'
-          }
+    
 
     variant('python', default=True, description='Compile with Python support')
     variant('xz', default=True, description='Compile with lzma support')

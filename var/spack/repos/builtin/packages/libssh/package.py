@@ -9,16 +9,16 @@ from spack.package import *
 class Libssh(CMakePackage):
     """libssh: the SSH library"""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.libssh.org"
     url      = "https://www.libssh.org/files/0.8/libssh-0.8.5.tar.xz"
 
     version('0.8.5', sha256='07d2c431240fc88f6b06bcb36ae267f9afeedce2e32f6c42f8844b205ab5a335')
     version('0.7.5', sha256='54e86dd5dc20e5367e58f3caab337ce37675f863f80df85b6b1614966a337095')
 
-    cpe = {
-            '0.8.5':'cpe:2.3:a:libssh:libssh:0.8.5:*:*:*:*:*:*:*',
-            '0.7.5':'cpe:2.3:a:libssh:libssh:0.7.5:*:*:*:*:*:*:*'
-          }
+    
 
     variant("gssapi", default=True, description="Build with gssapi support")
     depends_on('openssl@:1.0', when='@:0.7')

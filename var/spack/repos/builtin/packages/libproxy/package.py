@@ -10,6 +10,9 @@ class Libproxy(CMakePackage):
     """libproxy is a library that provides automatic proxy configuration
     management."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://libproxy.github.io/libproxy/"
     url      = "https://github.com/libproxy/libproxy/archive/0.4.15.tar.gz"
 
@@ -19,13 +22,7 @@ class Libproxy(CMakePackage):
     version('0.4.14', sha256='6220a6cab837a8996116a0568324cadfd09a07ec16b930d2a330e16d5c2e1eb6')
     version('0.4.13', sha256='d610bc0ef81a18ba418d759c5f4f87bf7102229a9153fb397d7d490987330ffd')
 
-    cpe = {
-            '0.4.17':'cpe:2.3:a:libproxy_project:libproxy:0.4.17:*:*:*:*:*:*:*', 
-            '0.4.16':'cpe:2.3:a:libproxy_project:libproxy:0.4.16:*:*:*:*:*:*:*',
-            '0.4.15':'cpe:2.3:a:libproxy_project:libproxy:0.4.15:*:*:*:*:*:*:*', 
-            '0.4.14':'cpe:2.3:a:libproxy_project:libproxy:0.4.14:*:*:*:*:*:*:*',
-            '0.4.13':'cpe:2.3:a:libproxy_project:libproxy:0.4.13:*:*:*:*:*:*:*'
-          }
+    
 
     variant('perl', default=False, description='Enable Perl bindings')
     variant('python', default=True, description='Enable Python bindings')

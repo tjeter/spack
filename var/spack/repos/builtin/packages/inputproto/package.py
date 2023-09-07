@@ -12,14 +12,15 @@ class Inputproto(AutotoolsPackage, XorgPackage):
     This extension defines a protocol to provide additional input devices
     management such as graphic tablets."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/inputproto"
     xorg_mirror_path = "proto/inputproto-2.3.2.tar.gz"
 
     version('2.3.2', sha256='10eaadd531f38f7c92ab59ef0708ca195caf3164a75c4ed99f0c04f2913f6ef3')
 
-    cpe = {
-            '2.3.2':'cpe:2.3:a:freedesktop:inputproto:2.3.2:*:*:*:*:*:*:*'
-          }
+    
 
     depends_on('pkgconfig', type='build')
     depends_on('util-macros', type='build')

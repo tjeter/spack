@@ -10,6 +10,9 @@ class Libiconv(AutotoolsPackage, GNUMirrorPackage):
     """GNU libiconv provides an implementation of the iconv() function
     and the iconv program for character set conversion."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.gnu.org/software/libiconv/"
     gnu_mirror_path = "libiconv/libiconv-1.16.tar.gz"
 
@@ -17,11 +20,7 @@ class Libiconv(AutotoolsPackage, GNUMirrorPackage):
     version('1.15', sha256='ccf536620a45458d26ba83887a983b96827001e92a13847b45e4925cc8913178')
     version('1.14', sha256='72b24ded17d687193c3366d0ebe7cde1e6b18f0df8c55438ac95be39e8a30613')
 
-    cpe = {
-            '1.16':'cpe:2.3:a:gnu:libiconv:1.16',
-            '1.15':'cpe:2.3:a:gnu:libiconv:1.15',
-            '1.14':'cpe:2.3:a:gnu:libiconv:1.14'
-          }
+    
 
     variant('libs', default='shared,static', values=('shared', 'static'),
             multi=True, description='Build shared libs, static libs or both')

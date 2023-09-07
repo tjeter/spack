@@ -17,6 +17,9 @@ class Zlib(Package):
     data-compression library.
     """
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://zlib.net"
     # URL must remain http:// so Spack can bootstrap curl
     url = "https://zlib.net/fossils/zlib-1.2.11.tar.gz"
@@ -26,12 +29,7 @@ class Zlib(Package):
     version('1.2.8', sha256='36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d', deprecated=True)
     version('1.2.3', sha256='1795c7d067a43174113fdf03447532f373e1c6c57c08d61d9e4e9be5e244b05e', deprecated=True)
 
-    cpe = {
-            '1.2.3':'cpe:2.3:a:zlib:zlib:1.2.3:*:*:*:*:*:*:*',
-            '1.2.8':'cpe:2.3:a:zlib:zlib:1.2.8:*:*:*:*:*:*:*',
-            '1.2.11':'cpe:2.3:a:zlib:zlib:1.2.11:*:*:*:*:*:*:*',
-            '1.2.12':'cpe:2.3:a:zlib:zlib:1.2.12:*:*:*:*:*:*:*'
-          }
+    
 
     variant('pic', default=True,
             description='Produce position-independent code (for shared libs)')

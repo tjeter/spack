@@ -14,6 +14,9 @@ class Postgresql(AutotoolsPackage):
     that has earned it a strong reputation for reliability, data integrity, and
     correctness."""
 
+	with open("cpe.json") as f:
+		data = json.load(f)
+	cpe = data
     homepage = "https://www.postgresql.org/"
     url      = "https://ftp.postgresql.org/pub/source/v9.3.4/postgresql-9.3.4.tar.bz2"
     list_url = "http://ftp.postgresql.org/pub/source"
@@ -37,25 +40,7 @@ class Postgresql(AutotoolsPackage):
     version('9.5.3', sha256='7385c01dc58acba8d7ac4e6ad42782bd7c0b59272862a3a3d5fe378d4503a0b4')
     version('9.3.4', sha256='9ee819574dfc8798a448dc23a99510d2d8924c2f8b49f8228cd77e4efc8a6621')
 
-    cpe = {
-            '14.0':'cpe:2.3:a:postgresql:postgresql:14.0:*:*:*:*:*:*:*',
-            '12.2':'cpe:2.3:a:postgresql:postgresql:12.2:*:*:*:*:*:*:*',  
-            '11.2':'cpe:2.3:a:postgresql:postgresql:11.2:*:*:*:*:*:*:*',
-            '11.1':'cpe:2.3:a:postgresql:postgresql:11.1:*:*:*:*:*:*:*',  
-            '11.0':'cpe:2.3:a:postgresql:postgresql:11.0:*:*:*:*:*:*:*',
-            '10.7':'cpe:2.3:a:postgresql:postgresql:10.7:*:*:*:*:*:*:*',  
-            '10.6':'cpe:2.3:a:postgresql:postgresql:10.6:*:*:*:*:*:*:*',
-            '10.5':'cpe:2.3:a:postgresql:postgresql:10.5:*:*:*:*:*:*:*',  
-            '10.4':'cpe:2.3:a:postgresql:postgresql:10.4:*:*:*:*:*:*:*',
-            '10.3':'cpe:2.3:a:postgresql:postgresql:10.3:*:*:*:*:*:*:*',
-            '10.2':'cpe:2.3:a:postgresql:postgresql:10.2:*:*:*:*:*:*:*', 
-            '10.1':'cpe:2.3:a:postgresql:postgresql:10.1:*:*:*:*:*:*:*',  
-            '10.0':'cpe:2.3:a:postgresql:postgresql:10.0:*:*:*:*:*:*:*',  
-            '9.6.12':'cpe:2.3:a:postgresql:postgresql:9.6.12:*:*:*:*:*:*:*',
-            '9.6.11':'cpe:2.3:a:postgresql:postgresql:9.6.11:*:*:*:*:*:*:*',
-            '9.5.3':'cpe:2.3:a:postgresql:postgresql:9.5.3:*:*:*:*:*:*:*', 
-            '9.3.4':'cpe:2.3:a:postgresql:postgresql:9.3.4:*:*:*:*:*:*:*' 
-          }
+    
 
     variant('client_only', default=False,
             description='Build and install client only.')
