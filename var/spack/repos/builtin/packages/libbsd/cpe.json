@@ -1,0 +1,12 @@
+{
+    "0.8.6": "cpe:2.3:a:freedesktop:libbsd:0.8.6:*:*:*:*:*:*:*",
+    "0.8.7": "cpe:2.3:a:freedesktop:libbsd:0.8.7:*:*:*:*:*:*:*",
+    "0.9.0": "cpe:2.3:a:freedesktop:libbsd:0.9.0:*:*:*:*:*:*:*",
+    "0.9.1": "cpe:2.3:a:freedesktop:libbsd:0.9.1:*:*:*:*:*:*:*",
+    "0.10.0": "cpe:2.3:a:freedesktop:libbsd:0.10.0:*:*:*:*:*:*:*",
+    "0.11.0": "cpe:2.3:a:freedesktop:libbsd:0.11.0:*:*:*:*:*:*:*",
+    "0.11.1": "cpe:2.3:a:freedesktop:libbsd:0.11.1:*:*:*:*:*:*:*",
+    "0.11.2": "cpe:2.3:a:freedesktop:libbsd:0.11.2:*:*:*:*:*:*:*",
+    "0.11.3": "cpe:2.3:a:freedesktop:libbsd:0.11.3:*:*:*:*:*:*:*",
+    "0.11.5": "cpe:2.3:a:freedesktop:libbsd:0.11.5:*:*:*:*:*:*:*"
+}

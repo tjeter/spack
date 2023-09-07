@@ -1,0 +1,8 @@
+{
+    "3.5.7": "cpe:2.3:a:libxpm_project:libxpm:3.5.7:*:*:*:*:*:*:*",
+    "3.5.8": "cpe:2.3:a:libxpm_project:libxpm:3.5.8:*:*:*:*:*:*:*",
+    "3.5.9": "cpe:2.3:a:libxpm_project:libxpm:3.5.9:*:*:*:*:*:*:*",
+    "3.5.10": "cpe:2.3:a:libxpm_project:libxpm:3.5.10:*:*:*:*:*:*:*",
+    "3.5.11": "cpe:2.3:a:libxpm_project:libxpm:3.5.11:*:*:*:*:*:*:*",
+    "3.5.12": "cpe:2.3:a:libxpm_project:libxpm:3.5.12:*:*:*:*:*:*:*"
+}

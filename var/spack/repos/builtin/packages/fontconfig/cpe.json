@@ -1,0 +1,8 @@
+{
+    "2.11.1": "cpe:2.3:a:fontconfig_project:fontconfig:2.11.1:*:*:*:*:*:*:*",
+    "2.12.1": "cpe:2.3:a:fontconfig_project:fontconfig:2.12.1:*:*:*:*:*:*:*",
+    "2.12.3": "cpe:2.3:a:fontconfig_project:fontconfig:2.12.3:*:*:*:*:*:*:*",
+    "2.13.1": "cpe:2.3:a:fontconfig_project:fontconfig:2.13.1:*:*:*:*:*:*:*",
+    "2.13.93": "cpe:2.3:a:fontconfig_project:fontconfig:2.13.93:*:*:*:*:*:*:*",
+    "2.13.94": "cpe:2.3:a:fontconfig_project:fontconfig:2.13.94:*:*:*:*:*:*:*"
+}

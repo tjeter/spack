@@ -1,0 +1,19 @@
+{
+    "14.0": "cpe:2.3:a:postgresql:postgresql:14.0:*:*:*:*:*:*:*",
+    "12.2": "cpe:2.3:a:postgresql:postgresql:12.2:*:*:*:*:*:*:*",
+    "11.2": "cpe:2.3:a:postgresql:postgresql:11.2:*:*:*:*:*:*:*",
+    "11.1": "cpe:2.3:a:postgresql:postgresql:11.1:*:*:*:*:*:*:*",
+    "11.0": "cpe:2.3:a:postgresql:postgresql:11.0:*:*:*:*:*:*:*",
+    "10.7": "cpe:2.3:a:postgresql:postgresql:10.7:*:*:*:*:*:*:*",
+    "10.6": "cpe:2.3:a:postgresql:postgresql:10.6:*:*:*:*:*:*:*",
+    "10.5": "cpe:2.3:a:postgresql:postgresql:10.5:*:*:*:*:*:*:*",
+    "10.4": "cpe:2.3:a:postgresql:postgresql:10.4:*:*:*:*:*:*:*",
+    "10.3": "cpe:2.3:a:postgresql:postgresql:10.3:*:*:*:*:*:*:*",
+    "10.2": "cpe:2.3:a:postgresql:postgresql:10.2:*:*:*:*:*:*:*",
+    "10.1": "cpe:2.3:a:postgresql:postgresql:10.1:*:*:*:*:*:*:*",
+    "10.0": "cpe:2.3:a:postgresql:postgresql:10.0:*:*:*:*:*:*:*",
+    "9.6.12": "cpe:2.3:a:postgresql:postgresql:9.6.12:*:*:*:*:*:*:*",
+    "9.6.11": "cpe:2.3:a:postgresql:postgresql:9.6.11:*:*:*:*:*:*:*",
+    "9.5.3": "cpe:2.3:a:postgresql:postgresql:9.5.3:*:*:*:*:*:*:*",
+    "9.3.4": "cpe:2.3:a:postgresql:postgresql:9.3.4:*:*:*:*:*:*:*"
+}

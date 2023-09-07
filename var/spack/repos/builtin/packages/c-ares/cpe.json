@@ -1,0 +1,5 @@
+{
+    "master": "cpe:2.3:a:c-ares_project:c-ares:master:*:*:*:*:*:*:*",
+    "1.13.0": "cpe:2.3:a:c-ares_project:c-ares:1.13.0:*:*:*:*:*:*:*",
+    "1.15.0": "cpe:2.3:a:c-ares_project:c-ares:1.15.0:*:*:*:*:*:*:*"
+}
