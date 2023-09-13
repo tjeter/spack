@@ -4,17 +4,17 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack.package import *
-
-
+import json
+import os
 class Httpd(AutotoolsPackage):
     """The Apache HTTP Server is a powerful and flexible HTTP/1.1 compliant
     web server."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://httpd.apache.org/"
-    url      = "https://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2"
+    url         = "https://archive.apache.org/dist/httpd/httpd-2.4.43.tar.bz2"
 
     version('2.4.43', sha256='a497652ab3fc81318cdc2a203090a999150d86461acff97c1065dc910fe10f43')
     version('2.4.41', sha256='133d48298fe5315ae9366a0ec66282fa4040efa5d566174481077ade7d18ea40')
