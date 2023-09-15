@@ -72,7 +72,7 @@ def cve_update(pkg):
 		print(pkg.cpe[i])
 		r = (nvdlib.searchCVE(cpeName=pkg.cpe[i], key=api_key))
 		for eachCVE in r:
-			if eachCVE.score[0] == 'V3':
+			if eachCVE.score[0] == 'V31':
 				cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
 				cve_dict[i]["cve"] = eachCVE.id
 				cve_dict[i]["score"] = eachCVE.score[1]
