@@ -24,10 +24,10 @@ class Octave(AutotoolsPackage, GNUMirrorPackage):
     experiments using a language that is mostly compatible with Matlab.
     It may also be used as a batch-oriented language.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/octave/"
     gnu_mirror_path = "octave/octave-4.0.0.tar.gz"
     maintainers = ['mtmiller', 'siko1056']

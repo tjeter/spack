@@ -16,10 +16,10 @@ class Bazel(Package):
     projects in multiple languages and builds outputs for multiple platforms.
     Bazel supports large codebases across multiple repositories, and large
     numbers of users."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://bazel.build/"
     url      = "https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-dist.zip"
 

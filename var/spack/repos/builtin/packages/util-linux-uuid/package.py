@@ -10,10 +10,10 @@ from spack.package import *
 
 class UtilLinuxUuid(AutotoolsPackage):
     """Util-linux is a suite of essential utilities for any Linux system."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://github.com/karelzak/util-linux"
     url      = "https://www.kernel.org/pub/linux/utils/util-linux/v2.29/util-linux-2.29.2.tar.gz"
     list_url = "https://www.kernel.org/pub/linux/utils/util-linux"

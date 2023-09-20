@@ -12,10 +12,10 @@ class Mkfontdir(AutotoolsPackage, XorgPackage):
     """mkfontdir creates the fonts.dir files needed by the legacy X server
     core font system.   The current implementation is a simple wrapper script
     around the mkfontscale program, which must be built and installed first."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/app/mkfontdir"
     xorg_mirror_path = "app/mkfontdir-1.0.7.tar.gz"
 

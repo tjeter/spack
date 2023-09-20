@@ -15,10 +15,10 @@ class Tmux(AutotoolsPackage):
     programs in one terminal, detach them (they keep running in the
     background) and reattach them to a different terminal. And do a lot more.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://tmux.github.io"
     url = "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
     git = 'https://github.com/tmux/tmux.git'

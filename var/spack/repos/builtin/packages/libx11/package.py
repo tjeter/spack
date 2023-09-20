@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libx11(AutotoolsPackage, XorgPackage):
     """libX11 - Core X11 protocol client library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.x.org/"
     xorg_mirror_path = "lib/libX11-1.6.7.tar.gz"
 

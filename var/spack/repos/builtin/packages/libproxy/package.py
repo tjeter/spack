@@ -11,10 +11,10 @@ from spack.package import *
 class Libproxy(CMakePackage):
     """libproxy is a library that provides automatic proxy configuration
     management."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://libproxy.github.io/libproxy/"
     url      = "https://github.com/libproxy/libproxy/archive/0.4.15.tar.gz"
 

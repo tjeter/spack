@@ -11,10 +11,10 @@ from spack.package import *
 class Nghttp2(AutotoolsPackage):
     """nghttp2 is an implementation of HTTP/2 and its header compression
        algorithm HPACK in C."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://nghttp2.org/"
     url      = "https://github.com/nghttp2/nghttp2/releases/download/v1.26.0/nghttp2-1.26.0.tar.gz"
 

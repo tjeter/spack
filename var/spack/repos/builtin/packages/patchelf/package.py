@@ -13,10 +13,10 @@ from spack.package import *
 class Patchelf(AutotoolsPackage):
     """PatchELF is a small utility to modify the dynamic linker and RPATH of
        ELF executables."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://nixos.org/patchelf.html"
     url      = "https://github.com/NixOS/patchelf/releases/download/0.12/patchelf-0.12.tar.bz2"
     list_url = "https://nixos.org/releases/patchelf/"

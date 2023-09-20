@@ -11,10 +11,10 @@ from spack.package import *
 class Pigz(MakefilePackage):
     """A parallel implementation of gzip for modern multi-processor,
        multi-core machines."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://zlib.net/pigz/"
     url      = "https://github.com/madler/pigz/archive/v2.3.4.tar.gz"
 

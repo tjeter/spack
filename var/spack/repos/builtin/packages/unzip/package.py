@@ -10,10 +10,10 @@ from spack.package import *
 
 class Unzip(MakefilePackage):
     """Unzip is a compression and file packaging/archive utility."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = 'http://www.info-zip.org/Zip.html'
     url      = 'http://downloads.sourceforge.net/infozip/unzip60.tar.gz'
 

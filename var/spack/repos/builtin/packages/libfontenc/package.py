@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libfontenc(AutotoolsPackage, XorgPackage):
     """libfontenc - font encoding library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libfontenc"
     xorg_mirror_path = "lib/libfontenc-1.1.3.tar.gz"
 

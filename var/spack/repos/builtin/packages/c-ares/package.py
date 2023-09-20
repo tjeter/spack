@@ -10,10 +10,10 @@ from spack.package import *
 
 class CAres(CMakePackage):
     """c-ares: A C library for asynchronous DNS requests"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://c-ares.haxx.se"
     url      = "https://github.com/c-ares/c-ares/archive/cares-1_15_0.tar.gz"
     git      = "https://github.com/c-ares/c-ares.git"

@@ -13,10 +13,10 @@ class Freetype(AutotoolsPackage):
     It is written in C, designed to be small, efficient, highly customizable,
     and portable while capable of producing high-quality output (glyph images)
     of most vector and bitmap font formats."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.freetype.org/index.html"
     url      = "https://download.savannah.gnu.org/releases/freetype/freetype-2.10.1.tar.gz"
 

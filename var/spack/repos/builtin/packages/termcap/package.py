@@ -12,10 +12,10 @@ class Termcap(AutotoolsPackage):
     """This is the GNU termcap library, a library of C functions that
     enable programs to send control strings to terminals in a way
     independent of the terminal type."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/termutils/manual/termcap-1.3/html_mono/termcap.html"
     url      = "https://ftp.gnu.org/gnu/termcap/termcap-1.3.1.tar.gz"
 

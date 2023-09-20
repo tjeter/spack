@@ -10,10 +10,10 @@ from spack.package import *
 
 class Xextproto(AutotoolsPackage, XorgPackage):
     """X Protocol Extensions."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/xextproto"
     xorg_mirror_path = "proto/xextproto-7.3.0.tar.gz"
 

@@ -10,10 +10,10 @@ from spack.package import *
 
 class FontUtil(AutotoolsPackage, XorgPackage):
     """X.Org font package creation/installation utilities and fonts."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/font/util"
     xorg_mirror_path = "font/font-util-1.3.1.tar.gz"
 

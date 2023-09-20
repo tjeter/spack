@@ -12,10 +12,10 @@ from spack.package import *
 
 class Autoconf(AutotoolsPackage, GNUMirrorPackage):
     """Autoconf -- system configuration part of autotools"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = 'https://www.gnu.org/software/autoconf/'
     gnu_mirror_path = 'autoconf/autoconf-2.69.tar.gz'
 

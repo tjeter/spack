@@ -12,10 +12,10 @@ class Libmd(AutotoolsPackage):
     """This library provides message digest functions found on BSD systems
        either on their libc (NetBSD, OpenBSD) or libmd (FreeBSD, DragonflyBSD,
        macOS, Solaris) libraries and lacking on others like GNU systems."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.hadrons.org/software/libmd/"
     url      = "https://archive.hadrons.org/software/libmd/libmd-1.0.3.tar.xz"
 

@@ -19,10 +19,10 @@ class Openssh(AutotoolsPackage):
        capabilities, several authentication methods, and sophisticated
        configuration options.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.openssh.com/"
     url      = "https://mirrors.sonic.net/pub/OpenBSD/OpenSSH/portable/openssh-8.7p1.tar.gz"
 

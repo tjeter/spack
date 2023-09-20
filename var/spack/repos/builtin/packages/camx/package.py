@@ -93,7 +93,7 @@ else ifneq (, $(findstring $(MPI),openmpi openMPI OPENMPI))''',
                             # Yes, flake8, Makefile rules needs tabs!
                             '''all: parlib comp_$(COMPILER)
 parlib :
-	$(MAKE) -C $(CAMX_MPI)/util  # noqa: E101,W191
+    $(MAKE) -C $(CAMX_MPI)/util  # noqa: E101,W191
 ''',
                             string=True)  # noqa: E101
             makefile_parlib = FileFilter('MPI/util/Makefile')

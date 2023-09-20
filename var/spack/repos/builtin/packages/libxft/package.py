@@ -14,10 +14,10 @@ class Libxft(AutotoolsPackage, XorgPackage):
     Xft version 2.1 was the first stand alone release of Xft, a library that
     connects X applications with the FreeType font rasterization library. Xft
     uses fontconfig to locate fonts so it has no configuration files."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXft"
     xorg_mirror_path = "lib/libXft-2.3.2.tar.gz"
 

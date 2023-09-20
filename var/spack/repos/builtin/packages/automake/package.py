@@ -11,10 +11,10 @@ from spack.package import *
 
 class Automake(AutotoolsPackage, GNUMirrorPackage):
     """Automake -- make file builder part of autotools"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = 'https://www.gnu.org/software/automake/'
     gnu_mirror_path = 'automake/automake-1.15.tar.gz'
 

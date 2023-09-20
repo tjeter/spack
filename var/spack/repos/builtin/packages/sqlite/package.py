@@ -17,9 +17,10 @@ class Sqlite(AutotoolsPackage):
     """SQLite is a C-language library that implements a small, fast,
     self-contained, high-reliability, full-featured, SQL database engine.
     """
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.sqlite.org"
 
     version('3.38.5', sha256='5af07de982ba658fd91a03170c945f99c971f6955bc79df3266544373e39869c')

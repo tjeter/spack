@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libice(AutotoolsPackage, XorgPackage):
     """libICE - Inter-Client Exchange Library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libICE"
     xorg_mirror_path = "lib/libICE-1.0.9.tar.gz"
 

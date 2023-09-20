@@ -15,10 +15,10 @@ class Readline(AutotoolsPackage, GNUMirrorPackage):
     includes additional functions to maintain a list of previously-entered
     command lines, to recall and perhaps reedit those lines, and perform
     csh-like history expansion on previous commands."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://tiswww.case.edu/php/chet/readline/rltop.html"
     # URL must remain http:// so Spack can bootstrap curl
     gnu_mirror_path = "readline/readline-8.0.tar.gz"

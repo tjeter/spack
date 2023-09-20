@@ -17,10 +17,10 @@ class Texinfo(AutotoolsPackage, GNUMirrorPackage):
     It was invented by Richard Stallman and Bob Chassell many years ago,
     loosely based on Brian Reid's Scribe and other formatting languages
     of the time. It is used by many non-GNU projects as well."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/texinfo/"
     gnu_mirror_path = "texinfo/texinfo-6.0.tar.gz"
 

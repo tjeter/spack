@@ -14,10 +14,10 @@ from spack.package import *
 class PyTensorflow(Package, CudaPackage):
     """TensorFlow is an Open Source Software Library for Machine Intelligence
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.tensorflow.org"
     url      = "https://github.com/tensorflow/tensorflow/archive/v2.3.1.tar.gz"
 

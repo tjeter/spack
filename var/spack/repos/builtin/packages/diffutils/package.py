@@ -17,10 +17,10 @@ class Diffutils(AutotoolsPackage, GNUMirrorPackage):
     tags = ['core-packages']
 
     executables = [r'^diff$']
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/diffutils/"
     gnu_mirror_path = "diffutils/diffutils-3.7.tar.xz"
 

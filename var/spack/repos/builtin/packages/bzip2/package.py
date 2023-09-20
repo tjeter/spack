@@ -16,10 +16,10 @@ class Bzip2(Package, SourcewarePackage):
     of the best available techniques (the PPM family of statistical
     compressors), whilst being around twice as fast at compression
     and six times faster at decompression."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://sourceware.org/bzip2/"
     sourceware_mirror_path = "bzip2/bzip2-1.0.8.tar.gz"
 

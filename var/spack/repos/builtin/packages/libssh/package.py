@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libssh(CMakePackage):
     """libssh: the SSH library"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.libssh.org"
     url      = "https://www.libssh.org/files/0.8/libssh-0.8.5.tar.xz"
 

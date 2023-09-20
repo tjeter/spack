@@ -15,10 +15,10 @@ class Libevent(AutotoolsPackage):
        callbacks due to signals or regular timeouts.
 
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://libevent.org"
     url      = "https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz"
     list_url = "https://libevent.org/old-releases.html"

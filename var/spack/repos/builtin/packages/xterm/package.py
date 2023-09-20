@@ -12,10 +12,10 @@ class Xterm(AutotoolsPackage):
     """The xterm program is a terminal emulator for the X Window System. It
     provides DEC VT102 and Tektronix 4014 compatible terminals for programs
     that can't use the window system directly."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://invisible-island.net/xterm/"
     url      = "ftp://ftp.invisible-island.net/xterm/xterm-327.tgz"
 

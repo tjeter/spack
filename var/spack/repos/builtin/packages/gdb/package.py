@@ -16,10 +16,10 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     'inside' another program while it executes -- or what another
     program was doing at the moment it crashed.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/gdb"
     gnu_mirror_path = "gdb/gdb-11.2.tar.gz"
 

@@ -13,9 +13,10 @@ class Libffi(AutotoolsPackage):
     interface to various calling conventions. This allows a programmer
     to call any function specified by a call interface description at
     run time."""
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://sourceware.org/libffi/"
     url      = "https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz"
 

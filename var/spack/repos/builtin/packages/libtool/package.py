@@ -12,10 +12,10 @@ from spack.package import *
 
 class Libtool(AutotoolsPackage, GNUMirrorPackage):
     """libtool -- library building part of autotools."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = 'https://www.gnu.org/software/libtool/'
     gnu_mirror_path = "libtool/libtool-2.4.6.tar.gz"
 

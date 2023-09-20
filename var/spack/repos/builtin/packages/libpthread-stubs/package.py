@@ -11,10 +11,10 @@ from spack.package import *
 class LibpthreadStubs(AutotoolsPackage):
     """The libpthread-stubs package provides weak aliases for pthread
     functions not provided in libc or otherwise available by default."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://xcb.freedesktop.org/"
     url      = "https://xcb.freedesktop.org/dist/libpthread-stubs-0.4.tar.gz"
 

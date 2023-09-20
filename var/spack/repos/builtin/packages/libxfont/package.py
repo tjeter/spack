@@ -15,10 +15,10 @@ class Libxfont(AutotoolsPackage, XorgPackage):
     X Font Server (xfs), and some font utilities (bdftopcf for instance),
     but should not be used by normal X11 clients.  X11 clients access fonts
     via either the new API's in libXft, or the legacy API's in libX11."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXfont"
     xorg_mirror_path = "lib/libXfont-1.5.2.tar.gz"
 

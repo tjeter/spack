@@ -10,9 +10,10 @@ from spack.package import *
 
 class Fontconfig(AutotoolsPackage):
     """Fontconfig is a library for configuring/customizing font access"""
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.freedesktop.org/wiki/Software/fontconfig/"
     url      = "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.3.tar.gz"
 

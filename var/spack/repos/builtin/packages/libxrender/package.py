@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libxrender(AutotoolsPackage, XorgPackage):
     """libXrender - library for the Render Extension to the X11 protocol."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXrender"
     xorg_mirror_path = "lib/libXrender-0.9.10.tar.gz"
 

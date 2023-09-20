@@ -14,10 +14,10 @@ class Tomcat(Package):
     Java Servlet, JavaServer Pages, Java Expression Language and Java
     WebSocket technologies.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://tomcat.apache.org/"
     url      = "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.30/bin/apache-tomcat-9.0.30.tar.gz"
 

@@ -10,10 +10,10 @@ from spack.package import *
 
 class Fontsproto(AutotoolsPackage, XorgPackage):
     """X Fonts Extension."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/fontsproto"
     xorg_mirror_path = "proto/fontsproto-2.1.3.tar.gz"
 

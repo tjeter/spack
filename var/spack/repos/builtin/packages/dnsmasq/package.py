@@ -10,10 +10,10 @@ from spack.package import *
 
 class Dnsmasq(MakefilePackage):
     """A lightweight, caching DNS proxy with integrated DHCP server."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.thekelleys.org.uk/dnsmasq/doc.html"
     url      = "http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.70.tar.gz"
 

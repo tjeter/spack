@@ -13,10 +13,10 @@ class Renderproto(AutotoolsPackage, XorgPackage):
 
     This extension defines the protcol for a digital image composition as
     the foundation of a new rendering model within the X Window System."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/renderproto"
     xorg_mirror_path = "proto/renderproto-0.11.1.tar.gz"
 

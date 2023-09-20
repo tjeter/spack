@@ -12,10 +12,10 @@ class Libxau(AutotoolsPackage, XorgPackage):
     """The libXau package contains a library implementing the X11
     Authorization Protocol. This is useful for restricting client
     access to the display."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXau/"
     xorg_mirror_path = "lib/libXau-1.0.8.tar.gz"
 

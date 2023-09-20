@@ -13,10 +13,10 @@ class Xtrans(AutotoolsPackage, XorgPackage):
     handle network protocol transport in a modular fashion, allowing a
     single place to add new transport types.  It is used by the X server,
     libX11, libICE, the X font server, and related components."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libxtrans"
     xorg_mirror_path = "lib/xtrans-1.3.5.tar.gz"
 

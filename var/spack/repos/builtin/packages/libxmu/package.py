@@ -13,10 +13,10 @@ class Libxmu(AutotoolsPackage, XorgPackage):
     Xlib standard.  It contains routines which only use public interfaces so
     that it may be layered on top of any proprietary implementation of Xlib
     or Xt."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXmu"
     xorg_mirror_path = "lib/libXmu-1.1.2.tar.gz"
 

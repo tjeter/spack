@@ -12,10 +12,10 @@ class Zstd(MakefilePackage):
     """Zstandard, or zstd as short version, is a fast lossless compression
     algorithm, targeting real-time compression scenarios at zlib-level and
     better compression ratios."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://facebook.github.io/zstd/"
     url      = "https://github.com/facebook/zstd/archive/v1.4.3.tar.gz"
     git      = "https://github.com/facebook/zstd.git"

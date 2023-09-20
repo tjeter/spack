@@ -15,10 +15,10 @@ class Xz(AutotoolsPackage, SourceforgePackage):
     high compression ratio. XZ Utils were written for POSIX-like systems,
     but also work on some not-so-POSIX systems. XZ Utils are the successor
     to LZMA Utils."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://tukaani.org/xz/"
     sourceforge_mirror_path = "lzmautils/files/xz-5.2.5.tar.bz2"
     list_url = "https://tukaani.org/xz/old.html"

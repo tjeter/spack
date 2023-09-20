@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libxdmcp(AutotoolsPackage, XorgPackage):
     """libXdmcp - X Display Manager Control Protocol library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXdmcp"
     xorg_mirror_path = "lib/libXdmcp-1.1.2.tar.gz"
 

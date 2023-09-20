@@ -13,10 +13,10 @@ class Gdbm(AutotoolsPackage, GNUMirrorPackage):
     that use extensible hashing and work similar to the standard UNIX dbm.
     These routines are provided to a programmer needing to create and
     manipulate a hashed database."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org.ua/software/gdbm/gdbm.html"
     gnu_mirror_path = "gdbm/gdbm-1.13.tar.gz"
 

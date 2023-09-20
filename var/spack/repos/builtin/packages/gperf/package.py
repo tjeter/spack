@@ -15,10 +15,10 @@ class Gperf(AutotoolsPackage, GNUMirrorPackage):
     input string. The hash function is perfect, which means that the
     hash table has no collisions, and the hash table lookup needs a
     single string comparison only."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/gperf/"
     gnu_mirror_path = "gperf/gperf-3.0.4.tar.gz"
 

@@ -35,7 +35,7 @@ class Libmicrohttpd(AutotoolsPackage):
             '--disable-rpath',      # let spack handle the RPATH
             '--disable-doc',        # don't build the docs
             '--disable-examples',   # don't build the examples
-            '--disable-curl'		# disable cURL-based testcases
+            '--disable-curl'        # disable cURL-based testcases
         ]
 
         if self.spec.satisfies('+https'):

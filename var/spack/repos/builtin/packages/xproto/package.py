@@ -17,10 +17,10 @@ class Xproto(AutotoolsPackage, XorgPackage):
     It also includes a number of headers that aren't purely protocol related,
     but are depended upon by many other X Window System packages to provide
     common definitions and porting layer."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/x11proto"
     xorg_mirror_path = "proto/xproto-7.0.31.tar.gz"
 

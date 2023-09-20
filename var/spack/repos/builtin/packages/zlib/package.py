@@ -19,10 +19,10 @@ class Zlib(Package):
     """A free, general-purpose, legally unencumbered lossless
     data-compression library.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://zlib.net"
     # URL must remain http:// so Spack can bootstrap curl
     url = "https://zlib.net/fossils/zlib-1.2.11.tar.gz"

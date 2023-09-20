@@ -13,10 +13,10 @@ class Libxcb(AutotoolsPackage):
     for Xlib featuring a small footprint, latency hiding, direct
     access to the protocol, improved threading support, and
     extensibility."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://xcb.freedesktop.org/"
     url      = "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.14.tar.xz"
 

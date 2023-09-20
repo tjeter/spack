@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libxt(AutotoolsPackage, XorgPackage):
     """libXt - X Toolkit Intrinsics library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXt"
     xorg_mirror_path = "lib/libXt-1.1.5.tar.gz"
 

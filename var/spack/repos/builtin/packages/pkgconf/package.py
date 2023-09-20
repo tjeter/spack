@@ -13,10 +13,10 @@ class Pkgconf(AutotoolsPackage):
     flags for development frameworks. It is similar to pkg-config from
     freedesktop.org, providing additional functionality while also
     maintaining compatibility."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "http://pkgconf.org/"
     # URL must remain http:// so Spack can bootstrap curl
     url      = "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.6.3.tar.xz"

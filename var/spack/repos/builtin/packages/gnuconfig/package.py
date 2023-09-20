@@ -14,10 +14,10 @@ class Gnuconfig(Package):
     This package can be used as a build dependency for autotools packages that
     ship a tarball with outdated config.guess and config.sub files.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/config/"
     git      = "https://github.com/spack/gnuconfig.git"
     url      = "https://github.com/spack/gnuconfig/releases/download/2021-08-14/gnuconfig-2021-08-14.tar.gz"

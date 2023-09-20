@@ -13,10 +13,10 @@ from spack.package import *
 class Opencv(CMakePackage, CudaPackage):
     """OpenCV (Open Source Computer Vision Library) is an open source computer
     vision and machine learning software library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://opencv.org/"
     url = "https://github.com/opencv/opencv/archive/4.5.0.tar.gz"
     git = "https://github.com/opencv/opencv.git"

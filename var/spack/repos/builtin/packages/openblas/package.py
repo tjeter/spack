@@ -17,10 +17,10 @@ from spack.package_test import compare_output_file, compile_c_and_execute
 
 class Openblas(MakefilePackage):
     """OpenBLAS: An optimized BLAS library"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = 'https://www.openblas.net'
     url      = 'https://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz'
     git      = 'https://github.com/xianyi/OpenBLAS.git'

@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libpng(AutotoolsPackage):
     """libpng is the official PNG reference library."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "http://www.libpng.org/pub/png/libpng.html"
     url = "https://prdownloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
     git = "https://github.com/glennrp/libpng.git"

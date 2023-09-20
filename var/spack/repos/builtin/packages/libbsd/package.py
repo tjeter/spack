@@ -14,10 +14,10 @@ class Libbsd(AutotoolsPackage):
     to port projects with strong BSD origins, without needing to embed the
     same code over and over again on each project.
     """
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://libbsd.freedesktop.org/wiki/"
     urls     = [
         "https://libbsd.freedesktop.org/releases/libbsd-0.9.1.tar.xz",

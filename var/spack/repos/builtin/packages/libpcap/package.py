@@ -10,9 +10,10 @@ from spack.package import *
 
 class Libpcap(AutotoolsPackage):
     """libpcap is a portable library in C/C++ for packet capture."""
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.tcpdump.org/"
     list_url = "https://www.tcpdump.org/release/"
     url      = "https://www.tcpdump.org/release/libpcap-1.8.1.tar.gz"

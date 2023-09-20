@@ -11,10 +11,10 @@ from spack.package import *
 
 class Wireshark(CMakePackage):
     """Graphical network analyzer and capture tool"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.wireshark.org"
     url      = "https://www.wireshark.org/download/src/all-versions/wireshark-2.6.0.tar.xz"
 

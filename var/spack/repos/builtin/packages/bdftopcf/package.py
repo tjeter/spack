@@ -15,10 +15,10 @@ class Bdftopcf(AutotoolsPackage, XorgPackage):
     them directly without reformatting.  This allows fast reading on the
     appropriate machine, but the files are still portable (but read more
     slowly) on other machines."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/app/bdftopcf"
     xorg_mirror_path = "app/bdftopcf-1.0.5.tar.gz"
 

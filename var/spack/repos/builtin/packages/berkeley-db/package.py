@@ -11,10 +11,10 @@ from spack.package import *
 
 class BerkeleyDb(AutotoolsPackage):
     """Oracle Berkeley DB"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.oracle.com/database/technologies/related/berkeleydb.html"
     # URL must remain http:// so Spack can bootstrap curl
     url      = "https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz"

@@ -12,10 +12,10 @@ class Torque(Package):
     """TORQUE (Terascale Open-source Resource and QUEue Manager) is an open
     source project based on the original PBS resource manager developed by NASA,
     LLNL, and MRJ."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://github.com/abarbu/torque"
     has_code = False
 

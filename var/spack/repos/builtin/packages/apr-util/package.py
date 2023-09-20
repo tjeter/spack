@@ -10,10 +10,10 @@ from spack.package import *
 
 class AprUtil(AutotoolsPackage):
     """Apache Portable Runtime Utility"""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage  = 'https://apr.apache.org/'
     url       = 'https://archive.apache.org/dist/apr/apr-util-1.6.1.tar.gz'
 

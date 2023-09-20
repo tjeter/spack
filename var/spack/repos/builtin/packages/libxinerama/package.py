@@ -10,10 +10,10 @@ from spack.package import *
 
 class Libxinerama(AutotoolsPackage, XorgPackage):
     """libXinerama - API for Xinerama extension to X11 Protocol."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXinerama"
     xorg_mirror_path = "lib/libXinerama-1.1.3.tar.gz"
 

@@ -12,10 +12,10 @@ class Stream(MakefilePackage):
     """The STREAM benchmark is a simple synthetic benchmark program that
     measures sustainable memory bandwidth (in MB/s) and the corresponding
     computation rate for simple vector kernels."""
-
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.cs.virginia.edu/stream/ref.html"
     git      = "https://github.com/jeffhammond/STREAM.git"
 

@@ -19,9 +19,10 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
        commercial-grade, and full-featured toolkit for the Transport
        Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
        It is also a general-purpose cryptography library."""
-	with open("cpe.json") as f:
-		data = json.load(f)
-	cpe = data
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.openssl.org"
 
     # URL must remain http:// so Spack can bootstrap curl
