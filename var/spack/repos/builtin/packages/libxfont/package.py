@@ -16,7 +16,7 @@ class Libxfont(AutotoolsPackage, XorgPackage):
     but should not be used by normal X11 clients.  X11 clients access fonts
     via either the new API's in libXft, or the legacy API's in libX11."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXfont"

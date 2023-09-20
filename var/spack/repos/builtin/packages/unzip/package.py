@@ -11,7 +11,7 @@ from spack.package import *
 class Unzip(MakefilePackage):
     """Unzip is a compression and file packaging/archive utility."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = 'http://www.info-zip.org/Zip.html'

@@ -12,7 +12,7 @@ class Libiconv(AutotoolsPackage, GNUMirrorPackage):
     """GNU libiconv provides an implementation of the iconv() function
     and the iconv program for character set conversion."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.gnu.org/software/libiconv/"

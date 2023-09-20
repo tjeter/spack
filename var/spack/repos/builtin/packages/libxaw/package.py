@@ -12,7 +12,7 @@ class Libxaw(AutotoolsPackage, XorgPackage):
     """Xaw is the X Athena Widget Set.
     Xaw is a widget set based on the X Toolkit Intrinsics (Xt) Library."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXaw"

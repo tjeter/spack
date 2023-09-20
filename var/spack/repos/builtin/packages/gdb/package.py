@@ -17,7 +17,7 @@ class Gdb(AutotoolsPackage, GNUMirrorPackage):
     program was doing at the moment it crashed.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.gnu.org/software/gdb"

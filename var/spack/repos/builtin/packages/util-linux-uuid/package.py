@@ -11,7 +11,7 @@ from spack.package import *
 class UtilLinuxUuid(AutotoolsPackage):
     """Util-linux is a suite of essential utilities for any Linux system."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://github.com/karelzak/util-linux"

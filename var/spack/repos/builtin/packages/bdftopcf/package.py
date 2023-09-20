@@ -16,7 +16,7 @@ class Bdftopcf(AutotoolsPackage, XorgPackage):
     appropriate machine, but the files are still portable (but read more
     slowly) on other machines."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/app/bdftopcf"

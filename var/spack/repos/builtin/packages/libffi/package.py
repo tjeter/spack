@@ -14,7 +14,7 @@ class Libffi(AutotoolsPackage):
     to call any function specified by a call interface description at
     run time."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://sourceware.org/libffi/"

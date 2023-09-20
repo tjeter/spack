@@ -14,7 +14,7 @@ class Tar(AutotoolsPackage, GNUMirrorPackage):
     """GNU Tar provides the ability to create tar archives, as well as various
     other kinds of manipulation."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.gnu.org/software/tar/"

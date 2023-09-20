@@ -14,7 +14,7 @@ class Xtrans(AutotoolsPackage, XorgPackage):
     single place to add new transport types.  It is used by the X server,
     libX11, libICE, the X font server, and related components."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libxtrans"

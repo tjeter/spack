@@ -17,7 +17,7 @@ class Bzip2(Package, SourcewarePackage):
     compressors), whilst being around twice as fast at compression
     and six times faster at decompression."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://sourceware.org/bzip2/"

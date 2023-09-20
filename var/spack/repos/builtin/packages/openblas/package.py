@@ -18,7 +18,7 @@ from spack.package_test import compare_output_file, compile_c_and_execute
 class Openblas(MakefilePackage):
     """OpenBLAS: An optimized BLAS library"""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = 'https://www.openblas.net'

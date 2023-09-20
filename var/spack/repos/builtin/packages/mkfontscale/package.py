@@ -12,7 +12,7 @@ class Mkfontscale(AutotoolsPackage, XorgPackage):
     """mkfontscale creates the fonts.scale and fonts.dir index files used by the
     legacy X11 font system."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/app/mkfontscale"

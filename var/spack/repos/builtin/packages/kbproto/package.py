@@ -14,7 +14,7 @@ class Kbproto(AutotoolsPackage, XorgPackage):
     This extension defines a protcol to provide a number of new capabilities
     and controls for text keyboards."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/kbproto"

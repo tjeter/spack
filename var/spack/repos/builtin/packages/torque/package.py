@@ -13,7 +13,7 @@ class Torque(Package):
     source project based on the original PBS resource manager developed by NASA,
     LLNL, and MRJ."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://github.com/abarbu/torque"

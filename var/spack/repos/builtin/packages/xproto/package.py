@@ -18,7 +18,7 @@ class Xproto(AutotoolsPackage, XorgPackage):
     but are depended upon by many other X Window System packages to provide
     common definitions and porting layer."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/proto/x11proto"

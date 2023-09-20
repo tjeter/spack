@@ -16,7 +16,7 @@ class Tmux(AutotoolsPackage):
     background) and reattach them to a different terminal. And do a lot more.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://tmux.github.io"

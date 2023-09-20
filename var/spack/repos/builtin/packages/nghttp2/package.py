@@ -12,7 +12,7 @@ class Nghttp2(AutotoolsPackage):
     """nghttp2 is an implementation of HTTP/2 and its header compression
        algorithm HPACK in C."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://nghttp2.org/"

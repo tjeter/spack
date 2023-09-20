@@ -13,7 +13,7 @@ class Pcre(AutotoolsPackage):
     libraries. These are useful for implementing regular expression
     pattern matching using the same syntax and semantics as Perl 5."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.pcre.org"

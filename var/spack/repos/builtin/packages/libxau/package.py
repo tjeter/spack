@@ -13,7 +13,7 @@ class Libxau(AutotoolsPackage, XorgPackage):
     Authorization Protocol. This is useful for restricting client
     access to the display."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXau/"

@@ -12,7 +12,7 @@ class Pigz(MakefilePackage):
     """A parallel implementation of gzip for modern multi-processor,
        multi-core machines."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://zlib.net/pigz/"

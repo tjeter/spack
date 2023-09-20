@@ -14,7 +14,7 @@ class Patchelf(AutotoolsPackage):
     """PatchELF is a small utility to modify the dynamic linker and RPATH of
        ELF executables."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://nixos.org/patchelf.html"

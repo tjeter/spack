@@ -30,7 +30,7 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     """The GNU Compiler Collection includes front ends for C, C++, Objective-C,
     Fortran, Ada, and Go, as well as libraries for these languages."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = 'https://gcc.gnu.org'

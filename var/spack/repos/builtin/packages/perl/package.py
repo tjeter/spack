@@ -35,7 +35,7 @@ class Perl(Package):  # Perl doesn't use Autotools, it should subclass Package
     """Perl 5 is a highly capable, feature-rich programming language with over
        27 years of development."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.perl.org"

@@ -15,7 +15,7 @@ class Libxft(AutotoolsPackage, XorgPackage):
     connects X applications with the FreeType font rasterization library. Xft
     uses fontconfig to locate fonts so it has no configuration files."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXft"

@@ -13,7 +13,7 @@ class Libmd(AutotoolsPackage):
        either on their libc (NetBSD, OpenBSD) or libmd (FreeBSD, DragonflyBSD,
        macOS, Solaris) libraries and lacking on others like GNU systems."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.hadrons.org/software/libmd/"

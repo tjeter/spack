@@ -18,7 +18,7 @@ class Texinfo(AutotoolsPackage, GNUMirrorPackage):
     loosely based on Brian Reid's Scribe and other formatting languages
     of the time. It is used by many non-GNU projects as well."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.gnu.org/software/texinfo/"

@@ -22,7 +22,7 @@ class Mariadb(CMakePackage):
     tools make it very versatile for a wide variety of use cases.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://mariadb.org/about/"

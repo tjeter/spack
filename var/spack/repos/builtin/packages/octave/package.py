@@ -25,7 +25,7 @@ class Octave(AutotoolsPackage, GNUMirrorPackage):
     It may also be used as a batch-oriented language.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.gnu.org/software/octave/"

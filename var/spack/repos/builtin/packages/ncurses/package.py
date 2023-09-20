@@ -19,7 +19,7 @@ class Ncurses(AutotoolsPackage, GNUMirrorPackage):
     characters and function-key mapping, and has all the other
     SYSV-curses enhancements over BSD curses."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://invisible-island.net/ncurses/ncurses.html"

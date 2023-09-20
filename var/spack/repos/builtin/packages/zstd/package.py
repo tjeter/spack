@@ -13,7 +13,7 @@ class Zstd(MakefilePackage):
     algorithm, targeting real-time compression scenarios at zlib-level and
     better compression ratios."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://facebook.github.io/zstd/"

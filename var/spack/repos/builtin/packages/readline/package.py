@@ -16,7 +16,7 @@ class Readline(AutotoolsPackage, GNUMirrorPackage):
     command lines, to recall and perhaps reedit those lines, and perform
     csh-like history expansion on previous commands."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://tiswww.case.edu/php/chet/readline/rltop.html"

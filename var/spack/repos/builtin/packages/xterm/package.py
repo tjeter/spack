@@ -13,7 +13,7 @@ class Xterm(AutotoolsPackage):
     provides DEC VT102 and Tektronix 4014 compatible terminals for programs
     that can't use the window system directly."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://invisible-island.net/xterm/"

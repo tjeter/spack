@@ -13,7 +13,7 @@ class Mkfontdir(AutotoolsPackage, XorgPackage):
     core font system.   The current implementation is a simple wrapper script
     around the mkfontscale program, which must be built and installed first."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/app/mkfontdir"

@@ -13,7 +13,7 @@ class Stream(MakefilePackage):
     measures sustainable memory bandwidth (in MB/s) and the corresponding
     computation rate for simple vector kernels."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.cs.virginia.edu/stream/ref.html"

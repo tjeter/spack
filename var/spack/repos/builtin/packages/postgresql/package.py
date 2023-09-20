@@ -17,7 +17,7 @@ class Postgresql(AutotoolsPackage):
     that has earned it a strong reputation for reliability, data integrity, and
     correctness."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.postgresql.org/"

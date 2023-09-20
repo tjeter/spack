@@ -22,7 +22,7 @@ class Jdk(Package):
     form of a binary product aimed at Java developers. Includes a complete JRE
     plus tools for developing, debugging, and monitoring Java applications."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.oracle.com/technetwork/java/javase/downloads/index.html"
@@ -36,7 +36,7 @@ class Jdk(Package):
     # http://stackoverflow.com/questions/10268583/how-to-automate-download-and-installation-of-java-jdk-on-linux
     fetch_options = {'cookie': 'oraclelicense=accept-securebackup-cookie'}
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     # To add the latest version, go to the homepage listed above,
@@ -177,7 +177,7 @@ and adding entries for each installation:
           prefix: /path/to/jdk/Home
         - spec: jdk@1.7.0_45-b18
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
           prefix: /path/to/jdk/Home""".format(self.homepage)

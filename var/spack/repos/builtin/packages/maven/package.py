@@ -13,7 +13,7 @@ from spack.package import *
 class Maven(Package):
     """Apache Maven is a software project management and comprehension tool."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://maven.apache.org/index.html"

@@ -20,7 +20,7 @@ class Openssl(Package):   # Uses Fake Autotools, should subclass Package
        Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
        It is also a general-purpose cryptography library."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://www.openssl.org"

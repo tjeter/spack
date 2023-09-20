@@ -14,7 +14,7 @@ class Libxmu(AutotoolsPackage, XorgPackage):
     that it may be layered on top of any proprietary implementation of Xlib
     or Xt."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "cpe.json") as f:
+    with open(dir_path + "/cpe.json") as f:
         data = json.load(f)
     cpe = data
     homepage = "https://cgit.freedesktop.org/xorg/lib/libXmu"
