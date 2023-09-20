@@ -7,8 +7,11 @@
 # Although zlib comes with a configure script, it does not use Autotools
 # The AutotoolsPackage causes zlib to fail to build with PGI
 import glob
+import json
 import os
 
+import json
+import os
 from spack.package import *
 
 

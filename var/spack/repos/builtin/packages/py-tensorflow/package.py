@@ -6,6 +6,8 @@
 import sys
 import tempfile
 
+import json
+import os
 from spack.package import *
 
 

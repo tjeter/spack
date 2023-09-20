@@ -5,6 +5,8 @@
 
 import sys
 
+import json
+import os
 from spack.package import *
 
 

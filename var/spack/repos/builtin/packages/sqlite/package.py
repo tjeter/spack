@@ -2,11 +2,14 @@
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+import json
 import os
 import re
 from tempfile import NamedTemporaryFile
 
 import spack.platforms
+import json
+import os
 from spack.package import *
 
 

@@ -11,6 +11,7 @@
 # Author: Justin Too <justin@doubleotoo.com>
 # Date: September 6, 2015
 #
+import json
 import os
 import platform
 import re
@@ -20,7 +21,11 @@ from contextlib import contextmanager
 from llnl.util.lang import match_predicate
 from llnl.util.symlink import symlink
 
+import json
+import os
 from spack.operating_systems.mac_os import macos_version
+import json
+import os
 from spack.package import *
 
 is_windows = sys.platform == 'win32'

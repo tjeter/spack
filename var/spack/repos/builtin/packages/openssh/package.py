@@ -6,6 +6,8 @@
 import re
 import socket
 
+import json
+import os
 from spack.package import *
 
 

@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 import re
 
+import json
+import os
 from spack.package import *
 
 

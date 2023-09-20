@@ -6,6 +6,8 @@
 
 import re
 
+import json
+import os
 from spack.package import *
 
 
