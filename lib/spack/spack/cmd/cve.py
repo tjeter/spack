@@ -103,7 +103,7 @@ def cve_deps(pkg):
 		for i in dep.cpe:
 			r = (nvdlib.searchCVE(cpeName=dep.cpe[i], key=api_key))
 			for eachCVE in r:
-				if eachCVE.score[0] == 'V3':
+				if eachCVE.score[0] == 'V31':
 					cve_dict = {str(i):{"cve":None, "score":None, "url":None}}
 					cve_dict[i]["cve"] = eachCVE.id
 					cve_dict[i]["score"] = eachCVE.score[1]
@@ -201,5 +201,5 @@ def cve(parser, args):
 		read_json(pkg)
 	else:
 		cve_update(pkg)
-		#cve_deps(pkg)
+		cve_deps(pkg)
 		read_json(pkg)
