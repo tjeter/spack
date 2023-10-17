@@ -8,7 +8,7 @@ from spack.package import *
 
 class Lzo(AutotoolsPackage):
     """Real-time data compression library"""
-
+    cpe = {}
     homepage = 'https://www.oberhumer.com/opensource/lzo/'
     url = 'https://www.oberhumer.com/opensource/lzo/download/lzo-2.09.tar.gz'
 

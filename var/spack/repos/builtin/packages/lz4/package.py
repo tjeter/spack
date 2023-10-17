@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import sys
-
+import os
+import json
 from spack.package import *
 
 
@@ -14,6 +15,10 @@ class Lz4(MakefilePackage):
     an extremely fast decoder, with speed in multiple GB/s per core,
     typically reaching RAM speed limits on multi-core systems."""
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://lz4.github.io/lz4/"
     url      = "https://github.com/lz4/lz4/archive/v1.9.2.tar.gz"
 

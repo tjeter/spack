@@ -8,7 +8,7 @@ from spack.package import *
 
 class Numactl(AutotoolsPackage):
     """NUMA support for Linux"""
-
+    cpe = {}
     homepage = "https://github.com/numactl/numactl"
     url      = "https://github.com/numactl/numactl/archive/v2.0.11.tar.gz"
 

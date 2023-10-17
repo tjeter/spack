@@ -11,6 +11,7 @@ from spack.package import *
 
 class CBlosc(CMakePackage):
     """Blosc, an extremely fast, multi-threaded, meta-compressor library"""
+    cpe = {}
     homepage = "https://www.blosc.org"
     url      = "https://github.com/Blosc/c-blosc/archive/v1.11.1.tar.gz"
 

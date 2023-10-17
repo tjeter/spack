@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import sys
-
+import os 
+import json
 import spack.util.web
 from spack.package import *
 
@@ -12,6 +13,10 @@ from spack.package import *
 class Protobuf(Package):
     """Google's data interchange format."""
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://developers.google.com/protocol-buffers"
     url      = "https://github.com/protocolbuffers/protobuf/archive/v3.18.0.tar.gz"
 

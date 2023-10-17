@@ -26,7 +26,7 @@ class Openmpi(AutotoolsPackage, CudaPackage):
     Open MPI offers advantages for system and software vendors,
     application developers and computer science researchers.
     """
-
+    cpe = {}
     homepage = "https://www.open-mpi.org"
     url = "https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.bz2"
     list_url = "https://www.open-mpi.org/software/ompi/"

@@ -10,7 +10,11 @@ from spack.package import *
 
 class Krb5(AutotoolsPackage):
     """Network authentication protocol"""
-
+    
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage   = "https://kerberos.org"
     url        = "https://kerberos.org/dist/krb5/1.16/krb5-1.16.1.tar.gz"
     list_url   = "https://kerberos.org/dist/krb5/"

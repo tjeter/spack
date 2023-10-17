@@ -11,7 +11,7 @@ from spack.package import *
 class Adios2(CMakePackage, CudaPackage):
     """The Adaptable Input Output System version 2,
     developed in the Exascale Computing Program"""
-
+    cpe = {}
     homepage = "https://csmd.ornl.gov/software/adios2"
     url = "https://github.com/ornladios/ADIOS2/archive/v2.8.0.tar.gz"
     git = "https://github.com/ornladios/ADIOS2.git"

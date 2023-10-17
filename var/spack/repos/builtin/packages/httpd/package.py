@@ -6,17 +6,9 @@
 import json
 import os
 from spack.package import *
-import json
-import json
-import os
 class Httpd(AutotoolsPackage):
     """The Apache HTTP Server is a powerful and flexible HTTP/1.1 compliant
     web server."""
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(dir_path + "/cpe.json") as f:
         data = json.load(f)

@@ -4,10 +4,15 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack.package import *
-
+import os 
+import json
 
 class Libedit(AutotoolsPackage):
     """An autotools compatible port of the NetBSD editline library"""
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://thrysoee.dk/editline/"
     url      = "https://thrysoee.dk/editline/libedit-20170329-3.1.tar.gz"
 

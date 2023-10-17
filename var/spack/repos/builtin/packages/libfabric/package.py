@@ -9,7 +9,7 @@ from spack.package import *
 class Libfabric(AutotoolsPackage):
     """The Open Fabrics Interfaces (OFI) is a framework focused on exporting
        fabric communication services to applications."""
-
+    cpe ={}
     homepage = "https://libfabric.org/"
     url      = "https://github.com/ofiwg/libfabric/releases/download/v1.8.0/libfabric-1.8.0.tar.bz2"
     git      = "https://github.com/ofiwg/libfabric.git"

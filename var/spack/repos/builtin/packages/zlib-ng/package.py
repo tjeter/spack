@@ -8,7 +8,7 @@ from spack.package import *
 
 class ZlibNg(CMakePackage):
     """zlib replacement with optimizations for next generation systems."""
-
+    cpe = {}
     homepage = "https://github.com/zlib-ng/zlib-ng"
     url      = "https://github.com/zlib-ng/zlib-ng/archive/2.0.0.tar.gz"
 

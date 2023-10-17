@@ -23,7 +23,7 @@ class Hwloc(AutotoolsPackage):
     computing hardware so as to exploit it accordingly and
     efficiently.
     """
-
+    cpe = {}
     homepage = "https://www.open-mpi.org/projects/hwloc/"
     url      = "https://download.open-mpi.org/release/hwloc/v2.0/hwloc-2.0.2.tar.gz"
     list_url = "http://www.open-mpi.org/software/hwloc/"

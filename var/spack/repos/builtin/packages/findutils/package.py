@@ -14,6 +14,10 @@ class Findutils(AutotoolsPackage, GNUMirrorPackage):
 
     tags = ['core-packages']
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://www.gnu.org/software/findutils/"
     gnu_mirror_path = "findutils/findutils-4.8.0.tar.xz"
 

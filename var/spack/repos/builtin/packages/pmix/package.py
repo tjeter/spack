@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 import os
-
+import json
 from spack.package import *
 
 
@@ -29,6 +29,10 @@ class Pmix(AutotoolsPackage):
        while maintaining strict separation between it and the standard
        itself."""
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(dir_path + "/cpe.json") as f:
+        data = json.load(f)
+    cpe = data
     homepage = "https://pmix.org"
     url      = "https://github.com/pmix/pmix/releases/download/v3.1.3/pmix-3.1.3.tar.bz2"
     git      = "https://github.com/openpmix/openpmix.git"

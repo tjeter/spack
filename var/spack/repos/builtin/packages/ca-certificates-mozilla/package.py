@@ -8,7 +8,7 @@ from spack.package import *
 
 class CaCertificatesMozilla(Package):
     """The Mozilla CA certificate store in PEM format"""
-
+    cpe = {}
     homepage = "https://curl.se/docs/caextract.html"
     url      = "https://curl.se/ca/cacert-2021-04-13.pem"
 
