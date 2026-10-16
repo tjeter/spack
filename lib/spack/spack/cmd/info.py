@@ -25,7 +25,7 @@ from os.path import exists
 import json
 
 import nvdlib
-api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
+api_key = os.environ.get("NVD_API_KEY")  # never hardcode keys; export NVD_API_KEY
 
 description = 'get detailed information on a particular package'
 section = 'basic'

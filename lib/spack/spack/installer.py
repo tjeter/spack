@@ -62,7 +62,7 @@ from spack.util.executable import which
 from spack.util.timer import Timer
 
 import nvdlib
-api_key = "02c60af5-9cd8-4f71-9449-1670ef0d77be"
+api_key = os.environ.get("NVD_API_KEY")  # never hardcode keys; export NVD_API_KEY
 
 #: Counter to support unique spec sequencing that is used to ensure packages
 #: with the same priority are (initially) processed in the order in which they

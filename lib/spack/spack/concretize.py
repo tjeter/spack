@@ -44,7 +44,6 @@ from spack.package_prefs import PackagePrefs, is_spec_buildable, spec_externals
 from spack.version import Version, VersionList, VersionRange, ver
 
 import nvdlib
-api_key = "92e8afaf-85fd-4a65-a862-3bedf09dcd87"
 
 #: impements rudimentary logic for ABI compatibility
 _abi = llnl.util.lang.Singleton(lambda: spack.abi.ABI())
